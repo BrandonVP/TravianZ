@@ -42,10 +42,14 @@ if (!empty($village)) {
     /**
      * Safely cache values to reduce repeated access
      */
-    $woodStore = round($village->awood);
-    $clayStore = round($village->aclay);
-    $ironStore = round($village->airon);
-    $cropStore = round($village->acrop);
+    // floor, not round: stock is stored fractional (vdata float) and every
+    // server-side check compares against the real value. Rounding up made the
+    // header (and the JS ticker seeded from it) show 1 unit more than exists,
+    // so "send max" on the marketplace failed with "Not enough resources".
+    $woodStore = floor($village->awood);
+    $clayStore = floor($village->aclay);
+    $ironStore = floor($village->airon);
+    $cropStore = floor($village->acrop);
 
     $maxStore  = $village->maxstore;
     $maxCrop   = $village->maxcrop;
