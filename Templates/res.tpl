@@ -54,13 +54,22 @@ if (!empty($village)) {
     $maxStore  = $village->maxstore;
     $maxCrop   = $village->maxcrop;
 
+    $upkeep = $village->pop + $technology->getUpkeep($village->unitall, 0);
+
     /**
-     * Fill level per store as a CSS variable (--fill) on each cell; the
-     * Travian Modern pack draws it as a bar, other packs ignore it.
+     * One card per resource. The hidden #l1..#l4 spans keep the exact
+     * "amount/capacity" text and production title that unx.js reads and ticks;
+     * tzres.js copies the ticking value into the visible card every second.
      */
-    $fill = function ($amount, $max) {
-        $pct = $max > 0 ? max(0, min(100, $amount / $max * 100)) : 0;
-        return '--fill:' . round($pct, 1) . '%';
+    $tzCards = array(
+        array('l4', 'r1', 'wood', LUMBER, $woodStore, $maxStore, $wood, true),
+        array('l3', 'r2', 'clay', CLAY,   $clayStore, $maxStore, $clay, true),
+        array('l2', 'r3', 'iron', IRON,   $ironStore, $maxStore, $iron, true),
+        array('l1', 'r4', 'crop', CROP,   $cropStore, $maxCrop,  $crop, $village->acrop > 0),
+    );
+
+    $tzSigned = function ($n) {
+        return ($n < 0 ? '&minus;' : '+') . number_format(abs($n));
     };
 ?>
 
@@ -68,62 +77,33 @@ if (!empty($village)) {
 <div id="resWrap">
 
     <!-- ================= RESOURCES ================= -->
-    <table cellpadding="1" cellspacing="1">
-        <tr>
+    <div class="tz-rcards">
+<?php foreach ($tzCards as $c) {
+    list($id, $icon, $kind, $label, $amount, $cap, $prod, $ticks) = $c;
+    $pct = $cap > 0 ? max(0, min(100, $amount / $cap * 100)) : 0;
+?>
+        <div class="tz-rcard tz-r-<?php echo $kind; ?>" style="--fill:<?php echo round($pct, 1); ?>%">
+            <div class="tz-rhead">
+                <img src="img/x.gif" class="<?php echo $icon; ?>" alt="" />
+                <span class="tz-rname"><?php echo $label; ?></span>
+                <span class="tz-rprod<?php echo $prod < 0 ? ' neg' : ''; ?>"><?php echo $tzSigned($prod); ?>/h</span>
+            </div>
+            <div class="tz-ramt"><strong class="tz-rnow"><?php echo number_format(max(0, $amount)); ?></strong> <span class="tz-rcap">/ <?php echo number_format($cap); ?></span></div>
+            <div class="tz-rbar"><span></span></div>
+            <div class="tz-rfull">&nbsp;</div>
+            <span class="tz-rraw"<?php echo $ticks ? ' id="' . $id . '"' : ''; ?> title="<?php echo $prod; ?>"><?php echo max(0, $amount) . "/" . $cap; ?></span>
+        </div>
+<?php } ?>
 
-            <!-- Wood -->
-            <td>
-                <img src="img/x.gif" class="r1" alt="<?php echo LUMBER; ?>" title="<?php echo LUMBER; ?>" />
-            </td>
-
-            <td id="l4" style="<?php echo $fill($woodStore, $maxStore); ?>" title="<?php echo $wood; ?>">
-                <?php echo $woodStore . "/" . $maxStore; ?>
-            </td>
-
-            <!-- Clay -->
-            <td>
-                <img src="img/x.gif" class="r2" alt="<?php echo CLAY; ?>" title="<?php echo CLAY; ?>" />
-            </td>
-
-            <td id="l3" style="<?php echo $fill($clayStore, $maxStore); ?>" title="<?php echo $clay; ?>">
-                <?php echo $clayStore . "/" . $maxStore; ?>
-            </td>
-
-            <!-- Iron -->
-            <td>
-                <img src="img/x.gif" class="r3" alt="<?php echo IRON; ?>" title="<?php echo IRON; ?>" />
-            </td>
-
-            <td id="l2" style="<?php echo $fill($ironStore, $maxStore); ?>" title="<?php echo $iron; ?>">
-                <?php echo $ironStore . "/" . $maxStore; ?>
-            </td>
-
-            <!-- Crop -->
-            <td>
-                <img src="img/x.gif" class="r4" alt="<?php echo CROP; ?>" title="<?php echo CROP; ?>" />
-            </td>
-
-            <?php if ($village->acrop > 0) { ?>
-                <td id="l1" style="<?php echo $fill($cropStore, $maxCrop); ?>" title="<?php echo $crop; ?>">
-                    <?php echo $cropStore . "/" . $maxCrop; ?>
-                </td>
-            <?php } else { ?>
-                <td title="<?php echo $crop; ?>">
-                    0/<?php echo $maxCrop; ?>
-                </td>
-            <?php } ?>
-
-            <!-- Crop consumption -->
-            <td>
-                <img src="img/x.gif" class="r5" alt="<?php echo CROP_COM; ?>" title="<?php echo CROP_COM; ?>" />
-            </td>
-
-            <td>
-                <?php echo ($village->pop + $technology->getUpkeep($village->unitall, 0)) . "/" . $totalproduction; ?>
-            </td>
-
-        </tr>
-    </table>
+        <div class="tz-rcard tz-r-net">
+            <div class="tz-rhead">
+                <img src="img/x.gif" class="r4" alt="" />
+                <span class="tz-rname"><?php echo defined('TZ_NET_CROP') ? TZ_NET_CROP : 'Net crop'; ?></span>
+            </div>
+            <div class="tz-ramt"><strong class="tz-rnet<?php echo $crop < 0 ? ' neg' : ''; ?>"><?php echo $tzSigned($crop); ?>/h</strong></div>
+            <div class="tz-rfull" title="<?php echo CROP_COM; ?>"><?php echo number_format($totalproduction); ?> produced &middot; <?php echo number_format($upkeep); ?> upkeep</div>
+        </div>
+    </div>
 
 </div>
 </div>

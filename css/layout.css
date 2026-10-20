@@ -264,15 +264,129 @@ body.mod3 div#mid {
     min-width: var(--tz-page);
     margin: 0 auto;
     float: none;
-    padding-top: 40px;
+    padding-top: 140px;
 }
 
-/* resource bar sits just under the top bar */
+/* resource cards (Templates/res.tpl), just under the top bar */
 div#res,
 body.mod1 div#res,
 body.mod2 div#res,
 body.mod3 div#res {
-    top: calc(var(--tz-bar-h) + 13px);
+    position: absolute;
+    left: 0;
+    top: calc(var(--tz-bar-h) + 15px);
+    width: 100%;
+    min-width: var(--tz-page);
+    height: auto;
+    z-index: 3;
+}
+
+div#res div#resWrap {
+    position: static;
+    left: auto;
+    width: var(--tz-page);
+    margin: 0 auto;
+}
+
+.tz-rcards {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.tz-rcard {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 11px 14px 9px;
+    background: var(--tz-panel);
+    border: 1px solid var(--tz-line);
+    border-radius: 10px;
+    color: var(--tz-ink);
+    font-family: "Source Sans 3", "Segoe UI", Verdana, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.25;
+}
+
+.tz-rhead {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* the icons are 18x12 cells of one sprite (img/a/res2.gif): scale the
+   element, not the background */
+.tz-rhead img {
+    zoom: 1.5;
+    image-rendering: pixelated;
+}
+
+.tz-rprod {
+    margin-left: auto;
+    color: #3f6b2a;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.tz-rcard .neg {
+    color: #a3271c;
+}
+
+.tz-ramt {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.tz-rnow,
+.tz-rnet {
+    font-size: 23px;
+    font-weight: 700;
+}
+
+.tz-rnet {
+    color: #3f6b2a;
+}
+
+.tz-rcap {
+    font-size: 14px;
+    color: #6b5a45;
+}
+
+.tz-rbar {
+    height: 6px;
+    border-radius: 3px;
+    background: #e3d2ac;
+    overflow: hidden;
+}
+
+.tz-rbar > span {
+    display: block;
+    height: 100%;
+    width: var(--fill, 0%);
+    border-radius: 3px;
+    background: #8a5a2b;
+}
+
+.tz-r-clay .tz-rbar > span { background: #b4532a; }
+.tz-r-iron .tz-rbar > span { background: #56636e; }
+.tz-r-crop .tz-rbar > span { background: #b8901f; }
+
+.tz-rfull {
+    font-size: 13px;
+    color: #6b5a45;
+    white-space: nowrap;
+}
+
+.tz-rcard[data-state="soon"] .tz-rfull { color: #9a6a00; }
+.tz-rcard[data-state="full"] .tz-rfull,
+.tz-rcard[data-state="empty"] .tz-rfull { color: #a3271c; font-weight: 600; }
+
+/* the raw "amount/capacity" span unx.js ticks */
+.tz-rraw {
+    display: none;
 }
 
 /* left column: hero card, villages, admin/event widgets */
