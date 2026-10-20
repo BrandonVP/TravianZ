@@ -387,6 +387,59 @@ div#mid > div#content {
     background: #b8862b;
 }
 
+/* right-column status cards (dorf1: build queue, troops, movements) */
+.tz-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.tz-card table {
+    width: 100% !important;
+    margin: 0;
+}
+
+.tz-card table thead th {
+    text-align: left;
+    padding: 6px 8px;
+}
+
+.tz-card table td {
+    padding: 4px 6px;
+}
+
+/* build queue: building + countdown on one line, finish time under it */
+.tz-card-build table tbody tr {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    align-items: center;
+}
+
+.tz-card-build table tbody td:nth-child(4) {
+    grid-column: 2 / 4;
+    padding-top: 0;
+    font-size: 12px;
+    color: #6b5a45;
+}
+
+.tz-card-build table tbody td:nth-child(3) {
+    white-space: nowrap;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.tz-card td.tz-calm {
+    padding: 8px;
+    color: #2f5220;
+}
+
+/* the pages put <br>s between #content and #side_info; they push the
+   right column down */
+div#mid > br {
+    display: none;
+}
+
 /* right column */
 div#side_info,
 body.mod1 div#side_info,

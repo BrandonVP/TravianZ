@@ -9,6 +9,11 @@ $layoutTimerStart = isset($start_timer) ? $start_timer : (isset($pagestart) ? $p
 ?>
 <div id="side_info">
 <?php
+// page-specific cards for the top of the right column (dorf1: build queue,
+// troops, movements), captured by the page before including this file
+if (!empty($layoutRightTop)) {
+	echo '<div class="tz-cards">' . $layoutRightTop . '</div>';
+}
 include(__DIR__ . "/../quest.tpl");
 include(__DIR__ . "/../news.tpl");
 if(!NEW_FUNCTIONS_DISPLAY_LINKS) {

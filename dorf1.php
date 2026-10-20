@@ -64,13 +64,31 @@ else $building->procBuild($_GET);
 $timer = 1;
 ?>
 <div id="map_details">
-<br /><br />
 <?php
-include("Templates/movement.tpl");
 include("Templates/production.tpl");
-include("Templates/troops.tpl");
-
-if($building->NewBuilding) include("Templates/Building.tpl");
 ?>
 </div>
+</div><!-- #content -->
+<?php
+// Build queue, troops and movements become cards in the right column
+// (printed by Templates/layout/page_bottom.tpl).
+$layoutRightTop = '';
+if($building->NewBuilding) {
+	ob_start();
+	include("Templates/Building.tpl");
+	$layoutRightTop .= '<div class="tz-card tz-card-build">' . ob_get_clean() . '</div>';
+}
+ob_start();
+include("Templates/troops.tpl");
+$layoutRightTop .= '<div class="tz-card tz-card-troops">' . ob_get_clean() . '</div>';
+ob_start();
+include("Templates/movement.tpl");
+$tzMoves = ob_get_clean();
+if (strpos($tzMoves, '<table') === false) {
+	// nothing on the way: say so, like the mockup
+	$tzMoves = '<table id="movements" cellpadding="1" cellspacing="1"><thead><tr><th>' . TROOP_MOVEMENTS
+	         . '</th></tr></thead><tbody><tr><td class="tz-calm">No incoming attacks</td></tr></tbody></table>';
+}
+$layoutRightTop .= '<div class="tz-card tz-card-moves">' . $tzMoves . '</div>';
+?>
 <br /><br /><br /><br /><?php include("Templates/layout/page_bottom.tpl"); ?>

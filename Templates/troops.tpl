@@ -135,4 +135,3 @@ if (!$troopsPresent) {
 </tbody>
 
 </table>
-</div>
