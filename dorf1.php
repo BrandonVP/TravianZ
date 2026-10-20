@@ -78,17 +78,6 @@ if($building->NewBuilding) {
 	include("Templates/Building.tpl");
 	$layoutRightTop .= '<div class="tz-card tz-card-build">' . ob_get_clean() . '</div>';
 }
-ob_start();
-include("Templates/troops.tpl");
-$layoutRightTop .= '<div class="tz-card tz-card-troops">' . ob_get_clean() . '</div>';
-ob_start();
-include("Templates/movement.tpl");
-$tzMoves = ob_get_clean();
-if (strpos($tzMoves, '<table') === false) {
-	// nothing on the way: say so, like the mockup
-	$tzMoves = '<table id="movements" cellpadding="1" cellspacing="1"><thead><tr><th>' . TROOP_MOVEMENTS
-	         . '</th></tr></thead><tbody><tr><td class="tz-calm">No incoming attacks</td></tr></tbody></table>';
-}
-$layoutRightTop .= '<div class="tz-card tz-card-moves">' . $tzMoves . '</div>';
+include("Templates/layout/troop_cards.tpl");
 ?>
 <br /><br /><br /><br /><?php include("Templates/layout/page_bottom.tpl"); ?>

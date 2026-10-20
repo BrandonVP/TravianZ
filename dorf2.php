@@ -58,4 +58,8 @@ if($building->NewBuilding) {
 }
 ?>
 </div>
+<?php
+// Troops and movements as right-column cards, like the Fields page
+include("Templates/layout/troop_cards.tpl");
+?>
 <br /><br /><br /><br /><?php include("Templates/layout/page_bottom.tpl"); ?>
