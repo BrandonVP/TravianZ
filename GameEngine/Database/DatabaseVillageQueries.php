@@ -1261,7 +1261,19 @@ trait DatabaseVillageQueries {
          return mysqli_query( $this->dblink, $q);
 	}
 
-   	function setMaxStoreForVillage($vid, $maxLevel) {
+   	/**
+	 * Village gold (local redesign): add $amount, clamped to [0, $cap].
+	 * vdata.gold must exist (see GameEngine/Data/gold.php).
+	 */
+	function addVillageGold($vid, $amount, $cap) {
+	    $vid = (int) $vid;
+	    $amount = (float) $amount;
+	    $cap = (float) $cap;
+	    return mysqli_query($this->dblink,
+	        "UPDATE " . TB_PREFIX . "vdata SET gold = LEAST(GREATEST(gold + $amount, 0), $cap) WHERE wref = $vid");
+	}
+
+	function setMaxStoreForVillage($vid, $maxLevel) {
 	    $vid = (int) $vid;
 	    $maxLevel = (int) $maxLevel;
 

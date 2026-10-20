@@ -2225,6 +2225,7 @@ CREATE TABLE IF NOT EXISTS `%PREFIX%vdata` (
 `maxstore` int(11) NULL,
 `crop` float(12,2) NULL,
 `maxcrop` int(11) NULL,
+`gold` float(12,2) NOT NULL DEFAULT '0.00',
 `lastupdate` int(11) NULL,
 `lastupdate2` int(11) NULL DEFAULT '0', 
 `loyalty` float(9,6) NULL DEFAULT '100',

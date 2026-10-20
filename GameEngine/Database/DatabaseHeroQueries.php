@@ -37,7 +37,7 @@ trait DatabaseHeroQueries {
 	        return self::$heroVillageCache[$wid];
 	    }
 
-		$q = "SELECT heroid, uid, wref, resources, res_type
+		$q = "SELECT heroid, uid, wref, level, resources, res_type
 		        FROM " . TB_PREFIX . "hero
 		       WHERE wref = " . $wid . "
 		         AND dead = 0

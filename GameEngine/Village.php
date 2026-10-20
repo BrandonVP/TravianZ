@@ -31,6 +31,7 @@ include_once("Building.php");
 include_once("Market.php");
 include_once("GameEngine/Units.php");
 include_once("Technology.php");
+include_once("VillageGold.php");
 
 class Village {
 
@@ -248,6 +249,11 @@ class Village {
 	/**
 	 * APPLY PRODUCTION (NO MORE LOADTOWN RELOAD)
 	 */
+	/** Village gold (local redesign): set by processProduction() when active. */
+	public $goldActive = false;
+	public $goldRate = null;
+	public $agold = 0;
+
 	private function processProduction(): void {
 		// hardening: do not let a lastupdate from the future (clock skew) produce a negative delta
 		$timepast = max(0, time() - $this->infoarray['lastupdate']);
@@ -260,6 +266,15 @@ class Village {
 		// FIX #1b (Day 1): a single UPDATE - lastupdate is set in the same query as the
 		// resources (the $setLastupdate param in modifyResource); updateVillage() removed.
 		$this->db->modifyResource($this->wid, $nwood, $nclay, $niron, $ncrop, 1, true);
+
+		// Village gold (local redesign): same interval as the resources.
+		// No-op until vdata.gold exists (GameEngine/VillageGold.php).
+		$this->goldActive = VillageGold::active($this->infoarray);
+		if ($this->goldActive) {
+			$this->goldRate = VillageGold::rate($this->db, $this->wid, $this->resarray);
+			$ngold = VillageGold::accrue($this->db, $this->wid, $this->infoarray, $this->resarray, $timepast);
+			$this->agold = min(max((float) $this->infoarray['gold'] + $ngold, 0), TZ_GOLD_CAP);
+		}
 
 		// lightweight sync ONLY (no DB reload)
 		$this->infoarray['lastupdate'] = time();

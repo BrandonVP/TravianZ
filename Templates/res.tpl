@@ -85,6 +85,32 @@ if (!empty($village)) {
 
     <!-- ================= RESOURCES ================= -->
     <div class="tz-rcards">
+<?php
+    /**
+     * Village gold (local redesign, phase 1): first card, replacing net crop.
+     * The raw span has no id: unx.js leaves it alone, tzres.js ticks it.
+     */
+    if (!empty($village->goldActive)) {
+        $tzGold = floor(max(0, $village->agold));
+        $tzGoldRate = $village->goldRate;
+        $tzGoldPct = TZ_GOLD_CAP > 0 ? max(0, min(100, $tzGold / TZ_GOLD_CAP * 100)) : 0;
+        $tzGoldTip = 'Base +' . round($tzGoldRate['base'], 1) . '/h'
+                   . ' · Main Building +' . round($tzGoldRate['mb'], 1) . '/h'
+                   . ' · Marketplace +' . round($tzGoldRate['market'], 1) . '/h'
+                   . ' · Hero +' . round($tzGoldRate['hero'], 1) . '/h';
+?>
+        <div class="tz-rcard tz-r-gold" style="--fill:<?php echo round($tzGoldPct, 1); ?>%" title="<?php echo htmlspecialchars($tzGoldTip, ENT_QUOTES, 'UTF-8'); ?>">
+            <div class="tz-rhead">
+                <svg class="tz-rcoin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/><path d="M9.5 9.5h4a1.6 1.6 0 0 1 0 3.2h-3a1.6 1.6 0 0 0 0 3.2h4" fill="none" stroke="#7a5a0e" stroke-width="1.3" stroke-linecap="round"/></svg>
+                <span class="tz-rname"><?php echo defined('TZ_VILLAGE_GOLD') ? TZ_VILLAGE_GOLD : 'Gold'; ?></span>
+                <span class="tz-rprod">+<?php echo number_format($tzGoldRate['total'], $tzGoldRate['total'] < 10 ? 1 : 0); ?>/h</span>
+            </div>
+            <div class="tz-ramt"><strong class="tz-rnow"><?php echo number_format($tzGold); ?></strong> <span class="tz-rcap">/ <?php echo number_format(TZ_GOLD_CAP); ?></span></div>
+            <div class="tz-rbar"><span></span></div>
+            <div class="tz-rfull">&nbsp;</div>
+            <span class="tz-rraw" title="<?php echo round($tzGoldRate['total'], 3); ?>"><?php echo $tzGold . "/" . (int) TZ_GOLD_CAP; ?></span>
+        </div>
+<?php } ?>
 <?php foreach ($tzCards as $c) {
     list($id, $icon, $kind, $label, $amount, $cap, $prod, $ticks) = $c;
     $pct = $cap > 0 ? max(0, min(100, $amount / $cap * 100)) : 0;
@@ -98,10 +124,14 @@ if (!empty($village)) {
             <div class="tz-ramt"><strong class="tz-rnow"><?php echo number_format(max(0, $amount)); ?></strong> <span class="tz-rcap">/ <?php echo number_format($cap); ?></span></div>
             <div class="tz-rbar"><span></span></div>
             <div class="tz-rfull">&nbsp;</div>
+            <?php if ($kind === 'crop' && !empty($village->goldActive)) { ?>
+            <div class="tz-rnote"><?php echo number_format($totalproduction); ?> produced &middot; <?php echo number_format($upkeep); ?> upkeep</div>
+            <?php } ?>
             <span class="tz-rraw"<?php echo $ticks ? ' id="' . $id . '"' : ''; ?> title="<?php echo $prod; ?>"><?php echo max(0, $amount) . "/" . $cap; ?></span>
         </div>
 <?php } ?>
 
+<?php if (empty($village->goldActive)) { ?>
         <div class="tz-rcard tz-r-net">
             <div class="tz-rhead">
                 <img src="img/x.gif" class="r4" alt="" />
@@ -110,6 +140,7 @@ if (!empty($village)) {
             <div class="tz-ramt"><strong class="tz-rnet<?php echo $crop < 0 ? ' neg' : ''; ?>"><?php echo $tzSigned($crop); ?>/h</strong></div>
             <div class="tz-rfull" title="<?php echo CROP_COM; ?>"><?php echo number_format($totalproduction); ?> produced &middot; <?php echo number_format($upkeep); ?> upkeep</div>
         </div>
+<?php } ?>
     </div>
 
 </div>

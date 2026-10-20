@@ -387,6 +387,11 @@ trait AutomationVillageUpkeep {
     	$niron = ($this->bountyGetResourceProd($resArray, $numberOfOasis, 3) / 3600) * $timepast;
     	$ncrop = (($this->bountyGetResourceProd($resArray, $numberOfOasis, 4) - $villagePopulation - $upkeep) / 3600) * $timepast;
     	$database->modifyResource($bountywid, $nwood, $nclay, $niron, $ncrop, 1);
+
+    	// Village gold (local redesign): same interval, before lastupdate moves on
+    	include_once __DIR__ . '/../VillageGold.php';
+    	VillageGold::accrue($database, $bountywid, $villageInfoArray, $resArray, $timepast);
+
     	$database->updateVillage($bountywid);
     }
 

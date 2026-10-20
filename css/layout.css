@@ -375,6 +375,20 @@ div#res div#resWrap {
 .tz-r-clay .tz-rbar > span { background: #b4532a; }
 .tz-r-iron .tz-rbar > span { background: #56636e; }
 .tz-r-crop .tz-rbar > span { background: #b8901f; }
+.tz-r-gold .tz-rbar > span { background: #d4a017; }
+
+.tz-rhead svg.tz-rcoin {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+}
+
+/* crop card: upkeep line (when the gold card replaces net crop) */
+.tz-rnote {
+    margin-top: -3px;
+    font-size: 12px;
+    color: #6b5a45;
+}
 
 .tz-rfull {
     font-size: 13px;
