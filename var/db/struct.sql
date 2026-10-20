@@ -1813,6 +1813,7 @@ CREATE TABLE IF NOT EXISTS `%PREFIX%send` (
  `iron` int(11) NULL,
  `crop` int(11) NULL,
  `merchant` tinyint(2) NULL,
+ `gold` int(11) NOT NULL DEFAULT '0',
  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
