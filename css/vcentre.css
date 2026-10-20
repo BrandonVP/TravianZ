@@ -1,0 +1,113 @@
+/*
+ * Sharper village-centre art (generated): every image rule of the default
+ * pack for the village map and building pictures, pointed at the 4x WebP
+ * versions in img/vcentre/ and drawn at the original pixel size, so
+ * nothing moves. Regenerate rather than edit by hand.
+ */
+
+img.g1 { background-image: url("../img/vcentre/g1.webp"); background-size: 75px 100px; }
+img.g2 { background-image: url("../img/vcentre/g2.webp"); background-size: 75px 100px; }
+img.g3 { background-image: url("../img/vcentre/g3.webp"); background-size: 75px 100px; }
+img.g4 { background-image: url("../img/vcentre/g4.webp"); background-size: 75px 100px; }
+img.g5 { background-image: url("../img/vcentre/g5.webp"); background-size: 75px 100px; }
+img.g5b { background-image: url("../img/vcentre/g5b.webp"); background-size: 75px 100px; }
+img.g6 { background-image: url("../img/vcentre/g6.webp"); background-size: 75px 100px; }
+img.g6b { background-image: url("../img/vcentre/g6b.webp"); background-size: 75px 100px; }
+img.g7 { background-image: url("../img/vcentre/g7.webp"); background-size: 75px 100px; }
+img.g7b { background-image: url("../img/vcentre/g7b.webp"); background-size: 75px 100px; }
+img.g8 { background-image: url("../img/vcentre/g8.webp"); background-size: 75px 100px; }
+img.g8b { background-image: url("../img/vcentre/g8b.webp"); background-size: 75px 100px; }
+img.g9 { background-image: url("../img/vcentre/g9.webp"); background-size: 75px 100px; }
+img.g9b { background-image: url("../img/vcentre/g9b.webp"); background-size: 75px 100px; }
+img.g10 { background-image: url("../img/vcentre/g10.webp"); background-size: 75px 100px; }
+img.g10b { background-image: url("../img/vcentre/g10b.webp"); background-size: 75px 100px; }
+img.g11 { background-image: url("../img/vcentre/g11.webp"); background-size: 75px 100px; }
+img.g11b { background-image: url("../img/vcentre/g11b.webp"); background-size: 75px 100px; }
+img.g12 { background-image: url("../img/vcentre/g12.webp"); background-size: 75px 100px; }
+img.g12b { background-image: url("../img/vcentre/g12b.webp"); background-size: 75px 100px; }
+img.g13 { background-image: url("../img/vcentre/g13.webp"); background-size: 75px 100px; }
+img.g13b { background-image: url("../img/vcentre/g13b.webp"); background-size: 75px 100px; }
+img.g14 { background-image: url("../img/vcentre/g14.webp"); background-size: 75px 100px; }
+img.g14b { background-image: url("../img/vcentre/g14b.webp"); background-size: 75px 100px; }
+img.g15 { background-image: url("../img/vcentre/g15.webp"); background-size: 75px 100px; }
+img.g15b { background-image: url("../img/vcentre/g15b.webp"); background-size: 75px 100px; }
+img.g16 { background-image: url("../img/vcentre/g16.webp"); background-size: 68px 120px; }
+img.g16b { background-image: url("../img/vcentre/g16b.webp"); background-size: 68px 120px; }
+img.g16e { background-image: url("../img/vcentre/g16e.webp"); background-size: 68px 120px; }
+img.g17 { background-image: url("../img/vcentre/g17.webp"); background-size: 75px 100px; }
+img.g17b { background-image: url("../img/vcentre/g17b.webp"); background-size: 75px 100px; }
+img.g18 { background-image: url("../img/vcentre/g18.webp"); background-size: 75px 100px; }
+img.g18b { background-image: url("../img/vcentre/g18b.webp"); background-size: 75px 100px; }
+img.g19 { background-image: url("../img/vcentre/g19.webp"); background-size: 75px 100px; }
+img.g19b { background-image: url("../img/vcentre/g19b.webp"); background-size: 75px 100px; }
+img.g20 { background-image: url("../img/vcentre/g20.webp"); background-size: 75px 100px; }
+img.g20b { background-image: url("../img/vcentre/g20b.webp"); background-size: 75px 100px; }
+img.g21 { background-image: url("../img/vcentre/g21.webp"); background-size: 75px 100px; }
+img.g21b { background-image: url("../img/vcentre/g21b.webp"); background-size: 75px 100px; }
+img.g22 { background-image: url("../img/vcentre/g22.webp"); background-size: 75px 100px; }
+img.g22b { background-image: url("../img/vcentre/g22b.webp"); background-size: 75px 100px; }
+img.g23 { background-image: url("../img/vcentre/g23.webp"); background-size: 75px 100px; }
+img.g23b { background-image: url("../img/vcentre/g23b.webp"); background-size: 75px 100px; }
+img.g24 { background-image: url("../img/vcentre/g24.webp"); background-size: 75px 100px; }
+img.g24b { background-image: url("../img/vcentre/g24b.webp"); background-size: 75px 100px; }
+img.g25 { background-image: url("../img/vcentre/g25.webp"); background-size: 75px 100px; }
+img.g25b { background-image: url("../img/vcentre/g25b.webp"); background-size: 75px 100px; }
+img.g26 { background-image: url("../img/vcentre/g26.webp"); background-size: 75px 100px; }
+img.g26b { background-image: url("../img/vcentre/g26b.webp"); background-size: 75px 100px; }
+img.g27 { background-image: url("../img/vcentre/g27.webp"); background-size: 75px 100px; }
+img.g27b { background-image: url("../img/vcentre/g27b.webp"); background-size: 75px 100px; }
+img.g28 { background-image: url("../img/vcentre/g28.webp"); background-size: 75px 100px; }
+img.g28b { background-image: url("../img/vcentre/g28b.webp"); background-size: 75px 100px; }
+img.g29 { background-image: url("../img/vcentre/g29.webp"); background-size: 75px 100px; }
+img.g29b { background-image: url("../img/vcentre/g29b.webp"); background-size: 75px 100px; }
+img.g31 { background-image: url("../img/vcentre/g31.webp"); background-size: 75px 100px; }
+img.g32 { background-image: url("../img/vcentre/g32.webp"); background-size: 75px 100px; }
+img.g33 { background-image: url("../img/vcentre/g33.webp"); background-size: 75px 100px; }
+img.g30 { background-image: url("../img/vcentre/g30.webp"); background-size: 75px 100px; }
+img.g30b { background-image: url("../img/vcentre/g30b.webp"); background-size: 75px 100px; }
+img.g34 { background-image: url("../img/vcentre/g34.webp"); background-size: 75px 100px; }
+img.g34b { background-image: url("../img/vcentre/g34b.webp"); background-size: 75px 100px; }
+img.g36 { background-image: url("../img/vcentre/g36.webp"); background-size: 75px 100px; }
+img.g36b { background-image: url("../img/vcentre/g36b.webp"); background-size: 75px 100px; }
+img.g37 { background-image: url("../img/vcentre/g37.webp"); background-size: 75px 100px; }
+img.g37b { background-image: url("../img/vcentre/g37b.webp"); background-size: 75px 100px; }
+img.g38 { background-image: url("../img/vcentre/g38.webp"); background-size: 75px 100px; }
+img.g38b { background-image: url("../img/vcentre/g38b.webp"); background-size: 75px 100px; }
+img.g39 { background-image: url("../img/vcentre/g39.webp"); background-size: 75px 100px; }
+img.g39b { background-image: url("../img/vcentre/g39b.webp"); background-size: 75px 100px; }
+img.g40 { background-image: url("../img/vcentre/g40.webp"); background-size: 214px 154px; }
+img.g40_1 { background-image: url("../img/vcentre/g40_1.webp"); background-size: 214px 167px; }
+img.g40_2 { background-image: url("../img/vcentre/g40_2.webp"); background-size: 214px 193px; }
+img.g40_3 { background-image: url("../img/vcentre/g40_3.webp"); background-size: 214px 230px; }
+img.g40_4 { background-image: url("../img/vcentre/g40_4.webp"); background-size: 214px 239px; }
+img.g40_5 { background-image: url("../img/vcentre/g40_5.webp"); background-size: 214px 302px; }
+img.g41 { background-image: url("../img/vcentre/g41.webp"); background-size: 75px 100px; }
+img.g41b { background-image: url("../img/vcentre/g41b.webp"); background-size: 75px 100px; }
+img.g42 { background-image: url("../img/vcentre/g42.webp"); background-size: 75px 100px; }
+img.g43 { background-image: url("../img/vcentre/g43.webp"); background-size: 75px 100px; }
+img.g44 { background-image: url("../img/vcentre/g44.webp"); background-size: 75px 100px; }
+img.g44b { background-image: url("../img/vcentre/g44b.webp"); background-size: 75px 100px; }
+img.g45 { background-image: url("../img/vcentre/g45.webp"); background-size: 75px 100px; }
+img.g45b { background-image: url("../img/vcentre/g45b.webp"); background-size: 75px 100px; }
+img.g46 { background-image: url("../img/vcentre/g46.webp"); background-size: 75px 100px; }
+img.g46b { background-image: url("../img/vcentre/g46b.webp"); background-size: 75px 100px; }
+img.g47 { background-image: url("../img/vcentre/g47.webp"); background-size: 75px 100px; }
+img.g48 { background-image: url("../img/vcentre/g48.webp"); background-size: 75px 100px; }
+img.g48b { background-image: url("../img/vcentre/g48b.webp"); background-size: 75px 100px; }
+img.g49 { background-image: url("../img/vcentre/g49.webp"); background-size: 75px 100px; }
+img.g49b { background-image: url("../img/vcentre/g49b.webp"); background-size: 75px 100px; }
+img.g50 { background-image: url("../img/vcentre/g50.webp"); background-size: 75px 100px; }
+img.g43 { background-image: url("../img/vcentre/g43.webp"); background-size: 75px 100px; }
+img.g44 { background-image: url("../img/vcentre/g44.webp"); background-size: 75px 100px; }
+img.g44b { background-image: url("../img/vcentre/g44b.webp"); background-size: 75px 100px; }
+div.village2 div.d2_0 { background-image: url("../img/vcentre/bg0.webp"); background-size: 540px 448px; }
+div.village2 div.d2_1 { background-image: url("../img/vcentre/bg1.webp"); background-size: 540px 448px; }
+div.village2 div.d2_11 { background-image: url("../img/vcentre/bg11.webp"); background-size: 540px 448px; }
+div.village2 div.d2_12 { background-image: url("../img/vcentre/bg12.webp"); background-size: 540px 448px; }
+div.village2 div.d2_16 { background-image: url("../img/vcentre/bg16.webp"); background-size: 540px 448px; }
+div.village2 div.d2_17 { background-image: url("../img/vcentre/bg17.webp"); background-size: 540px 448px; }
+div.village2 div.d2_18 { background-image: url("../img/vcentre/bg18.webp"); background-size: 540px 448px; }
+div.village2 div.d2_19 { background-image: url("../img/vcentre/bg19.webp"); background-size: 540px 448px; }
+div.village2 div#village_map img.iso { background-image: url("../img/vcentre/iso.webp"); background-size: 75px 100px; }
+img.g35 { background-image: url("../img/vcentre/g35.webp"); background-size: 75px 100px; }
+img.g35b { background-image: url("../img/vcentre/g35b.webp"); background-size: 75px 100px; }

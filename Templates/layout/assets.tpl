@@ -23,6 +23,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap" rel="stylesheet" type="text/css" />
 	<link href="css/layout.css?v=<?php echo @filemtime(__DIR__ . '/../../css/layout.css'); ?>" rel="stylesheet" type="text/css" />
+	<link href="css/vcentre.css?v=<?php echo @filemtime(__DIR__ . '/../../css/vcentre.css'); ?>" rel="stylesheet" type="text/css" />
 <?php
 	// A pack's own theme layer (e.g. Travian Modern's modern.css), versioned by
 	// file time so browsers pick up every change instead of a 30-day cache.

@@ -861,9 +861,20 @@ div#content .tz-vhead h1 {
     border-bottom-color: #b8862b;
 }
 
-/* village centre map centred in the wider panel */
+/* village centre map centred in the wider panel and enlarged to fill it
+   (the art is 4x, css/vcentre.css); zoom scales the click areas too */
 div.village2 div#village_map {
     margin: 0 auto;
+    zoom: 1.18;
+}
+
+/* the level toggle sits right after the map, positioned for the old 540px
+   map; put it on the enlarged map's bottom-right corner */
+div#content.village2 img#lswitch {
+    position: relative;
+    display: block;
+    left: calc(50% + 290px);
+    top: -34px;
 }
 
 /* right column */
