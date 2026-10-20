@@ -1,0 +1,345 @@
+/*
+ * Page frame for the redesigned layout (all graphics packs).
+ * Structure only plus the top bar, which is new markup no pack styles.
+ * Loaded by Templates/layout/assets.tpl after the graphics-pack CSS.
+ */
+
+:root {
+    --tz-page: 980px;
+    --tz-bar-h: 60px;
+    --tz-wood: #2b1d12;
+    --tz-wood-2: #4a3220;
+    --tz-gold: #b8862b;
+    --tz-gold-2: #f0d9a0;
+    --tz-cream: #f7e9c6;
+    --tz-cream-2: #e6d3a8;
+    --tz-panel: #f7efdc;
+    --tz-line: #d6c39b;
+    --tz-ink: #2a2118;
+}
+
+/* ---------- top bar ---------- */
+
+/* the packs paint the old header artwork as body/.wrapper backgrounds */
+html body.v35,
+html body div.wrapper {
+    background-image: none;
+}
+
+div#dynamic_header,
+body.mod1 div#dynamic_header,
+body.mod2 div#dynamic_header,
+body.mod3 div#dynamic_header {
+    display: none;
+}
+
+div#header.tzbar {
+    position: relative;
+    z-index: 40;
+    height: auto;
+    min-width: var(--tz-page);
+    width: 100%;
+    background: var(--tz-wood);
+    border-bottom: 3px solid var(--tz-gold);
+    font-family: "Source Sans 3", "Segoe UI", Verdana, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+.tzbar-inner {
+    box-sizing: border-box;
+    width: var(--tz-page);
+    min-height: var(--tz-bar-h);
+    margin: 0 auto;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+a.tzbar-logo,
+a.tzbar-logo:visited {
+    font-family: "Cinzel", Georgia, "Times New Roman", serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--tz-gold-2);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.tzbar-nav {
+    flex: 1 1 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+.tzbar-nav a,
+.tzbar-nav a:visited {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 9px;
+    border-radius: 7px;
+    color: var(--tz-cream-2);
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.tzbar-nav a:hover {
+    background: #3a2818;
+    color: #ffffff;
+}
+
+.tzbar-nav a.current {
+    background: var(--tz-wood-2);
+    color: var(--tz-cream);
+}
+
+.tzbar-count {
+    min-width: 18px;
+    padding: 0 5px;
+    box-sizing: border-box;
+    border-radius: 9px;
+    background: #d9a441;
+    color: var(--tz-wood);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+}
+
+.tzbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+}
+
+/* gold / silver */
+a.tzbar-coins,
+a.tzbar-coins:visited {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    color: var(--tz-gold-2);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+a.tzbar-coins .tzCoinRow {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 17px;
+}
+
+a.tzbar-coins .tzCoinStack {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 15px;
+}
+
+a.tzbar-coins .tzCoinBg { fill: #f6f5f2; stroke: #b8b6b1; stroke-width: 1; }
+a.tzbar-coins .tzCoin-gold .tzCoinDisc { fill: #e3b427; stroke: #9a7512; stroke-width: .8; }
+a.tzbar-coins .tzCoin-gold .tzCoinShine { fill: #f7e08a; }
+a.tzbar-coins .tzCoin-goldOff .tzCoinDisc { fill: #d3d2ce; stroke: #a3a19c; stroke-width: .8; }
+a.tzbar-coins .tzCoin-goldOff .tzCoinShine { fill: #efeeeb; }
+a.tzbar-coins .tzCoinRow-goldOff .tzCoinValue { color: #b3b3b3; }
+a.tzbar-coins .tzCoin-silver .tzCoinDisc { fill: #cdd2d6; stroke: #7e858b; stroke-width: .8; }
+a.tzbar-coins .tzCoin-silver .tzCoinShine { fill: #eef1f3; }
+
+.tzbar-time {
+    color: var(--tz-cream);
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.tzbar-time span.b {
+    font-weight: 600;
+}
+
+/* account menu */
+details.tzbar-account {
+    position: relative;
+}
+
+details.tzbar-account > summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    background: var(--tz-wood-2);
+    color: var(--tz-cream);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+details.tzbar-account > summary::-webkit-details-marker {
+    display: none;
+}
+
+details.tzbar-account > summary::after {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid var(--tz-gold-2);
+    border-bottom: 2px solid var(--tz-gold-2);
+    transform: translateY(-2px) rotate(45deg);
+}
+
+details.tzbar-account[open] > summary {
+    background: #5a3e28;
+}
+
+.tzbar-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    z-index: 200;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+    background: var(--tz-panel);
+    border: 1px solid var(--tz-line);
+    border-radius: 10px;
+    box-shadow: 0 10px 24px rgba(43, 29, 18, 0.35);
+}
+
+.tzbar-menu a,
+.tzbar-menu a:visited {
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: var(--tz-ink);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.tzbar-menu a:hover {
+    background: #efe2c4;
+    color: #4e2f0b;
+}
+
+.tzbar-menu a.staff {
+    color: #a3271c;
+}
+
+.tzbar-menu a.logout {
+    margin-top: 4px;
+    border-top: 1px solid var(--tz-line);
+    border-radius: 0 0 6px 6px;
+}
+
+/* ---------- page frame ---------- */
+
+div#mid,
+body.mod1 div#mid,
+body.mod2 div#mid,
+body.mod3 div#mid {
+    width: var(--tz-page);
+    min-width: var(--tz-page);
+    margin: 0 auto;
+    float: none;
+    padding-top: 40px;
+}
+
+/* resource bar sits just under the top bar */
+div#res,
+body.mod1 div#res,
+body.mod2 div#res,
+body.mod3 div#res {
+    top: calc(var(--tz-bar-h) + 13px);
+}
+
+/* left column: hero card, villages, admin/event widgets */
+div#side_navi,
+body.mod1 div#side_navi,
+body.mod2 div#side_navi,
+body.mod3 div#side_navi {
+    width: 190px;
+    margin-right: 10px;
+    min-height: 0;
+    height: auto !important;
+    font-size: 13px;
+}
+
+div#side_navi div#mtop.tz-hero-slot {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: auto;
+    height: 76px;
+    margin: 0 0 8px;
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+div#side_navi #tzHeroBox {
+    left: 50%;
+    margin-left: -62px;
+}
+
+div#side_navi table#vlist {
+    width: 100%;
+    background: transparent;
+}
+
+div#side_navi table#vlist td {
+    background: transparent;
+    font-size: 13px;
+}
+
+div#side_navi table#vlist thead td {
+    text-align: left;
+    padding: 2px 4px 6px;
+}
+
+div#side_navi table#vlist td.aligned_coords {
+    font-size: 11px;
+    white-space: nowrap;
+    text-align: right;
+}
+
+div#side_navi table#vlist td.aligned_coords div {
+    display: inline;
+    float: none;
+    width: auto;
+}
+
+div#side_navi table#vlist td.link {
+    width: 100%;
+}
+
+div#side_navi .tz-side-extras {
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+/* right column */
+div#side_info,
+body.mod1 div#side_info,
+body.mod2 div#side_info,
+body.mod3 div#side_info {
+    width: 212px;
+    padding-left: 16px;
+}
+
+/* render time under the footer */
+div#stime.tz-rendertime {
+    position: static;
+    padding: 6px 0 10px;
+    text-align: center;
+    color: #8a7a62;
+    font-size: 11px;
+}

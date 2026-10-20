@@ -11,3 +11,6 @@
 	<link href="<?php echo GP_LOCATE; ?>lang/en/lang.css?e21d2" rel="stylesheet" type="text/css" />
 	<link href="<?php echo GP_LOCATE; ?>travian.css?e21d2" rel="stylesheet" type="text/css" />
 	<link href="<?php echo GP_LOCATE; ?>lang/en/lang.css?e21d2" rel="stylesheet" type="text/css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap" rel="stylesheet" type="text/css" />
+	<link href="css/layout.css?v=<?php echo @filemtime(__DIR__ . '/../../css/layout.css'); ?>" rel="stylesheet" type="text/css" />

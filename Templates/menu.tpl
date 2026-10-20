@@ -81,135 +81,40 @@ $idUser      = isset($_SESSION['id_user']) ? (int)$_SESSION['id_user'] : 0;
 
 <div id="side_navi">
 
-    <!-- Logo -->
-    <a id="logo" href="<?php echo HOMEPAGE; ?>" name="logo">
-        <img
-            src="img/x.gif"
-            <?php if($isPlus) { echo 'class="logo_plus"'; } ?>
-            alt="<?php echo TZ_TRAVIAN; ?>"
-        >
-    </a>
-
-    <!-- Main navigation -->
-    <p>
-
-        <a href="<?php echo HOMEPAGE; ?>">
-            <?php echo HOME; ?>
-        </a>
-
-        <a href="#" onclick="return Popup(0,0,1);">
-            <?php echo $lang['index'][0][2]; ?>
-        </a>
-
-        <a href="spieler.php?uid=<?php echo $userId; ?>">
-            <?php echo PROFILE; ?>
-        </a>
-
+    <?php
+    /**
+     * Left column (local redesign): the account links moved to the top bar
+     * (header.tpl); this column now holds the village list and the
+     * admin/event widgets that used to sit under the menu links.
+     */
+    ?>
+    <div id="mtop" class="tz-hero-slot">
         <?php
         /**
-         * Multihunter links
+         * Hero component (health/experience ring, adventures, silver); it is
+         * positioned absolutely inside #mtop, see css/hero_header.css.
          */
-        if($isMH) {
-            ?>
-            <a href="Admin/admin.php">
-                <font color="Blue"><?php echo MH_PANEL; ?></font>
-            </a>
-        <?php
-        }
-
-        /**
-         * Admin links
-         */
-        if($isAdmin) {
-            ?>
-            <a href="Admin/admin.php">
-                <font color="Red"><?php echo ADMIN_PANEL; ?></font>
-            </a>
-
-            <a href="build_croppers.php">
-                <?php echo TZ_BUILD_CROPPER; ?>
-            </a>
-        <?php
+        if (file_exists('Templates/hero_header.tpl')) {
+            include('Templates/hero_header.tpl');
+        } elseif (file_exists(dirname(__FILE__) . '/hero_header.tpl')) {
+            include(dirname(__FILE__) . '/hero_header.tpl');
         }
         ?>
+    </div>
+    <?php
+    include("Templates/multivillage.tpl");
+    ?>
 
-        <a href="logout.php">
-            <?php echo LOGOUT; ?>
-        </a>
-
-    </p>
-
-    <!-- Forum -->
-    <p>
-        <a href="allianz.php?s=2">
-            <?php echo FORUM; ?>
-        </a>
-    </p>
-	
-	<!-- Discord -->
-	<p>
-		<a href="https://discord.gg/Bg9w8w9ft" target="_blank" rel="noopener noreferrer" style="color: #d32f2f; font-weight: bold;">
-			Discord
-		</a>
-	</p>
-
-    <!-- Plus / Support / Custom links -->
-    <p>
-
+    <div class="tz-side-extras">
         <?php
-        /**
-         * Hide support-only links from support account
-         */
-        if($idUser != 1) {
-        ?>
-            <a href="plus.php?id=3">
-                <?php echo TZ_TRAVIANZ; ?>
-                <b>
-                    <span class="plus_g">P</span>
-                    <span class="plus_o">l</span>
-                    <span class="plus_g">u</span>
-                    <span class="plus_o">s</span>
-                </b>
-            </a>
-        <?php
-        }
-
-        /**
-         * Support profile link
-         */
-        if($idUser != 1) {
-        ?>
-            <a href="spieler.php?uid=1">
-                <?php echo SUPPORT; ?>
-            </a>
-        <?php
-        }
-
-        /**
-         * Optional external/custom links
-         */
         if(defined('NEW_FUNCTIONS_DISPLAY_LINKS') && NEW_FUNCTIONS_DISPLAY_LINKS) {
             include("Templates/links.tpl");
         }
-
-        /**
-         * Natars include
-         */
         include("Templates/natars.tpl");
-		
-		/**
-		* Maintenance status for admins
-		*/
-		include("Templates/maintenance_status.tpl");
-
-		/**
-		* Debug Error Log quick toggle for admins
-		*/
-		include("Templates/debug_status.tpl");
-
+        include("Templates/maintenance_status.tpl");
+        include("Templates/debug_status.tpl");
         ?>
-
-    </p>
+    </div>
 
     <?php
     /**

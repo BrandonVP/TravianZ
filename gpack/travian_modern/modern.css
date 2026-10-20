@@ -77,30 +77,12 @@ div#ltime b {
     color: #f7e9c6;
 }
 
-/* The nav icons, Plus button and hero ring are drawn on white; they sit in a
-   parchment tray and multiply-blend so the white takes the tray's colour. */
-body div#mtop {
-    background: var(--tm-panel);
-    border-radius: 0 0 18px 18px;
-    box-shadow: 0 2px 0 var(--tm-gold), 0 6px 14px rgba(0, 0, 0, 0.35);
-}
-
-div#mtop > a,
-div#mtop > div#n5,
-div#mtop #tzHeroBox {
+/* left column hero card: the ring is drawn on white */
+div#side_navi #tzHeroBox {
     mix-blend-mode: multiply;
 }
 
-#goldHeader,
-#goldHeader .tzCoinValue {
-    color: var(--tm-wood);
-}
-
 /* ---------- resource bar: one card per resource ---------- */
-
-div#res {
-    top: 186px;
-}
 
 div#res #resWrap table {
     display: block;
@@ -171,8 +153,8 @@ div#res #resWrap td[id^="l"]::after {
 }
 
 /* room for the card row between the header and the page */
-div#mid {
-    padding-top: 52px;
+html body div#mid {
+    padding-top: 66px;
     background-image: none;
 }
 
