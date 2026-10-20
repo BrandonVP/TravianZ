@@ -475,6 +475,14 @@ div#side_navi .tz-hero-card div#mtop.tz-hero-slot {
     margin: 0;
 }
 
+/* the old left menu's hover (compact.css: div#side_navi a:hover) drew a
+   menu-highlight image and forced 113x20px; nothing in the column wants it */
+div#side_navi a:hover {
+    background-image: none;
+    width: auto;
+    height: auto;
+}
+
 /* village list as pills (markup unchanged: the AI bot parses table#vlist);
    the whole pill is clickable, the current village is dark */
 div#side_navi table#vlist,
