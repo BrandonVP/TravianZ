@@ -130,6 +130,12 @@ class Village {
 
 		$this->calculateProduction();
 		$this->processProduction();
+
+		// calculateProduction() re-caches this village's row before the UPDATE
+		// (getUpkeep -> getVillageField('owner'/'natar')), so cached resource reads
+		// for the rest of the request returned the previous request's stock
+		// (marketplace "send max" -> "Not enough resources"). Drop it again.
+		$db::clearVillageCache();
 	}
 
 	/**
