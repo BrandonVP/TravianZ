@@ -21,6 +21,16 @@ $countArray = [$database->countForums(0, $session->alliance) + count($session->s
 
 $forumArea = ["Alliance Forum(s)", "Public Forum(s)", "Confederation Forum(s)", "Closed Forum(s)"];
 
+// Local redesign: without an alliance there is nothing to create or post here,
+// so say how to get the forum working.
+if ($session->alliance == 0 && $session->access != ADMIN) {
+	$tzEmbassy = isset($building) ? (int) $building->getTypeField(18) : 0;
+	echo '<div class="tz-notice"><strong>' . (defined('TZ_FORUM_NEEDS_ALLY') ? TZ_FORUM_NEEDS_ALLY : 'The forum belongs to your alliance.') . '</strong> '
+	   . 'Join or found an alliance at the '
+	   . ($tzEmbassy > 0 ? '<a href="build.php?id=' . $tzEmbassy . '">Embassy</a>' : 'Embassy (build one in your village)')
+	   . ' to start posting. Below are the public forums other alliances share.</div>';
+}
+
 foreach($countArray as $index => $count){
 	if($session->alliance > 0 || ($session->alliance == 0 && $index == 1)){
 ?>
