@@ -1,4 +1,3 @@
 @CHARSET "UTF-8";
-/* Travian Modern: the default pack's rules, then the modern theme on top. */
+/* Travian Modern: the default pack's rules. The theme (modern.css) is linked by Templates/layout/assets.tpl with a file-time version, so changes reach browsers at once. */
 @import url("lang_base.css");
-@import url("../../modern.css?v=1");
