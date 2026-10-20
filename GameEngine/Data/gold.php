@@ -35,3 +35,10 @@ if (!defined('TZ_GOLD_PRICE_PLUS'))       define('TZ_GOLD_PRICE_PLUS', 1500);   
 if (!defined('TZ_GOLD_PRICE_PRODUCTION')) define('TZ_GOLD_PRICE_PRODUCTION', 1000); // +25% one resource, was 5
 if (!defined('TZ_GOLD_PRICE_GOLDCLUB'))   define('TZ_GOLD_PRICE_GOLDCLUB', 5000);   // Gold Club, was 100
 if (!defined('TZ_GOLD_PRICE_ROUTE'))      define('TZ_GOLD_PRICE_ROUTE', 50);        // create/extend a trade route (this village), was 2
+
+// Treasury (gid 27) as the gold vault: holds and protects this share of what a
+// Warehouse of the same level holds (level 20: 80,000 gold). The village keeps
+// at least TZ_GOLD_CAP of room; only gold inside the Treasury is safe from raids.
+if (!defined('TZ_GOLD_TREASURY_SHARE'))     define('TZ_GOLD_TREASURY_SHARE', 0.1);
+// catapult damage against a Treasury is divided by this (one of the toughest buildings)
+if (!defined('TZ_GOLD_TREASURY_TOUGHNESS')) define('TZ_GOLD_TREASURY_TOUGHNESS', 4);

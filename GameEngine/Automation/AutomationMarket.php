@@ -98,7 +98,7 @@ trait AutomationMarket {
             $database->modifyResource($data['to'],$data['wood'],$data['clay'],$data['iron'],$data['crop'],1);
             if ($goldIn > 0) {
                 include_once __DIR__ . '/../VillageGold.php';
-                $database->addVillageGold($data['to'], $goldIn, TZ_GOLD_CAP);
+                $database->addVillageGold($data['to'], $goldIn, VillageGold::capFor($database, $data['to']));
             }
 
             // Push protection: record completed cross-player deliveries so the

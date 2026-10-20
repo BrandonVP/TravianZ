@@ -1697,7 +1697,7 @@ class Building {
         }
         $refund = $this->tzGoldPrepaid - $actual;
         if ($refund > 0) {
-            $this->db->addVillageGold($this->vil->wid, $refund, TZ_GOLD_CAP);
+            $this->db->addVillageGold($this->vil->wid, $refund, VillageGold::capOf($this->vil));
         }
         if ($actual > 0) {
             $this->db->addGoldFinLog(

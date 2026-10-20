@@ -253,6 +253,7 @@ class Village {
 	public $goldActive = false;
 	public $goldRate = null;
 	public $agold = 0;
+	public $goldCap = 0;
 
 	private function processProduction(): void {
 		// hardening: do not let a lastupdate from the future (clock skew) produce a negative delta
@@ -273,7 +274,8 @@ class Village {
 		if ($this->goldActive) {
 			$this->goldRate = VillageGold::rate($this->db, $this->wid, $this->resarray);
 			$ngold = VillageGold::accrue($this->db, $this->wid, $this->infoarray, $this->resarray, $timepast);
-			$this->agold = min(max((float) $this->infoarray['gold'] + $ngold, 0), TZ_GOLD_CAP);
+			$this->goldCap = VillageGold::cap($this->resarray);
+			$this->agold = min(max((float) $this->infoarray['gold'] + $ngold, 0), $this->goldCap);
 		}
 
 		// lightweight sync ONLY (no DB reload)

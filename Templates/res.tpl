@@ -93,11 +93,16 @@ if (!empty($village)) {
     if (!empty($village->goldActive)) {
         $tzGold = floor(max(0, $village->agold));
         $tzGoldRate = $village->goldRate;
-        $tzGoldPct = TZ_GOLD_CAP > 0 ? max(0, min(100, $tzGold / TZ_GOLD_CAP * 100)) : 0;
+        $tzGoldCap = VillageGold::capOf($village);
+$tzGoldSafe = VillageGold::treasuryHolds(VillageGold::treasuryLevel($village->resarray));
+$tzGoldPct = $tzGoldCap > 0 ? max(0, min(100, $tzGold / $tzGoldCap * 100)) : 0;
         $tzGoldTip = 'Base +' . round($tzGoldRate['base'], 1) . '/h'
                    . ' · Main Building +' . round($tzGoldRate['mb'], 1) . '/h'
                    . ' · Marketplace +' . round($tzGoldRate['market'], 1) . '/h'
-                   . ' · Hero +' . round($tzGoldRate['hero'], 1) . '/h';
+                   . ' · Hero +' . round($tzGoldRate['hero'], 1) . '/h'
+    . ($tzGoldSafe > 0
+        ? ' · Treasury protects ' . number_format($tzGoldSafe) . ' gold'
+        : ' · No Treasury: raids can steal gold');
 ?>
         <div class="tz-rcard tz-r-gold" style="--fill:<?php echo round($tzGoldPct, 1); ?>%" title="<?php echo htmlspecialchars($tzGoldTip, ENT_QUOTES, 'UTF-8'); ?>">
             <div class="tz-rhead">
@@ -105,10 +110,10 @@ if (!empty($village)) {
                 <span class="tz-rname"><?php echo defined('TZ_VILLAGE_GOLD') ? TZ_VILLAGE_GOLD : 'Gold'; ?></span>
                 <span class="tz-rprod">+<?php echo number_format($tzGoldRate['total'], $tzGoldRate['total'] < 10 ? 1 : 0); ?>/h</span>
             </div>
-            <div class="tz-ramt"><strong class="tz-rnow"><?php echo number_format($tzGold); ?></strong> <span class="tz-rcap">/ <?php echo number_format(TZ_GOLD_CAP); ?></span></div>
+            <div class="tz-ramt"><strong class="tz-rnow"><?php echo number_format($tzGold); ?></strong> <span class="tz-rcap">/ <?php echo number_format($tzGoldCap); ?></span></div>
             <div class="tz-rbar"><span></span></div>
             <div class="tz-rfull">&nbsp;</div>
-            <span class="tz-rraw" title="<?php echo round($tzGoldRate['total'], 3); ?>"><?php echo $tzGold . "/" . (int) TZ_GOLD_CAP; ?></span>
+            <span class="tz-rraw" title="<?php echo round($tzGoldRate['total'], 3); ?>"><?php echo $tzGold . "/" . (int) $tzGoldCap; ?></span>
         </div>
 <?php } ?>
 <?php foreach ($tzCards as $c) {

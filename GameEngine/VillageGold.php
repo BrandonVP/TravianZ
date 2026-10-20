@@ -71,8 +71,58 @@ class VillageGold
     public static function capitalPayRefund($db, $village, $paid)
     {
         if ($paid > 0) {
-            $db->addVillageGold($village->wid, $paid, TZ_GOLD_CAP);
+            $db->addVillageGold($village->wid, $paid, self::capOf($village));
         }
+    }
+
+    /** Treasury (gid 27) level in a village (0 = none). */
+    public static function treasuryLevel($resArray)
+    {
+        $level = 0;
+        for ($i = 19; $i <= 40; $i++) {
+            if (isset($resArray['f' . $i . 't']) && (int) $resArray['f' . $i . 't'] == 27) {
+                $level = max($level, (int) $resArray['f' . $i]);
+            }
+        }
+        return $level;
+    }
+
+    /** Gold a Treasury of this level holds and protects (share of a Warehouse). */
+    public static function treasuryHolds($level)
+    {
+        static $warehouse = null;
+        $level = min(20, max(0, (int) $level));
+        if ($level == 0) {
+            return 0;
+        }
+        if ($warehouse === null) {
+            if (isset($GLOBALS['bid10'])) {
+                $warehouse = $GLOBALS['bid10'];
+            } else {
+                include __DIR__ . '/Data/buidata.php';
+                $warehouse = $bid10;
+            }
+        }
+        $mult = defined('STORAGE_MULTIPLIER') ? (float) STORAGE_MULTIPLIER : 1;
+        return (int) floor($warehouse[$level]['attri'] * $mult * TZ_GOLD_TREASURY_SHARE);
+    }
+
+    /** Most gold the village can hold: the Treasury, but never below TZ_GOLD_CAP. */
+    public static function cap($resArray)
+    {
+        return max((int) TZ_GOLD_CAP, self::treasuryHolds(self::treasuryLevel($resArray)));
+    }
+
+    /** Cap of a village object (set by Village::processProduction), else the base cap. */
+    public static function capOf($village)
+    {
+        return (is_object($village) && !empty($village->goldCap)) ? $village->goldCap : TZ_GOLD_CAP;
+    }
+
+    /** Cap of a village by id (reads its building levels). */
+    public static function capFor($db, $wref)
+    {
+        return self::cap($db->getResourceLevel($wref));
     }
 
     /** Highest Main Building (gid 15) and Marketplace (gid 17) level in a village. */
@@ -128,7 +178,7 @@ class VillageGold
         $rate = self::rate($db, $wref, $resArray);
         $amount = $rate['total'] / 3600 * $seconds;
         if ($amount > 0) {
-            $db->addVillageGold($wref, $amount, TZ_GOLD_CAP);
+            $db->addVillageGold($wref, $amount, self::cap($resArray));
         }
         return $amount;
     }

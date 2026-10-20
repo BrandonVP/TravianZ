@@ -46,6 +46,13 @@ trait AutomationBattleResolution {
             											         $battlepart['catapults']['strongerBuildings'],
                                                                  $battlepart['catapults']['moraleBonus']);
             
+            // Village gold (local redesign): the Treasury guards the gold and
+            // takes only a fraction of the damage (GameEngine/Data/gold.php)
+            if ($tbgid == 27) {
+                include_once __DIR__ . '/../Data/gold.php';
+                $catapultsDamage /= max(1, (float) TZ_GOLD_TREASURY_TOUGHNESS);
+            }
+
             $newLevel = $battle->calculateNewBuildingLevel($tblevel, $catapultsDamage / ($twoRowsCatapultSetup ? 2 : 1));
 
             //fix: Only modify build queue if actual damage was dealt
