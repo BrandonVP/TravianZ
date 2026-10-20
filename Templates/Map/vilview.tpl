@@ -22,7 +22,7 @@
 
 ?>
 
-<div id="content" class="map">
+<div id="content" class="map tz-vv">
 <?php
 // ---------- 0. SETUP ----------
 $d = isset($_GET['d'])? (int)$_GET['d'] : 0;
@@ -103,16 +103,22 @@ function renderReports($database,$generator,$session,$d,$limit,$typeMap=null){
 }
 ?>
 
-<h1><?php
-if(!$isOasis){
-    echo!$basearray['occupied']? ABANDVALLEY : $basearray['name'];
-} else {
-    echo $oasis['conqured']? OCCUOASIS : UNOCCUOASIS;
-}
-echo ' '.$coords;
-?></h1>
+<div class="tz-vhead">
+    <div class="tz-vtitle">
+        <h1><?php
+        if(!$isOasis){
+            echo!$basearray['occupied']? ABANDVALLEY : $basearray['name'];
+        } else {
+            echo $oasis['conqured']? OCCUOASIS : UNOCCUOASIS;
+        }
+        ?></h1>
+        <span class="tz-vcoords"><?php echo $coords;?></span>
+        <?php if($basearray['occupied'] && $basearray['capital']) echo '<span class="tz-vbadge">'.(defined('TZ_CAPITAL_BADGE') ? TZ_CAPITAL_BADGE : 'Capital').'</span>';?>
+        <?php if(!$isOasis && $tt) echo '<span class="tz-vmix" title="'.WOODCUTTER.' - '.CLAYPIT.' - '.IRONMINE.' - '.CROPLAND.'">'.$tt.'</span>';?>
+    </div>
+</div>
 
-<?php if($basearray['occupied'] && $basearray['capital']) echo '<div id="dmain">(capital)</div>';?>
+<div class="tz-vv-body">
 
 <?php if($uinfo && $uinfo['owner']==3 && $uinfo['name']==PLANVILLAGE){?>
 <img src="img/x.gif" id="detailed_map" class="f99" alt="<?php echo PLANVILLAGE;?>">
@@ -195,33 +201,34 @@ echo ' '.$coords;
     </tbody></table>
 <?php }?>
 </div>
+</div><!-- .tz-vv-body -->
 
-<table id="options" class="tableNone"><thead><tr><th><?php echo OPTION;?></th></tr></thead><tbody>
-<tr><td><a href="karte.php?z=<?php echo $d;?>">&raquo; <?php echo CENTREMAP;?>.</a></td></tr>
+<table id="options" class="tableNone tz-vv-actions"><thead><tr><th><?php echo OPTION;?></th></tr></thead><tbody>
+<tr><td><a href="karte.php?z=<?php echo $d;?>"><?php echo rtrim(CENTREMAP, '. ');?></a></td></tr>
 <?php if(!$basearray['occupied']){?>
 <tr><td class="none">
 <?php
 if($isOasis){
     $canRaid = $village->resarray['f39']>0;
     if($canRaid){
-        echo '<a href="a2b.php?z='.$d.'&o">&raquo; '.RAID.' '.$otext.'</a>';
+        echo '<a href="a2b.php?z='.$d.'&o">'.RAID.' '.$otext.'</a>';
     } else {
-        echo '&raquo; '.RAID.' '.$otext.' ('.BUILDRALLY.')';
+        echo ''.RAID.' '.$otext.' ('.BUILDRALLY.')';
     }
-    if($oasislink) echo '</td></tr><tr><td><a href="'.$oasislink.'">&raquo; Combat Simulator</a>';
+    if($oasislink) echo '</td></tr><tr><td><a href="'.$oasislink.'">Combat Simulator</a>';
 } else {
     $total = count($database->getProfileVillages($session->uid));
     $need = ${'cp'.CP}[$total+1];
     $have = floor($database->getUserField($session->uid,'cp',0));
     $settlers = $village->unitarray['u'.$session->tribe.'0'];
     if($settlers>=3 && $have>=$need && $village->resarray['f39']>0){
-        echo '<a href="a2b.php?id='.$d.'&s=1">&raquo; '.FNEWVILLAGE.'</a>';
+        echo '<a href="a2b.php?id='.$d.'&s=1">'.FNEWVILLAGE.'</a>';
     } elseif($settlers>=3 && $have<$need){
-        echo '&raquo; '.FNEWVILLAGE.' ('.$have.'/'.$need.' '.CULTUREPOINT.')';
+        echo ''.FNEWVILLAGE.' ('.$have.'/'.$need.' '.CULTUREPOINT.')';
     } elseif(!$village->resarray['f39']){
-        echo '&raquo; '.FNEWVILLAGE.' ('.BUILDRALLY.')';
+        echo ''.FNEWVILLAGE.' ('.BUILDRALLY.')';
     } else {
-        echo '&raquo; '.FNEWVILLAGE.' ('.$settlers.'/3 '.SETTLERSAVAIL.')';
+        echo ''.FNEWVILLAGE.' ('.$settlers.'/3 '.SETTLERSAVAIL.')';
     }
 }
 ?>
@@ -245,17 +252,17 @@ if($isOasis){
 ?>
 <tr><td class="none">
 <?php
-if($banned) echo '&raquo; '.SENDTROOP.' ('.BAN.')';
-elseif($tUser['vac_mode']=='1') echo '&raquo; Send troops. (Vacation mode on)';
-elseif($tUser['protect'] < time()) echo $village->resarray['f39']>0? '<a href="a2b.php?s=2&z='.$d.'">&raquo; '.SENDTROOP.'</a>' : '&raquo; '.SENDTROOP.' ('.BUILDRALLY.')';
-else echo '&raquo; '.SENDTROOP.' ('.BEGINPRO.')';
+if($banned) echo ''.SENDTROOP.' ('.BAN.')';
+elseif($tUser['vac_mode']=='1') echo 'Send troops. (Vacation mode on)';
+elseif($tUser['protect'] < time()) echo $village->resarray['f39']>0? '<a href="a2b.php?s=2&z='.$d.'">'.SENDTROOP.'</a>' : ''.SENDTROOP.' ('.BUILDRALLY.')';
+else echo ''.SENDTROOP.' ('.BEGINPRO.')';
 ?>
 </td></tr>
 <tr><td class="none">
 <?php
-if($banned) echo '&raquo; '.SENDMERC.' ('.BAN.')';
-elseif($tUser['vac_mode']=='1') echo '&raquo; Send merchant(s). (Vacation mode on)';
-else echo $building->getTypeLevel(17)? '<a href="build.php?z='.$d.'&id='.$building->getTypeField(17).'">&raquo; '.SENDMERC.'</a>' : '&raquo; '.SENDMERC.' ('.BUILDMARKET.')';
+if($banned) echo ''.SENDMERC.' ('.BAN.')';
+elseif($tUser['vac_mode']=='1') echo 'Send merchant(s). (Vacation mode on)';
+else echo $building->getTypeLevel(17)? '<a href="build.php?z='.$d.'&id='.$building->getTypeField(17).'">'.SENDMERC.'</a>' : ''.SENDMERC.' ('.BUILDMARKET.')';
 ?>
 </td></tr>
 <?php }?>

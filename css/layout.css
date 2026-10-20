@@ -924,6 +924,129 @@ div#footer div#mfoot {
     max-width: var(--tz-page);
 }
 
+/* village / valley / oasis page from the map (Templates/Map/vilview.tpl) */
+div#mid > div#content.tz-vv {
+    padding: 22px 28px 24px;
+}
+
+.tz-vmix {
+    align-self: center;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: #efe2c4;
+    color: #4e2f0b;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.tz-vv-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+    margin-bottom: 20px;
+}
+
+/* the valley picture: the 4x transparent field-map art (img/fieldmap) */
+.tz-vv img#detailed_map {
+    float: none;
+    position: static;
+    left: auto;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 300 / 264;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.tz-vv img#detailed_map.f1 { background-image: url("../img/fieldmap/f1.webp"); }
+.tz-vv img#detailed_map.f2 { background-image: url("../img/fieldmap/f2.webp"); }
+.tz-vv img#detailed_map.f3 { background-image: url("../img/fieldmap/f3.webp"); }
+.tz-vv img#detailed_map.f4 { background-image: url("../img/fieldmap/f4.webp"); }
+.tz-vv img#detailed_map.f5 { background-image: url("../img/fieldmap/f5.webp"); }
+.tz-vv img#detailed_map.f6 { background-image: url("../img/fieldmap/f6.webp"); }
+.tz-vv img#detailed_map.f7 { background-image: url("../img/fieldmap/f7.webp"); }
+.tz-vv img#detailed_map.f8 { background-image: url("../img/fieldmap/f8.webp"); }
+.tz-vv img#detailed_map.f9 { background-image: url("../img/fieldmap/f9.webp"); }
+.tz-vv img#detailed_map.f10 { background-image: url("../img/fieldmap/f10.webp"); }
+.tz-vv img#detailed_map.f11 { background-image: url("../img/fieldmap/f11.webp"); }
+.tz-vv img#detailed_map.f12 { background-image: url("../img/fieldmap/f12.webp"); }
+.tz-vv img#detailed_map.f99 { background-image: url("../img/fieldmap/f99.webp"); }
+
+.tz-vv div#map_details {
+    float: none;
+    width: auto;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.tz-vv div#map_details table {
+    width: 100% !important;
+    margin: 0;
+}
+
+/* options: a row of pill buttons; unavailable ones are dashed with their reason */
+div#content.tz-vv table.tz-vv-actions,
+div#content.tz-vv table.tz-vv-actions tbody {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: auto;
+    margin: 0;
+    background: none;
+}
+
+div#content.tz-vv table.tz-vv-actions thead {
+    display: none;
+}
+
+div#content.tz-vv table.tz-vv-actions tr {
+    display: contents;
+}
+
+div#content.tz-vv table.tz-vv-actions td {
+    display: block;
+    padding: 8px 16px;
+    border: 1px dashed #d6c39b;
+    border-radius: 20px;
+    background: none !important;
+    color: #8a7a62;
+    font-size: 14px;
+}
+
+div#content.tz-vv table.tz-vv-actions td:has(> a) {
+    padding: 0;
+    border: 0;
+}
+
+div#content.tz-vv table.tz-vv-actions td > a,
+div#content.tz-vv table.tz-vv-actions td > a:visited {
+    display: inline-block;
+    padding: 9px 18px;
+    border: 1px solid #b8862b;
+    border-radius: 20px;
+    background: #fbf6ea;
+    color: #4e2f0b;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+div#content.tz-vv table.tz-vv-actions td > a:hover {
+    background: #f0d9a0;
+    color: #2b1d12;
+}
+
+@media (max-width: 760px) {
+    .tz-vv-body {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

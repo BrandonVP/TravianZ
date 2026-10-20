@@ -377,3 +377,23 @@ div#side_navi .tz-quest-slot div#qge {
 div#side_navi .tz-quest-slot div#qge img {
     mix-blend-mode: multiply;
 }
+
+/* oasis pictures on the map's village page are drawn on white */
+.tz-vv img#detailed_map[class^="w"] {
+    mix-blend-mode: multiply;
+}
+
+/* TravianGames footer logo: recoloured for the dark footer (transparent
+   background, cream lettering, gold G) */
+div#footer div#mfoot {
+    background-image: url("images/footer_logo_tz.png");
+}
+
+/* footer version link: the template colours it bright red inline */
+div#footer .copyright a {
+    color: var(--tm-gold-2) !important;
+}
+
+div#footer .copyright a:hover {
+    color: #ffffff !important;
+}
