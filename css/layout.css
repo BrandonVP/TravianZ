@@ -476,6 +476,91 @@ div#side_navi .tz-hero-card div#mtop.tz-hero-slot {
     margin: 0;
 }
 
+/* village list as pills (markup unchanged: the AI bot parses table#vlist);
+   the whole pill is clickable, the current village is dark */
+div#side_navi table#vlist,
+div#side_navi table#vlist thead,
+div#side_navi table#vlist tbody {
+    display: block;
+    width: 100%;
+}
+
+div#side_navi table#vlist tbody tr {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 6px;
+    padding: 7px 12px;
+    font-family: "Source Sans 3", "Segoe UI", Verdana, Arial, sans-serif;
+    border: 1px solid #d6c39b;
+    border-radius: 18px;
+    background: #fbf6ea;
+    transition: background-color 0.12s ease;
+}
+
+div#side_navi table#vlist tbody tr:last-child {
+    margin-bottom: 0;
+}
+
+div#side_navi table#vlist tbody tr:hover {
+    background: #f0d9a0;
+}
+
+div#side_navi table#vlist tbody td {
+    padding: 0;
+    background: none;
+}
+
+div#side_navi table#vlist tbody td.dot {
+    display: none;
+}
+
+div#side_navi table#vlist tbody td.link {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+div#side_navi table#vlist tbody td.link a,
+div#side_navi table#vlist tbody td.link a:visited {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #2a2118;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* stretch the link over the whole pill */
+div#side_navi table#vlist tbody td.link a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+}
+
+div#side_navi table#vlist tbody td.aligned_coords {
+    padding-right: 0;
+    font-family: inherit;
+    color: #6b5a45;
+}
+
+div#side_navi table#vlist tbody tr:has(td.dot.hl) {
+    background: #2b1d12;
+    border-color: #2b1d12;
+}
+
+div#side_navi table#vlist tbody tr:has(td.dot.hl) td.link a {
+    color: #f7e9c6;
+}
+
+div#side_navi table#vlist tbody tr:has(td.dot.hl) td.aligned_coords {
+    color: #e6d3a8;
+}
+
 /* culture points card (left column) */
 .tz-cp-card {
     padding: 2px 4px;
