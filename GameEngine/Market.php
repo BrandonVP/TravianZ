@@ -967,8 +967,10 @@ class Market
             round($village->airon) +
             round($village->acrop);
 
-        // Too many resources requested
-        if ($newTotal > $currentTotal) {
+        // Too many resources requested, or (local fix) too few: an NPC trade
+        // redistributes the stock, it must not throw resources away. Up to 1
+        // per resource is allowed for rounding in the browser's distribution.
+        if ($newTotal > $currentTotal || $newTotal < $currentTotal - 4) {
 
             header('Location: build.php?id=' . $post['id'] . '&t=3');
             exit;
