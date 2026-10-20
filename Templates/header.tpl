@@ -133,12 +133,7 @@ if (!function_exists('tzCoinIcon')) {
             <div class="tzbar-menu">
                 <a href="spieler.php?uid=<?php echo (int) $session->uid; ?>"><?php echo PROFILE; ?></a>
                 <a href="#" onclick="return Popup(0,0,1);"><?php echo $lang['index'][0][2]; ?></a>
-<?php
-            // The forum lives in an alliance: without one (and not admin) the page
-            // only lists other alliances' public forums, with nothing to do there.
-            if ((isset($session->alliance) && $session->alliance > 0) || $tzIsAdmin) { ?>
                 <a href="allianz.php?s=2"><?php echo FORUM; ?></a>
-<?php } ?>
 <?php if (!$isRestrictedUser) { ?>
                 <a href="plus.php?id=3"<?php echo $tzPlusActive ? ' class="plus-active"' : ''; ?>><?php echo TZ_TRAVIANZ; ?> <b><span class="plus_g">P</span><span class="plus_o">l</span><span class="plus_g">u</span><span class="plus_o">s</span></b></a>
                 <a href="spieler.php?uid=1"><?php echo SUPPORT; ?></a>
