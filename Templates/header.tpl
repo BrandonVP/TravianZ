@@ -37,8 +37,9 @@ $tzUnreadReports  = (int) $message->nunread;
 
 $tzPage = basename($_SERVER['SCRIPT_NAME']);
 $tzNav = array(
-    array('dorf1.php',       $dorf1Link,          TZ_VILLAGE_OVERVIEW, 1, 0),
-    array('dorf2.php',       $dorf2Link,          VILLAGE_CENTER,      2, 0),
+    // short labels for the bar; the full names stay in the tooltips
+    array('dorf1.php',       $dorf1Link,          defined('TZ_NAV_FIELDS')  ? TZ_NAV_FIELDS  : 'Fields',  1, 0, TZ_VILLAGE_OVERVIEW),
+    array('dorf2.php',       $dorf2Link,          defined('TZ_NAV_VILLAGE') ? TZ_NAV_VILLAGE : 'Village', 2, 0, VILLAGE_CENTER),
     array('karte.php',       'karte.php',         MAP,                 3, 0),
     array('statistiken.php', 'statistiken.php',   STATISTICS,          4, 0),
     array('berichte.php',    $reportsLink,        REPORTS,             5, $tzUnreadReports),
@@ -81,8 +82,10 @@ if (!function_exists('tzCoinIcon')) {
     <nav class="tzbar-nav" aria-label="Main">
 <?php foreach ($tzNav as $n) {
     list($file, $href, $label, $key, $count) = $n;
+    $tip = isset($n[5]) ? $n[5] : '';
     $current = ($tzPage === $file);
     echo '        <a href="' . safeHTML($href) . '"'
+       . ($tip !== '' ? ' title="' . safeHTML($tip) . '"' : '')
        . ($key ? ' accesskey="' . $key . '"' : '')
        . ($current ? ' class="current" aria-current="page"' : '') . '>'
        . safeHTML($label)
@@ -92,6 +95,8 @@ if (!function_exists('tzCoinIcon')) {
     </nav>
 
     <div class="tzbar-right">
+
+        <span class="tzbar-time"><?php echo safeHTML(rtrim(SERVER_TIME, ': ')); ?> <span id="tp1" class="b"><?php echo date('H:i:s'); ?></span></span>
 
 <?php if (!$isRestrictedUser && isset($session->gold)) {
         $goldLabel = defined('GOLD') ? GOLD : 'Gold';
@@ -119,7 +124,7 @@ if (!function_exists('tzCoinIcon')) {
         </a>
 <?php } ?>
 
-        <span class="tzbar-time" title="<?php echo safeHTML(SERVER_TIME); ?>"><span id="tp1" class="b"><?php echo date('H:i:s'); ?></span></span>
+
 
         <details class="tzbar-account">
             <summary><?php echo safeHTML(isset($session->username) ? $session->username : ''); ?></summary>

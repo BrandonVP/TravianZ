@@ -180,6 +180,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var anchors = document.querySelectorAll('#tp1');
     if (!anchors.length) return;
     var tp = anchors[anchors.length - 1];
+    // the redesigned top bar shows server time only
+    if (tp.closest && tp.closest('.tzbar')) return;
     var off = <?php echo $localOffset; ?> * 1000;
     var label = <?php echo json_encode(LOCAL_TIME); ?>;
 
