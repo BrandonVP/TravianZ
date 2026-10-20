@@ -138,7 +138,6 @@ if (!function_exists('tzCoinIcon')) {
                 <a href="plus.php?id=3"<?php echo $tzPlusActive ? ' class="plus-active"' : ''; ?>><?php echo TZ_TRAVIANZ; ?> <b><span class="plus_g">P</span><span class="plus_o">l</span><span class="plus_g">u</span><span class="plus_o">s</span></b></a>
                 <a href="spieler.php?uid=1"><?php echo SUPPORT; ?></a>
 <?php } ?>
-                <a href="https://discord.gg/Bg9w8w9ft" target="_blank" rel="noopener noreferrer">Discord</a>
                 <a href="<?php echo HOMEPAGE; ?>"><?php echo HOME; ?></a>
 <?php if ($tzIsMH) { ?>
                 <a href="Admin/admin.php" class="staff"><?php echo MH_PANEL; ?></a>
