@@ -525,24 +525,85 @@ div#mid > div#content {
     padding: 4px 6px;
 }
 
-/* build queue: building + countdown on one line, finish time under it */
-.tz-card-build table tbody tr {
-    display: grid;
-    grid-template-columns: 22px minmax(0, 1fr) auto;
-    align-items: center;
+/* build queue (Templates/Building.tpl): name -> level, countdown, progress
+   bar, done at; queued jobs show when they start; Finish now button */
+table.tz-jobs {
+    width: 100%;
 }
 
-.tz-card-build table tbody td:nth-child(4) {
-    grid-column: 2 / 4;
-    padding-top: 0;
-    font-size: 12px;
+table.tz-jobs tr.tz-job td {
+    vertical-align: top;
+    padding: 8px 4px;
+    border-bottom: 1px solid #e3d2ac;
+}
+
+table.tz-jobs tr.tz-job td.ico {
+    width: 18px;
+    padding-top: 9px;
+}
+
+table.tz-jobs .tz-job-main a {
+    font-weight: 700;
+}
+
+table.tz-jobs .tz-job-bar {
+    height: 6px;
+    margin: 8px 0 5px;
+    border-radius: 3px;
+    background: #e3d2ac;
+    overflow: hidden;
+}
+
+table.tz-jobs .tz-job-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: #4f6b34;
+}
+
+table.tz-jobs .tz-job-sub {
+    margin-top: 3px;
+    font-size: 13px;
     color: #6b5a45;
 }
 
-.tz-card-build table tbody td:nth-child(3) {
+table.tz-jobs td.tz-job-time {
+    text-align: right;
     white-space: nowrap;
-    font-weight: 600;
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
+}
+
+table.tz-jobs .tz-job-wait {
+    font-weight: 400;
+    color: #6b5a45;
+}
+
+table.tz-jobs .tz-job-hidden {
+    display: none;
+}
+
+table.tz-jobs tfoot td {
+    padding: 12px 4px 4px;
+    background: none;
+    text-align: left;
+}
+
+a.tz-btn,
+a.tz-btn:visited {
+    display: inline-block;
+    padding: 9px 16px;
+    border: 1px solid #b8862b;
+    border-radius: 8px;
+    background: #fbf6ea;
+    color: #4e2f0b;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+a.tz-btn:hover {
+    background: #f0d9a0;
+    color: #2b1d12;
 }
 
 .tz-card td.tz-calm {

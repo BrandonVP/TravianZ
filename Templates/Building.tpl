@@ -33,129 +33,85 @@ if (!function_exists('safeHTML')) {
 }
 ?>
 
-<?php if ($building->NewBuilding) { ?>
+<?php if ($building->NewBuilding) {
+    /**
+     * Local redesign: each job shows a progress bar (start = finish - build
+     * time, from the same getBuildingTime() the game uses when queuing), a
+     * countdown and "done at"; a "Finish now" button replaces the clock icon.
+     * tzres.js moves the bars every second (data-tz-start / data-tz-end).
+     */
+    $tzNow = time();
+?>
 
-<table cellpadding="1" cellspacing="1" id="building_contract">
+<table cellpadding="1" cellspacing="1" id="building_contract" class="tz-jobs">
 
     <thead>
         <tr>
-            <th colspan="4">
-                <?php echo BUILDING_UPGRADING; ?>
-
-                <?php
-                // Buton instant finish dacă jucătorul are minim 2 gold
-                if (isset($session->gold) && $session->gold >= 2) {
-                ?>
-                    <a href="?buildingFinish=1"
-                       onclick="return confirm('<?php echo FINISH_GOLD; ?>');"
-                       title="<?php echo FINISH_GOLD; ?>">
-
-                        <img class="clock"
-                             alt="<?php echo FINISH_GOLD; ?>"
-                             src="img/x.gif" />
-                    </a>
-                <?php } ?>
-
-            </th>
+            <th colspan="3"><?php echo BUILDING_UPGRADING; ?></th>
         </tr>
     </thead>
 
     <tbody>
 
     <?php
-    // Verifică dacă există array valid
     if (!empty($building->buildArray) && is_array($building->buildArray)) {
 
         foreach ($building->buildArray as $jobs) {
 
-            // Normalizează valorile pentru compatibilitate și siguranță
             $jobId     = isset($jobs['id']) ? (int)$jobs['id'] : 0;
             $fieldId   = isset($jobs['field']) ? (int)$jobs['field'] : 0;
             $type      = isset($jobs['type']) ? (int)$jobs['type'] : 0;
             $level     = isset($jobs['level']) ? (int)$jobs['level'] : 0;
-            $timestamp = isset($jobs['timestamp']) ? (int)$jobs['timestamp'] : time();
+            $timestamp = isset($jobs['timestamp']) ? (int)$jobs['timestamp'] : $tzNow;
             $master    = isset($jobs['master']) ? (int)$jobs['master'] : 0;
             $loopcon   = isset($jobs['loopcon']) ? (int)$jobs['loopcon'] : 0;
 
-            // Nume clădire procesat
-            $buildingName = Building::procResType($type);
+            $buildingName  = Building::procResType($type);
+            $remainingTime = max(0, $timestamp - $tzNow);
 
-            // Timer rămas
-            $remainingTime = $timestamp - time();
-
-            // Evită timp negativ
-            if ($remainingTime < 0) {
-                $remainingTime = 0;
-            }
-
-            // Ora finalizării
-            $finishTime = date('H:i', $timestamp);
+            // build time of this level -> when the job started (or starts)
+            $currentLevel = isset($village->resarray['f'.$fieldId]) ? (int)$village->resarray['f'.$fieldId] : 0;
+            $plus = max(1, $level - $currentLevel);
+            $duration = ($master == 0)
+                ? (int)$database->getBuildingTime($fieldId, $type, $plus, $village->wid, $village->resarray)
+                : 0;
+            $start  = $timestamp - $duration;
+            $queued = ($loopcon == 1 || $start > $tzNow);
+            $pct    = ($duration > 0) ? max(0, min(100, ($tzNow - $start) / $duration * 100)) : 0;
     ?>
 
-        <tr>
+        <tr class="tz-job<?php echo $queued ? ' tz-job-queued' : ''; ?>">
 
-            <!-- Buton cancel -->
             <td class="ico">
                 <a href="?d=<?php echo $jobId; ?>&amp;a=0&amp;c=<?php echo safeHTML($session->checker); ?>">
-                    <img src="img/x.gif"
-                         class="del"
-                         title="<?php echo CANCEL; ?>"
-                         alt="<?php echo CANCEL; ?>" />
+                    <img src="img/x.gif" class="del" title="<?php echo CANCEL; ?>" alt="<?php echo CANCEL; ?>" />
                 </a>
             </td>
 
-            <!-- Informații clădire -->
-            <td>
+            <td class="tz-job-main">
+                <a href="build.php?id=<?php echo $fieldId; ?>"><?php echo safeHTML($buildingName); ?></a>
+                <span class="tz-job-to">&rarr; <?php echo LEVEL.' '.$level; ?></span>
 
                 <?php if ($master == 0) { ?>
-
-                    <a href="build.php?id=<?php echo $fieldId; ?>">
-                        <?php echo safeHTML($buildingName); ?>
-                    </a>
-
-                    (<?php echo LEVEL.' '.$level; ?>)
-
-                    <?php
-                    // Construcție în waiting loop
-                    if ($loopcon == 1) {
-                        echo WAITING_LOOP;
-                    }
-                    ?>
-
+                    <?php if (!$queued) { ?>
+                        <div class="tz-job-bar"><span style="width:<?php echo round($pct, 1); ?>%" data-tz-start="<?php echo $start; ?>" data-tz-end="<?php echo $timestamp; ?>" data-tz-now="<?php echo $tzNow; ?>"></span></div>
+                        <div class="tz-job-sub"><?php echo ucfirst(DONE_AT).' '.date('H:i', $timestamp); ?></div>
+                    <?php } else { ?>
+                        <div class="tz-job-sub">Starts <?php echo date('H:i', $start); ?> &middot; <?php echo DONE_AT.' '.date('H:i', $timestamp); ?></div>
+                    <?php } ?>
                 <?php } else { ?>
-					<a href="build.php?id=<?php echo $fieldId; ?>">
-                    <?php echo safeHTML($buildingName); ?>
-					</a>
-                    <span class="none">
-                        (<?php echo LEVEL.' '.$level.' ) ('.CONSTRUCTING_MASTER_BUILDER;?>)
-                    </span>
-
+                    <div class="tz-job-sub">(<?php echo CONSTRUCTING_MASTER_BUILDER; ?>)</div>
                 <?php } ?>
-
             </td>
 
-            <?php if ($master == 0) { ?>
-
-                <!-- Timer -->
-                <td>
-                    <?php echo P_IN; ?>
-                    <span id="timer<?php echo ++$session->timer; ?>">
-                        <?php echo $generator->getTimeFormat($remainingTime); ?>
-                    </span>
-                    <?php echo TZ_HRS_2; ?>
-                </td>
-
-                <!-- Ora finalizare -->
-                <td>
-                    <?php echo DONE_AT.' '.$finishTime; ?>
-                </td>
-
-            <?php } else { ?>
-			
-                <!-- Compatibil layout original -->
-                <td colspan="2">&nbsp;</td>
-
-            <?php } ?>
+            <td class="tz-job-time">
+                <?php if ($master == 0 && !$queued) { ?>
+                    <span id="timer<?php echo ++$session->timer; ?>"><?php echo $generator->getTimeFormat($remainingTime); ?></span>
+                <?php } elseif ($master == 0) { ?>
+                    <span class="tz-job-wait">Queued</span>
+                    <span id="timer<?php echo ++$session->timer; ?>" class="tz-job-hidden"><?php echo $generator->getTimeFormat($remainingTime); ?></span>
+                <?php } ?>
+            </td>
 
         </tr>
 
@@ -165,6 +121,18 @@ if (!function_exists('safeHTML')) {
     ?>
 
     </tbody>
+
+    <?php if (isset($session->gold) && $session->gold >= 2) { ?>
+    <tfoot>
+        <tr>
+            <td colspan="3">
+                <a class="tz-btn" href="?buildingFinish=1"
+                   onclick="return confirm('<?php echo safeHTML(FINISH_GOLD); ?>');"
+                   title="<?php echo safeHTML(FINISH_GOLD); ?>">Finish now &middot; 2 <?php echo strtolower(GOLD); ?></a>
+            </td>
+        </tr>
+    </tfoot>
+    <?php } ?>
 
 </table>
 

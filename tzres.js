@@ -73,9 +73,33 @@
         setInterval(tick, 1000);
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setup);
-    } else {
+    /* build-queue progress bars (Templates/Building.tpl): width from the
+       job's start and end time, in server seconds */
+    function setupJobs() {
+        var bars = document.querySelectorAll('[data-tz-start][data-tz-end]');
+        if (!bars.length) return;
+        var serverNow = parseInt(bars[0].getAttribute('data-tz-now') || '0', 10);
+        var offset = serverNow ? serverNow * 1000 - Date.now() : 0;
+        function tickJobs() {
+            var now = (Date.now() + offset) / 1000;
+            for (var i = 0; i < bars.length; i++) {
+                var s = parseInt(bars[i].getAttribute('data-tz-start'), 10);
+                var e = parseInt(bars[i].getAttribute('data-tz-end'), 10);
+                if (e > s) bars[i].style.width = Math.max(0, Math.min(100, (now - s) / (e - s) * 100)).toFixed(2) + '%';
+            }
+        }
+        tickJobs();
+        setInterval(tickJobs, 1000);
+    }
+
+    function init() {
         setup();
+        setupJobs();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
     }
 })();
