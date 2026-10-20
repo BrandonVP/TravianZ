@@ -598,21 +598,72 @@ table.tz-jobs tfoot td {
     text-align: left;
 }
 
-a.tz-btn,
-a.tz-btn:visited {
+/* one button style: Finish now, the old image buttons (wrapped by
+   tzbuttons.js) and the game's .trav_buttons */
+.tz-btn,
+a.tz-btn:visited,
+button.trav_buttons,
+input.trav_buttons {
+    position: relative;
     display: inline-block;
-    padding: 9px 16px;
+    box-sizing: border-box;
+    padding: 8px 16px;
     border: 1px solid #b8862b;
     border-radius: 8px;
     background: #fbf6ea;
+    background-image: none;
     color: #4e2f0b;
+    font-family: "Source Sans 3", "Segoe UI", Verdana, Arial, sans-serif;
+    font-size: 14px;
     font-weight: 700;
+    line-height: 1.2;
     text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
-a.tz-btn:hover {
+.tz-btn:hover,
+button.trav_buttons:hover,
+input.trav_buttons:hover {
     background: #f0d9a0;
+    border-color: #b8862b;
     color: #2b1d12;
+}
+
+button.trav_buttons:active,
+input.trav_buttons:active,
+.tz-btn:active {
+    background: #e6cc8a !important;
+    border-color: #8a6a22 !important;
+}
+
+button.trav_buttons:disabled,
+.tz-btn.is-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* the original image input sits invisibly over its text button */
+.tz-ibtn > input {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.tz-ibtn.is-disabled > input {
+    cursor: not-allowed;
+}
+
+a.tz-ilink > img {
+    display: none;
 }
 
 .tz-card td.tz-calm {

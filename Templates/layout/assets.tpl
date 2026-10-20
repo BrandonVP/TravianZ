@@ -8,6 +8,7 @@
 	<script src="unx.js?f4b7m" type="text/javascript"></script>
 	<script src="new.js?0faab" type="text/javascript"></script>
 	<script src="tzres.js?v=<?php echo @filemtime(__DIR__ . '/../../tzres.js'); ?>" type="text/javascript"></script>
+	<script src="tzbuttons.js?v=<?php echo @filemtime(__DIR__ . '/../../tzbuttons.js'); ?>" type="text/javascript"></script>
 <?php
 	// Graphics-pack stylesheets, versioned by file time so a changed pack file
 	// replaces a browser's cached copy instead of living on for weeks.
