@@ -85,10 +85,27 @@ div#side_navi #tzHeroBox {
 /* ---------- left menu ---------- */
 
 div#side_navi {
+    background: none;
+}
+
+div#side_navi .tz-side-card {
+    padding: 12px 14px;
     background: var(--tm-panel);
     border-radius: 12px;
     box-shadow: inset 0 0 0 1px var(--tm-line);
-    padding-bottom: 8px;
+}
+
+div#side_navi .tz-hero-card {
+    padding: 6px 14px;
+}
+
+div#side_navi .tz-villages-card table#vlist thead td,
+div#side_navi .tz-villages-card table#vlist thead td a {
+    font-family: var(--tm-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tm-link-hover);
+    padding: 0 4px 6px;
 }
 
 div#side_navi p {
@@ -304,13 +321,7 @@ div#footer .copyright {
 }
 
 /* left-column culture points card */
-div#side_navi .tz-cp-card {
-    margin: 12px 8px 4px;
-    padding: 10px 12px;
-    background: var(--tm-panel-2);
-    border-radius: 10px;
-    box-shadow: inset 0 0 0 1px var(--tm-line-2);
-}
+
 
 div#side_navi .tz-cp-card h3 {
     font-family: var(--tm-display);
@@ -360,7 +371,7 @@ div#side_info .tz-card td.tz-calm {
 
 /* quest giver in the left column: blend its white onto the panel */
 div#side_navi .tz-quest-slot div#qge {
-    background: var(--tm-panel);
+    background: var(--tm-ground);
 }
 
 div#side_navi .tz-quest-slot div#qge img {

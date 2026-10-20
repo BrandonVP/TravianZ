@@ -88,6 +88,7 @@ $idUser      = isset($_SESSION['id_user']) ? (int)$_SESSION['id_user'] : 0;
      * admin/event widgets that used to sit under the menu links.
      */
     ?>
+    <div class="tz-side-card tz-hero-card">
     <div id="mtop" class="tz-hero-slot">
         <?php
         /**
@@ -101,9 +102,12 @@ $idUser      = isset($_SESSION['id_user']) ? (int)$_SESSION['id_user'] : 0;
         }
         ?>
     </div>
+    </div>
     <?php
-    include("Templates/multivillage.tpl");
     ?>
+    <div class="tz-side-card tz-villages-card">
+        <?php include("Templates/multivillage.tpl"); ?>
+    </div>
 
     <?php
     /**
@@ -118,7 +122,7 @@ $idUser      = isset($_SESSION['id_user']) ? (int)$_SESSION['id_user'] : 0;
     if ($tzCpNeed > 0) {
         $tzCpPct = max(0, min(100, $tzCpHave / $tzCpNeed * 100));
     ?>
-    <div class="tz-cp-card">
+    <div class="tz-side-card tz-cp-card">
         <h3><?php echo CULTURE_POINTS; ?></h3>
         <div class="tz-cp-num"><strong><?php echo number_format($tzCpHave); ?></strong> / <?php echo number_format($tzCpNeed); ?></div>
         <div class="tz-bar" title="<?php echo round($tzCpPct); ?>%"><span style="width:<?php echo round($tzCpPct, 1); ?>%"></span></div>

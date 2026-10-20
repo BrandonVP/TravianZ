@@ -7,7 +7,8 @@
 :root {
     --tz-page: 1280px;
     --tz-left: 230px;
-    --tz-centre: 700px;
+    /* the three columns span exactly the page, like the resource cards */
+    --tz-centre: calc(var(--tz-page) - var(--tz-left) - var(--tz-right) - 2 * var(--tz-gap));
     --tz-right: 300px;
     --tz-gap: 25px;
     --tz-bar-h: 60px;
@@ -466,9 +467,17 @@ div#mid > div#content {
     width: var(--tz-centre);
 }
 
+/* left column: one card per block (hero, villages, culture points) */
+div#side_navi .tz-side-card {
+    margin-bottom: 14px;
+}
+
+div#side_navi .tz-hero-card div#mtop.tz-hero-slot {
+    margin: 0;
+}
+
 /* culture points card (left column) */
 .tz-cp-card {
-    margin-top: 14px;
     padding: 2px 4px;
     font-size: 13px;
 }
@@ -727,8 +736,9 @@ body.mod1 div#side_info,
 body.mod2 div#side_info,
 body.mod3 div#side_info {
     box-sizing: border-box;
-    width: var(--tz-right);
+    width: calc(var(--tz-right) + var(--tz-gap));
     padding-left: var(--tz-gap);
+    padding-top: 0;
 }
 
 /* render time under the footer */
