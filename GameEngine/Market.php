@@ -921,8 +921,11 @@ class Market
             return;
         }
 
-        // Not enough gold
-        if ($session->userinfo['gold'] < 3) {
+        // Not enough gold (village gold when it pays, else 3 Plus gold)
+        $tzNpcVillage = VillageGold::pays($village);
+        if ($tzNpcVillage
+            ? !VillageGold::canAfford($village, TZ_GOLD_PRICE_NPC)
+            : $session->userinfo['gold'] < 3) {
 
             header('Location: build.php?id=' . $post['id'] . '&t=3');
             exit;
@@ -971,6 +974,13 @@ class Market
             exit;
         }
 
+        // village gold is taken first, in one guarded UPDATE
+        if ($tzNpcVillage && !$database->takeVillageGold($village->wid, TZ_GOLD_PRICE_NPC)) {
+
+            header('Location: build.php?id=' . $post['id'] . '&t=3');
+            exit;
+        }
+
         $database->setVillageField(
             $village->wid,
             ['wood', 'clay', 'iron', 'crop'],
@@ -984,7 +994,9 @@ class Market
 		$this->forget();
 
         // permisiunea a fost verificata la intrarea in functie
-        $database->spendGold($session->uid, 3, 'NPC merchant');
+        if (!$tzNpcVillage) {
+            $database->spendGold($session->uid, 3, 'NPC merchant');
+        }
 
         header('Location: build.php?id=' . $post['id'] . '&t=3&c');
         exit;

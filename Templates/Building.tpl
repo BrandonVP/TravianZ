@@ -122,13 +122,13 @@ if (!function_exists('safeHTML')) {
 
     </tbody>
 
-    <?php if (isset($session->gold) && $session->gold >= 2) { ?>
+    <?php if ($building->canPayFinish()) { ?>
     <tfoot>
         <tr>
             <td colspan="3">
                 <a class="tz-btn" href="?buildingFinish=1"
-                   onclick="return confirm('<?php echo safeHTML(FINISH_GOLD); ?>');"
-                   title="<?php echo safeHTML(FINISH_GOLD); ?>">Finish now &middot; 2 <?php echo strtolower(GOLD); ?></a>
+                   onclick="return confirm('<?php echo safeHTML($building->finishConfirmText()); ?>');"
+                   title="<?php echo safeHTML($building->finishConfirmText()); ?>">Finish now &middot; <?php echo safeHTML($building->finishPriceLabel()); ?></a>
             </td>
         </tr>
     </tfoot>

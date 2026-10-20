@@ -22,7 +22,9 @@
 global $database, $session, $id;
 
 $t = isset($_GET['t'])? (int)$_GET['t'] : 0;
-$hasGold = (int)$session->userinfo['gold'] > 2;
+$hasGold = VillageGold::pays($village)
+    ? VillageGold::canAfford($village, TZ_GOLD_PRICE_NPC)
+    : (int)$session->userinfo['gold'] > 2;
 $hasRoutes = $session->goldclub == 1 && count($database->getProfileVillages($session->uid)) > 1;
 ?>
 <div id="textmenu">

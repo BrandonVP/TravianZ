@@ -19,6 +19,18 @@ class VillageGold
         return TZ_GOLD_ENABLED && is_array($villageRow) && array_key_exists('gold', $villageRow);
     }
 
+    /** Village purchases are paid with this village's gold (else Plus gold). */
+    public static function pays($village)
+    {
+        return defined('TZ_GOLD_PAYS_VILLAGE') && TZ_GOLD_PAYS_VILLAGE && is_object($village) && !empty($village->goldActive);
+    }
+
+    /** The village has at least $price whole gold. */
+    public static function canAfford($village, $price)
+    {
+        return is_object($village) && floor(max(0, (float) $village->agold)) >= (int) $price;
+    }
+
     /** Highest Main Building (gid 15) and Marketplace (gid 17) level in a village. */
     public static function buildingLevels($resArray)
     {

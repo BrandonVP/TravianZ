@@ -21,7 +21,17 @@
 
 global $database, $session, $village, $id;
 
-if ($session->gold <= 2) {
+// Village gold (local redesign, phase 3): NPC trade is paid from this village
+$tzNpcVillage = VillageGold::pays($village);
+$tzNpcCan = $tzNpcVillage
+    ? VillageGold::canAfford($village, TZ_GOLD_PRICE_NPC)
+    : $session->gold > 2;
+$tzNpcCost = $tzNpcVillage
+    ? '<b>' . TZ_GOLD_PRICE_NPC . '</b> gold'
+    : '<img src="img/x.gif" class="gold" alt="' . GOLD . '" title="' . GOLD . '" /><b>3</b>';
+
+// the "completed" message stays reachable after paying
+if (!$tzNpcCan && !isset($_GET['c'])) {
     header("Location: build.php?id=".(int)$_GET['id']);
     exit;
 }
@@ -67,7 +77,7 @@ $completed = isset($_GET['c']);
     <?php include("17_menu.tpl");?>
 
     <?php if ($completed):?>
-        <p><b><?php echo NPC_COMPLETED;?>.</b> <?php echo COSTS;?> 3<img src="img/x.gif" class="gold" alt="<?php echo GOLD;?>" title="<?php echo GOLD;?>" /></p>
+        <p><b><?php echo NPC_COMPLETED;?>.</b> <?php echo COSTS;?> <?php echo $tzNpcCost;?></p>
         <a href="javascript: history.go(-2)"><?php echo BACK_BUILDING;?></a>
 
     <?php else:?>
@@ -176,11 +186,11 @@ $completed = isset($_GET['c']);
             </table>
 
             <p id="submitButton">
-                <?php if ($session->userinfo['gold'] >= 3):?>
+                <?php if ($tzNpcCan):?>
                     <a href="javascript:document.snd.submit();"><?php echo TRADE_RESOURCES;?></a>
-                    <span class="none">(<?php echo COSTS;?>: <img src="img/x.gif" class="gold_g" alt="<?php echo GOLD;?>" title="<?php echo GOLD;?>" /><b>3</b>)</span>
+                    <span class="none">(<?php echo COSTS;?>: <?php echo $tzNpcCost;?>)</span>
                 <?php else:?>
-                    <span class="none"><?php echo TRADE_RESOURCES;?></span> (<?php echo COSTS;?>: <img src='img/x.gif' class='gold' alt='<?php echo GOLD;?>' title='<?php echo GOLD;?>' /><b>3</b>)
+                    <span class="none"><?php echo TRADE_RESOURCES;?></span> (<?php echo COSTS;?>: <?php echo $tzNpcCost;?>)
                 <?php endif;?>
             </p>
             <p id="submitText"></p>

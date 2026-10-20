@@ -376,7 +376,7 @@ if(isset($_GET['id']) || isset($_GET['gid']) || $route == 1 || isset($_POST['rou
 		else include("Templates/Build/".$village->resarray['f'.$_GET['id'].'t'].".tpl");
 		
 		if((isset($_GET['buildingFinish'])) && $_GET['buildingFinish'] == 1) {
-        	if($session->gold >= 2) {
+        	if($building->canPayFinish()) {
         		$building->finishAll("build.php?gid=".$_GET['id']."&ty=".$_GET['ty']);
         		exit;
         	}

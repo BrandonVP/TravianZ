@@ -407,8 +407,8 @@ class Building {
     // FINISH ALL
     if (
         isset($get['buildingFinish']) &&
-        $this->sess->gold >= 2 &&
-        $this->sess->sit == 0
+        $this->sess->sit == 0 &&
+        $this->canPayFinish()
     ) {
         $this->finishAll();
     }
@@ -542,17 +542,21 @@ class Building {
 
         case 4:
 
+            // Local change: the parallel slots below are for *different*
+            // buildings/fields. If this one is already upgrading, only the
+            // Plus waiting slot may be used (cost/level/time are only
+            // computed correctly for one active + one waiting job per field).
+            $alreadyQueued = $this->isCurrent($fieldId) || $this->isLoop($fieldId);
+
             if ($fieldId >= 19) {
 
-                $hasMainBuilding =
-                    (
-                        $this->sess->tribe == 1 ||
-                        ALLOW_ALL_TRIBE
-                    )
-                        ? $this->inner
-                        : $this->basic;
+                // Local change: allow up to INNER_MAX (Roman-style queue) or
+                // BASIC_MAX parallel village-building jobs instead of exactly 1.
+                $romanQueue = ($this->sess->tribe == 1 || ALLOW_ALL_TRIBE);
+                $hasMainBuilding = $romanQueue ? $this->inner : $this->basic;
+                $mainBuildingLimit = $romanQueue ? INNER_MAX : BASIC_MAX;
 
-                if ($hasMainBuilding == 0) {
+                if (!$alreadyQueued && $hasMainBuilding < $mainBuildingLimit) {
                     return 8;
                 }
 
@@ -563,7 +567,9 @@ class Building {
                 return 2;
             }
 
-            if ($this->basic == 1) {
+            // Local change: allow up to BASIC_MAX parallel resource-field jobs
+            // instead of exactly 1.
+            if ($alreadyQueued || $this->basic >= BASIC_MAX) {
 
                 if (($this->sess->plus || $gid == 40) && $this->plus == 0) {
                     return 9;
@@ -827,22 +833,23 @@ class Building {
 
             if ($romanQueue) {
 
-                if ($fieldId >= 19) {
+                // Local change: with several parallel jobs per category, wait
+                // for the one that finishes LAST (was: whichever is listed last).
+                $latest = 0;
 
-                    foreach ($this->buildArray as $build) {
+                foreach ($this->buildArray as $build) {
 
-                        if ($build['field'] >= 19) {
-                            $time = $build['timestamp'] + $uprequire['time'];
-                        }
+                    $sameCategory = ($fieldId >= 19)
+                        ? $build['field'] >= 19
+                        : $build['field'] <= 18;
+
+                    if ($sameCategory && $build['timestamp'] > $latest) {
+                        $latest = $build['timestamp'];
                     }
-                } else {
+                }
 
-                    foreach ($this->buildArray as $build) {
-
-                        if ($build['field'] <= 18) {
-                            $time = $build['timestamp'] + $uprequire['time'];
-                        }
-                    }
+                if ($latest > 0) {
+                    $time = $latest + $uprequire['time'];
                 }
             } else {
 
@@ -1283,10 +1290,12 @@ class Building {
     // resource fields
     if ($gid <= 4) {
 
+        // Local change: non-capital field cap comes from FIELD_MAX_NONCAPITAL (default 10).
+        $nonCapitalMax = defined('FIELD_MAX_NONCAPITAL') ? (int) FIELD_MAX_NONCAPITAL : 10;
         $maxLevel = (
             $this->vil->capital == 1
                 ? (count($dataarray) - 1 - $loop)
-                : (count($dataarray) - 11 - $loop)
+                : (min(count($dataarray) - 1, $nonCapitalMax) - $loop)
         );
 
         return ($currentLevel == $maxLevel);
@@ -1437,12 +1446,67 @@ class Building {
 	B-W2: spart in helpers; SQL-ul raw mutat in metode Database cu invalidare
 	*****************************************/
 
+	/** Village gold taken up front by finishAll() (local redesign). */
+	private $tzGoldPrepaid = 0;
+
+	/** Finish-now price in village gold: higher when Master Builder jobs wait. */
+	public function finishPrice() {
+	    foreach ((array) $this->buildArray as $job) {
+	        if ($job['wid'] == $this->vil->wid && (int) $job['master'] != 0) {
+	            return TZ_GOLD_PRICE_FINISH_MASTER;
+	        }
+	    }
+	    return TZ_GOLD_PRICE_FINISH;
+	}
+
+	/** Can this village pay for Finish now (village gold, else 2 Plus gold)? */
+	public function canPayFinish() {
+	    if (VillageGold::pays($this->vil)) {
+	        return VillageGold::canAfford($this->vil, TZ_GOLD_PRICE_FINISH);
+	    }
+	    return $this->sess->gold >= 2;
+	}
+
+	/** "50 gold" / "2 gold" for the Finish now button. */
+	public function finishPriceLabel() {
+	    return VillageGold::pays($this->vil) ? $this->finishPrice() . ' gold' : '2 gold';
+	}
+
+	/** Confirmation text for Finish now with the right price. */
+	public function finishConfirmText() {
+	    return VillageGold::pays($this->vil)
+	        ? 'Finish all construction and research orders in this village now for ' . $this->finishPrice() . ' gold?'
+	        : FINISH_GOLD;
+	}
+
 	public function finishAll($redirect_url = '') {
 
     global $technology;
 
     $countPlus2Gold  = false;
     $countMasterGold = false;
+
+    // Village gold (local redesign, phase 3): the price is taken BEFORE
+    // anything is finished (guarded UPDATE), and what was not used is refunded
+    // in chargeFinishGold(). Plus gold is still used when village gold is off.
+    $this->tzGoldPrepaid = 0;
+    if (VillageGold::pays($this->vil)) {
+        if (isset($this->sess) && method_exists($this->sess, 'sitterCan')
+            && !$this->sess->sitterCan(SITTER_PERM_GOLD)) {
+            header('Location: ' . ($redirect_url ? $redirect_url : $this->sess->referrer));
+            exit;
+        }
+        $price = $this->finishPrice();
+        if (!VillageGold::canAfford($this->vil, $price)) {
+            // not enough for the Master Builder jobs: finish the rest
+            $price = TZ_GOLD_PRICE_FINISH;
+        }
+        if (!$this->db->takeVillageGold($this->vil->wid, $price)) {
+            header('Location: ' . ($redirect_url ? $redirect_url : $this->sess->referrer));
+            exit;
+        }
+        $this->tzGoldPrepaid = $price;
+    }
 
     $deletIDs = array();
 
@@ -1495,7 +1559,9 @@ class Building {
             // aleatoriu (slotul 19..40 interpretat ca gid).
             if ($this->meetRequirement($jobs['type'])) {
 
-                if ($this->sess->gold > 2) {
+                if ($this->tzGoldPrepaid > 0
+                        ? $this->tzGoldPrepaid >= TZ_GOLD_PRICE_FINISH_MASTER
+                        : $this->sess->gold > 2) {
 
                     if ($villageFields === null) {
 
@@ -1620,6 +1686,31 @@ class Building {
 	 * sesiune (anti double-spend, pastrata 1:1).
 	 */
 	private function chargeFinishGold($countMasterGold, $countPlus2Gold) {
+
+    // Village gold: settle the prepayment (same rule as before: both kinds of
+    // job -> the higher price, any -> the base price, none -> nothing)
+    if ($this->tzGoldPrepaid > 0) {
+        if (!$countMasterGold && !$countPlus2Gold) {
+            $actual = 0;
+        } else {
+            $actual = ($countMasterGold && $countPlus2Gold) ? TZ_GOLD_PRICE_FINISH_MASTER : TZ_GOLD_PRICE_FINISH;
+        }
+        $refund = $this->tzGoldPrepaid - $actual;
+        if ($refund > 0) {
+            $this->db->addVillageGold($this->vil->wid, $refund, TZ_GOLD_CAP);
+        }
+        if ($actual > 0) {
+            $this->db->addGoldFinLog(
+                $this->vil->wid,
+                $this->sess->uid,
+                'Finish all constructions',
+                -$actual,
+                'Finish construction and research with village gold'
+            );
+        }
+        $this->tzGoldPrepaid = 0;
+        return;
+    }
 
     if (!$countMasterGold && !$countPlus2Gold) {
         return;
