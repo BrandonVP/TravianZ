@@ -66,6 +66,7 @@ else $building->procBuild($_GET);
 	<link href='".GP_LOCATE."travian.css?e21d2' rel='stylesheet' type='text/css' />
 	<link href='".GP_LOCATE."lang/en/lang.css?e21d2' rel='stylesheet' type='text/css' />";
 	?>
+	<link href="css/fieldmap.css?v=1" rel="stylesheet" type="text/css" />
 	<script type="text/javascript">
 	window.addEvent('domready', start);
 	</script>

@@ -1,0 +1,110 @@
+/* Resource field map (dorf1): upscaled transparent art + level medallions.
+   Pack-independent, loaded after the gpack stylesheets by dorf1.php.
+   Sizes use container units (cqw) so the medallions scale with the map. */
+
+div.village1 div#village_map.fieldmap {
+    float: none;
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    aspect-ratio: 300 / 264;
+    margin: 4px auto 18px;
+    background: none;
+    container-type: inline-size;
+}
+
+div#village_map.fieldmap img.fm-art {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+div#village_map.fieldmap a.fm-field {
+    position: absolute;
+    z-index: 2;
+    width: 8.2%;
+    height: 9.32%;               /* 8.2% of the width, as % of the 300:264 height */
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #8a5a2b;
+    border-width: 0.9cqw;
+    border-radius: 50%;
+    background: #fbf3df;
+    color: #2a2118;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: bold;
+    font-size: 17px;
+    font-size: 3.4cqw;
+    line-height: 1;
+    text-decoration: none;
+    box-shadow: 0 0.4cqw 1.2cqw rgba(43, 29, 18, 0.45);
+    transition: transform 0.12s ease, background-color 0.12s ease;
+}
+
+div#village_map.fieldmap a.fm-field:hover,
+div#village_map.fieldmap a.fm-field:focus-visible {
+    transform: translate(-50%, -50%) scale(1.1);
+    background: #ffffff;
+    color: #2a2118;
+    outline: none;
+}
+
+div#village_map.fieldmap a.fm-wood { border-color: #8a5a2b; }
+div#village_map.fieldmap a.fm-clay { border-color: #b4532a; }
+div#village_map.fieldmap a.fm-iron { border-color: #56636e; }
+div#village_map.fieldmap a.fm-crop { border-color: #b8901f; }
+
+div#village_map.fieldmap a.fm-field.fm-active,
+div#village_map.fieldmap a.fm-field.fm-active:hover {
+    background: #2b1d12;
+    border-color: #d9a441;
+    color: #f0d9a0;
+    font-size: 12px;
+    font-size: 2.3cqw;
+}
+
+div#village_map.fieldmap a.fm-center {
+    position: absolute;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+    padding: 0.8cqw 2cqw;
+    border-radius: 3cqw;
+    background: rgba(43, 29, 18, 0.82);
+    color: #f7e9c6;
+    font-weight: bold;
+    font-size: 12px;
+    font-size: 2.4cqw;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+div#village_map.fieldmap a.fm-center:hover {
+    background: rgba(43, 29, 18, 0.95);
+    color: #ffffff;
+}
+
+/* Movements / production / troops: a row under the map instead of a column beside it */
+div.village1 div#map_details {
+    float: none;
+    width: auto;
+    margin: 0 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0 18px;
+}
+
+div.village1 div#map_details > br {
+    display: none;
+}
+
+div.village1 div#map_details > table {
+    flex: 1 1 229px;
+}

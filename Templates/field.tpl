@@ -70,159 +70,72 @@ $fieldNames = array(
 );
 ?>
 
-<!-- ===================== RESOURCE MAP ===================== -->
-
-<map name="rx" id="rx">
-
+<!-- ===================== RESOURCE FIELD MAP ===================== -->
 <?php
 
 /**
- * Lucrări active în sat
- * Folosit pentru highlight upgrade în progres
+ * Upgrades in progress: fieldId => highest queued target level
  */
 $jobs = $database->getJobs($village->wid);
-
-/**
- * Cache fields active
- */
 $activeFields = array();
 
-/**
- * Compatibil PHP vechi
- */
 if (!empty($jobs) && is_array($jobs)) {
-
     foreach ($jobs as $job) {
-
-        /**
-         * Doar resource fields (1-4)
-         */
         if (isset($job['type']) && (int)$job['type'] <= 4) {
-
-            $activeFields[(int)$job['field']] = true;
+            $fid = (int)$job['field'];
+            $to  = isset($job['level']) ? (int)$job['level'] : 0;
+            $activeFields[$fid] = max(isset($activeFields[$fid]) ? $activeFields[$fid] : 0, $to);
         }
     }
 }
 
 /**
- * Generare areas resurse
+ * Field type => CSS modifier (ring colour)
  */
-for ($i = 1; $i <= 18; $i++) {
-
-    $fieldType  = isset($arrayVillage['f'.$i.'t'])
-        ? (int)$arrayVillage['f'.$i.'t']
-        : 0;
-
-    $fieldLevel = isset($arrayVillage['f'.$i])
-        ? (int)$arrayVillage['f'.$i]
-        : 0;
-
-    /**
-     * Nume resursă
-     */
-    $resourceName = Building::procResType($fieldType);
-
-    /**
-     * Upgrade activ
-     */
-    $isActive = isset($activeFields[$i]);
-
-    /**
-     * Tooltip
-     */
-    $title = $resourceName .
-             ' Level ' .
-             $fieldLevel;
-
-    if ($isActive) {
-        $title .= ' (upgrade in progress)';
-    }
-
-    echo '<area href="build.php?id=' . $i . '"
-                coords="' . safeHTML($coorarray[$i]) . '"
-                shape="circle"
-                title="' . safeHTML($title) . '" />' . "\r\n";
-}
-?>
-
-    <!-- Village center -->
-    <area href="dorf2.php"
-          coords="144,131,36"
-          shape="circle"
-          title="<?php echo VILLAGE_CENTER; ?>"
-          alt="" />
-
-</map>
-
-<!-- ===================== RESOURCE VILLAGE MAP ===================== -->
-
-<div id="village_map" class="f<?php echo (int)$village->type; ?>">
-
-<?php
+$fieldKinds = array(1 => 'wood', 2 => 'clay', 3 => 'iron', 4 => 'crop');
 
 /**
- * Randare resource fields
+ * Upscaled, transparent map art (img/fieldmap/f<type>.webp). The medallions sit on
+ * the art's badge spots, placed in % of the 300x264 design so they scale with it.
  */
+$mapType = (int)$village->type;
+if (!is_file(__DIR__ . '/../img/fieldmap/f' . $mapType . '.webp')) {
+    $mapType = 3;
+}
+?>
+<div id="village_map" class="fieldmap">
+    <img class="fm-art" src="img/fieldmap/f<?php echo $mapType; ?>.webp?v=1" alt="" />
+<?php
 for ($i = 1; $i <= 18; $i++) {
 
-    $fieldType = isset($arrayVillage['f'.$i.'t'])
-        ? (int)$arrayVillage['f'.$i.'t']
-        : 0;
+    $fieldType  = isset($arrayVillage['f'.$i.'t']) ? (int)$arrayVillage['f'.$i.'t'] : 0;
+    $fieldLevel = isset($arrayVillage['f'.$i])     ? (int)$arrayVillage['f'.$i]     : 0;
 
-    $fieldLevel = isset($arrayVillage['f'.$i])
-        ? (int)$arrayVillage['f'.$i]
-        : 0;
-
-    /**
-     * Dacă slotul este gol skip
-     */
     if ($fieldType == 0) {
         continue;
     }
 
-    /**
-     * Text alt
-     */
-    $text = isset($fieldNames[$fieldType])
-        ? $fieldNames[$fieldType]
-        : 'Resource Field Level';
+    list($cx, $cy) = array_map('intval', explode(',', $coorarray[$i]));
+    $left = round($cx / 300 * 100, 2);
+    $top  = round($cy / 264 * 100, 2);
 
-    /**
-     * Upgrade activ
-     */
-    $isActive = isset($activeFields[$i]);
+    $kind  = isset($fieldKinds[$fieldType]) ? $fieldKinds[$fieldType] : 'wood';
+    $title = Building::procResType($fieldType) . ' Level ' . $fieldLevel;
+    $label = (string)$fieldLevel;
+    $class = 'fm-field fm-' . $kind;
 
-    /**
-     * CSS class
-     */
-    $cssClass = 'reslevel rf' .
-                $i .
-                ' level' .
-                $fieldLevel;
-
-    if ($isActive) {
-        $cssClass .= '_active';
+    if (isset($activeFields[$i])) {
+        $class .= ' fm-active';
+        $title .= ' (upgrade in progress)';
+        if ($activeFields[$i] > $fieldLevel) {
+            $label = $fieldLevel . '&rarr;' . $activeFields[$i];
+        }
     }
 
-    /**
-     * Alt text
-     */
-    $altText = $text . ' ' . $fieldLevel;
-
-    if ($isActive) {
-        $altText .= ' (upgrade in progress)';
-    }
-
-    echo '<img src="img/x.gif"
-               class="' . safeHTML($cssClass) . '"
-               alt="' . safeHTML($altText) . '" />';
+    echo '<a href="build.php?id=' . $i . '" class="' . $class . '"'
+       . ' style="left:' . $left . '%;top:' . $top . '%"'
+       . ' title="' . safeHTML($title) . '">' . $label . '</a>' . "\r\n";
 }
 ?>
-
-    <!-- Overlay click map -->
-    <img id="resfeld"
-         usemap="#rx"
-         src="img/x.gif"
-         alt="" />
-
+    <a href="dorf2.php" class="fm-center" style="left:48%;top:49.62%" title="<?php echo safeHTML(VILLAGE_CENTER); ?>"><?php echo VILLAGE_CENTER; ?></a>
 </div>
