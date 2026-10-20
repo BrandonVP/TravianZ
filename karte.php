@@ -50,25 +50,7 @@ else{
 <html>
 <head>
 	<title><?php echo SERVER_NAME ?> - World Map</title>
-	<link rel="shortcut icon" href="favicon.ico"/>
-	<meta http-equiv="cache-control" content="max-age=0" />
-	<meta http-equiv="pragma" content="no-cache" />
-	<meta http-equiv="expires" content="0" />
-	<meta http-equiv="imagetoolbar" content="no" />
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-
-	<script src="mt-full.js?0ac37" type="text/javascript"></script>
-	<script src="unx.js?f4b7m" type="text/javascript"></script>
-	<script src="new.js?0ac37" type="text/javascript"></script>
-	<link href="<?php echo GP_LOCATE; ?>lang/en/lang.css?f4b7d" rel="stylesheet" type="text/css" />
-	<link href="<?php echo GP_LOCATE; ?>lang/en/compact.css?f4b7i" rel="stylesheet" type="text/css" />
-	<?php
-	// GP_LOCATE contine deja pachetul efectiv: alegerea jucatorului cand
-	// e permisa si valida, altfel pachetul serverului (vezi config.php).
-	echo "
-	<link href='".GP_LOCATE."travian.css?e21d2' rel='stylesheet' type='text/css' />
-	<link href='".GP_LOCATE."lang/en/lang.css?e21d2' rel='stylesheet' type='text/css' />";
-	?>
+	<?php include("Templates/layout/assets.tpl"); ?>
 	<script type="text/javascript">
 
 		window.addEvent('domready', start);
@@ -76,14 +58,8 @@ else{
 </head>
 
 
-<body class="v35 ie ie8">
-<div class="wrapper">
-<img style="filter:chroma();" src="img/x.gif" id="msfilter" alt="" />
-<div id="dynamic_header">
-	</div>
-<?php include("Templates/header.tpl"); ?>
-<div id="mid">
-<?php include("Templates/menu.tpl");
+<?php include("Templates/layout/page_top.tpl"); ?>
+<?php
 if(isset($_GET['d']) && !empty($_GET['d']) && isset($_GET['c']) && !empty($_GET['c'])) {
     if($generator->getMapCheck($_GET['d']) == $_GET['c']) include("Templates/Map/vilview.tpl");
 	else 
@@ -96,37 +72,4 @@ else {
 	include("Templates/Map/mapview.tpl");
 }
 ?>
-<br /><br /><br /><br /><div id="side_info">
-<?php
-include("Templates/multivillage.tpl");
-include("Templates/quest.tpl");
-include("Templates/news.tpl");
-if(!NEW_FUNCTIONS_DISPLAY_LINKS) {
-	echo "<br><br><br><br>";
-	include("Templates/links.tpl");
-}
-?>
-</div>
-<div class="clear"></div>
-</div>
-<div class="footer-stopper"></div>
-<div class="clear"></div>
-
-<?php
-include("Templates/footer.tpl");
-include("Templates/res.tpl");
-?>
-<div id="stime">
-<div id="ltime">
-<div id="ltimeWrap">
-<?php echo CALCULATED_IN;?> <b><?php
-echo round(($generator->pageLoadTimeEnd()-$start_timer)*1000);
-?></b> ms
-
-<br /><?php echo SERVER_TIME;?> <span id="tp1" class="b"><?php echo date('H:i:s'); ?></span>
-</div>
-	</div>
-</div>
-<div id="ce"></div>
-</body>
-</html>
+<br /><br /><br /><br /><?php include("Templates/layout/page_bottom.tpl"); ?>
