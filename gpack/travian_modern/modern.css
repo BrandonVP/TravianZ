@@ -152,9 +152,35 @@ div#res #resWrap td[id^="l"]::after {
     color: var(--tm-green);
 }
 
+/* live values from tzres.js: signed production, and "full in ..." under it */
+div#res #resWrap td[data-prod]::after {
+    content: attr(data-prod);
+}
+
+div#res #resWrap td[data-full]::before {
+    content: attr(data-full);
+    order: 2;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--tm-ink-2);
+}
+
+div#res #resWrap td[data-state="soon"]::before {
+    color: #9a6a00;
+}
+
+div#res #resWrap td[data-state="full"]::before,
+div#res #resWrap td[data-state="empty"]::before {
+    color: var(--tm-red);
+}
+
+div#res #resWrap td[data-state="empty"]::after {
+    color: var(--tm-red);
+}
+
 /* room for the card row between the header and the page */
 html body div#mid {
-    padding-top: 66px;
+    padding-top: 80px;
     background-image: none;
 }
 
