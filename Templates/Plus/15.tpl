@@ -32,12 +32,20 @@ if(!$session->sitterCan(SITTER_PERM_GOLD)) {
     header("Location: plus.php?id=3"); exit;
 }
 
+// Village gold (local redesign, phase 3b): paid with the capital's gold;
+// the Plus-gold part of the UPDATE below then costs nothing
+$tzPaid = VillageGold::capitalPayStart($database, $village, TZ_GOLD_PRICE_GOLDCLUB);
+if ($tzPaid === false) { header("Location: plus.php?id=3"); exit; }
+$tzLogCost = ($tzPaid !== null) ? $tzPaid : $cost;
+if ($tzPaid !== null) $cost = 0;
+
 // un singur query
 mysqli_query($database->dblink,
     "UPDATE ".TB_PREFIX."users 
      SET goldclub = 1, gold = gold - $cost 
      WHERE id = $uid AND gold >= $cost AND goldclub = 0"
 );
+$tzGranted = (mysqli_affected_rows($database->dblink) == 1);
 
 if(mysqli_affected_rows($database->dblink) == 1) {
     // update sesiune
@@ -54,10 +62,11 @@ if(mysqli_affected_rows($database->dblink) == 1) {
     mysqli_query($database->dblink,
         "INSERT INTO ".TB_PREFIX."gold_fin_log 
          (uid, wid, action, gold, time, details) 
-         VALUES ($uid, $wid, 'Use 100 gold for Gold Club', -$cost, $now, 'Gold Club activated')"
+         VALUES ($uid, $wid, 'Buy Gold Club', -$tzLogCost, $now, 'Gold Club activated')"
     );
 }
 
+if (!empty($tzPaid) && empty($tzGranted)) VillageGold::capitalPayRefund($database, $village, $tzPaid);
 header("Location: plus.php?id=3");
 exit;
 ?>

@@ -124,7 +124,7 @@ if ($session->goldclub == 1 && count($session->villages) > 1) {
         && !$session->sitterCan(SITTER_PERM_GOLD));
 
     if (isset($_POST['action']) && $_POST['action'] == 'addRoute') {
-        if ($session->gold >= 2 && $session->goldclub == 1 && !$sitterGoldBlocked) {
+        if (VillageGold::routeCanPay($village, $session) && $session->goldclub == 1 && !$sitterGoldBlocked) {
             for ($i = 1; $i <= 4; $i ++) {
                 if (empty($_POST['r'.$i])) $_POST['r'.$i] = 0;
             }
@@ -141,6 +141,11 @@ if ($session->goldclub == 1 && count($session->villages) > 1) {
             $timestamp = strtotime("-$hour hours -$second second -$minute minutes +$day day");
             
             if ($totalres > 0 && $_POST['tvillage'] != $village->wid && in_array($_POST['tvillage'], $session->villages) && ($_POST['start'] >= 0 && $_POST['start'] <= 23) && ($_POST['deliveries'] >= 1 && $_POST['deliveries'] <= 3)) {
+                // village gold (local redesign): creating a route is paid here
+                if (VillageGold::pays($village) && !$database->takeVillageGold($village->wid, TZ_GOLD_PRICE_ROUTE)) {
+                    header("Location: build.php?gid=17&t=4");
+                    exit;
+                }
                 $database->createTradeRoute($session->uid, $_POST['tvillage'], $village->wid, $_POST['r1'], $_POST['r2'], $_POST['r3'], $_POST['r4'], $_POST['start'], $_POST['deliveries'], $reqMerc, $timestamp);
                 $route = 1;
                 header("Location: build.php?gid=17&t=4");
@@ -154,7 +159,7 @@ if ($session->goldclub == 1 && count($session->villages) > 1) {
     }
 
     if (isset($_POST['routeid']) && isset($_POST['action']) && $_POST['action'] == 'extendRoute') {
-        if ($session->gold >= 2 && $session->goldclub == 1 && !$sitterGoldBlocked) {
+        if (VillageGold::routeCanPay($village, $session) && $session->goldclub == 1 && !$sitterGoldBlocked) {
             $traderoute = $database->getTradeRouteUid($_POST['routeid']);
             if ($traderoute == $session->uid) {
                 /**
@@ -164,7 +169,12 @@ if ($session->goldclub == 1 && count($session->villages) > 1) {
                  * riscul de dubla cheltuire semnalat in comentariul de aici.
                  * Prelungirea se face DOAR daca plata a reusit.
                  */
-                if ($database->spendGold($session->uid, 2, 'Extend trade route')) {
+                if (VillageGold::pays($village)) {
+                    // village gold (local redesign): paid by this village
+                    if ($database->takeVillageGold($village->wid, TZ_GOLD_PRICE_ROUTE)) {
+                        $database->editTradeRoute($_POST['routeid'], "timeleft", 604800, 1);
+                    }
+                } elseif ($database->spendGold($session->uid, 2, 'Extend trade route')) {
                     $database->editTradeRoute($_POST['routeid'], "timeleft", 604800, 1);
                     $session->gold -= 2;
                 }

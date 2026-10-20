@@ -55,6 +55,29 @@ if (!$golds) {
 
 include("Templates/Plus/pmenu.tpl");
 
+// Village gold (local redesign, phase 3b): account features are bought with
+// the CAPITAL's gold, at the capital; Finish now and the NPC merchant use the
+// gold of the village you are in.
+$tzVG = VillageGold::pays($village);
+$tzAtCapital = !empty($village->capital) && (string) $village->capital !== '0';
+$tzCapital = null;
+if ($tzVG) {
+    $tzCapRes = mysqli_query($database->dblink,
+        "SELECT wref, name, gold FROM " . TB_PREFIX . "vdata WHERE owner = " . $plusUid . " AND capital = 1 LIMIT 1");
+    $tzCapital = $tzCapRes ? mysqli_fetch_assoc($tzCapRes) : null;
+    // at the capital its gold was just brought up to date
+    $golds['gold'] = $tzAtCapital ? floor($village->agold) : ($tzCapital ? floor($tzCapital['gold']) : 0);
+}
+$tzPricePlus = $tzVG ? TZ_GOLD_PRICE_PLUS : 10;
+$tzPriceProd = $tzVG ? TZ_GOLD_PRICE_PRODUCTION : 5;
+$tzPriceClub = $tzVG ? TZ_GOLD_PRICE_GOLDCLUB : 100;
+$tzPriceFinish = $tzVG ? TZ_GOLD_PRICE_FINISH : 2;
+$tzPriceNpc = $tzVG ? TZ_GOLD_PRICE_NPC : 3;
+$tzHereGold = $tzVG ? floor($village->agold) : (int) $golds['gold'];
+$tzCoin = $tzVG
+    ? '<svg class="tz-coin-sm" viewBox="0 0 24 24" aria-label="Gold" role="img"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg> '
+    : '<img src="img/x.gif" class="gold" />';
+
 $date2 = time();
 
 /**
@@ -111,6 +134,16 @@ if (!function_exists('plusActionCell')) {
             return '<a href="banned.php"><span class="none">' . TOO_LITTLE_GOLD . '</span></a>';
         }
 
+        global $tzVG, $tzAtCapital, $tzCapital;
+        if ($tzVG && !$tzAtCapital) {
+            return $tzCapital
+                ? '<a href="plus.php?id=3&amp;newdid=' . (int) $tzCapital['wref'] . '"><span>Go to capital</span></a>'
+                : '<span class="none">Capital only</span>';
+        }
+        if ($tzVG && (int) $gold < (int) $cost) {
+            return '<span class="none">' . TOO_LITTLE_GOLD . '</span>';
+        }
+
         if ((int) $gold < (int) $cost) {
             return '<a href="plus.php?s=1"><span class="none">' . TOO_LITTLE_GOLD . '</span></a>';
         }
@@ -137,7 +170,13 @@ $plusDuration  = (PLUS_PRODUCTION >= 86400)
     ? (PLUS_PRODUCTION / 86400) . ' Days'
     : (PLUS_PRODUCTION / 3600) . ' Hours';
 
-if ((int) $golds['gold'] === 0) {
+if ($tzVG) {
+    echo '<p class="tz-plus-gold">' . $tzCoin . 'Plus features are bought with your <b>capital</b>\'s gold'
+       . ($tzCapital ? ' (<b>' . htmlspecialchars($tzCapital['name']) . '</b> has <b>' . (int) $golds['gold'] . '</b> gold)' : '')
+       . '. Finish now and the NPC merchant use the gold of the village you are in (<b>' . (int) $tzHereGold . '</b> here).'
+       . ($tzAtCapital ? '' : ' Go to your capital to buy Plus features.')
+       . '</p>';
+} elseif ((int) $golds['gold'] === 0) {
     echo "<p>You currently don't own gold.</p>";
 } else {
     echo '<p>' . CURRENT_HAVE . ' <b>' . (int) $golds['gold'] . '</b> ' . GOLD . '</p>';
@@ -176,9 +215,9 @@ if ((int) $golds['gold'] === 0) {
             <td class="dur"><?php
                 echo (PLUS_TIME >= 86400) ? (PLUS_TIME / 86400) . ' Days' : (PLUS_TIME / 3600) . ' Hours';
             ?></td>
-            <td class="cost"><img src="img/x.gif" class="gold" />10</td>
+            <td class="cost"><?php echo $tzCoin . $tzPricePlus; ?></td>
             <td class="act"><?php
-                echo plusActionCell($golds['gold'], 10, $golds['plus'], 8, false);
+                echo plusActionCell($golds['gold'], $tzPricePlus, $golds['plus'], 8, false);
             ?></td>
         </tr>
 
@@ -200,9 +239,9 @@ if ((int) $golds['gold'] === 0) {
                 ?></span>
             </td>
             <td class="dur"><?php echo $plusDuration; ?></td>
-            <td class="cost"><img src="img/x.gif" class="gold" />5</td>
+            <td class="cost"><?php echo $tzCoin . $tzPriceProd; ?></td>
             <td class="act"><span class="none"><?php
-                echo plusActionCell($golds['gold'], 5, $until, $plusBonus['id'], $plusIsBanned);
+                echo plusActionCell($golds['gold'], $tzPriceProd, $until, $plusBonus['id'], $plusIsBanned);
             ?></span></td>
         </tr>
         <?php } ?>
@@ -212,9 +251,9 @@ if ((int) $golds['gold'] === 0) {
             <td class="man"><a href="#" onClick="return Popup(7,6);"><img class="help" src="img/x.gif" /></a></td>
             <td class="desc"><?php echo TZ_COMPLETE_CONSTRUCTION_ORDERS_AND_R; ?></td>
             <td class="dur"><?php echo NOW; ?></td>
-            <td class="cost"><img src="img/x.gif" class="gold" />2</td>
+            <td class="cost"><?php echo $tzCoin . $tzPriceFinish; ?></td>
             <td class="act"><span class="none"><?php
-                if ((int) $golds['gold'] > 1) {
+                if ($tzHereGold >= $tzPriceFinish) {
                     echo '<a href="plus.php?id=7" onclick="if(this.dataset.c) return false;'
                        . ' this.dataset.c=1; this.style.pointerEvents=\'none\';"><span>'
                        . GOLD_ON . '</span></a>';
@@ -229,9 +268,9 @@ if ((int) $golds['gold'] === 0) {
             <td class="man"><a href="#" onClick="return Popup(8,6);"><img class="help" src="img/x.gif" /></a></td>
             <td class="desc"><?php echo TZ_N_1_1_TRADE_WITH_THE_NPC_MERCHANT; ?></td>
             <td class="dur"><?php echo NOW; ?></td>
-            <td class="cost"><img src="img/x.gif" class="gold" />3</td>
+            <td class="cost"><?php echo $tzCoin . $tzPriceNpc; ?></td>
             <td class="act"><span class="none"><?php
-                if ((int) $golds['gold'] > 2) {
+                if ($tzHereGold >= $tzPriceNpc) {
                     echo '<a href="build.php?gid=17&t=3"><span>' . NPC . '</span></a>';
                 } else {
                     echo '<a href="plus.php?s=1"><span class="none">' . TOO_LITTLE_GOLD . '</span></a>';
@@ -283,10 +322,10 @@ if (class_exists('GoldShop')):
             <td class="man"><a href="#" onClick="return Popup(9,6);"><img class="help" src="img/x.gif" /></a></td>
             <td class="desc"><b><?php echo GOLD_CLUB; ?></b></td>
             <td class="dur"><?php echo FOR_GAME_SERVER; ?></td>
-            <td class="cost"><img src="img/x.gif" class="gold" />100</td>
+            <td class="cost"><?php echo $tzCoin . $tzPriceClub; ?></td>
             <td class="act"><?php
                 if ((int) $golds['goldclub'] === 0) {
-                    echo plusActionCell($golds['gold'], 100, 0, 15, false);
+                    echo plusActionCell($golds['gold'], $tzPriceClub, 0, 15, false);
                 } else {
                     echo '<a href="plus.php?id=3"><span class="none">' . GOLD_ON . '</span></a>';
                 }

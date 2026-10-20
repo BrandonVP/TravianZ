@@ -28,7 +28,7 @@ if (!($session->goldclub == 1 && count($database->getProfileVillages($session->u
 
 $action = $_POST['action'] ?? '';
 $routeid = isset($_POST['routeid']) ? (int)$_POST['routeid'] : 0;
-$create = isset($_GET['create']) && $session->gold > 1;
+$create = isset($_GET['create']) && VillageGold::routeCanPay($village, $session);
 $edit = ($action === 'editRoute' && $routeid > 0 && $database->getTradeRouteUid($routeid) == $session->uid);
 ?>
 <div id="build" class="gid17">
@@ -47,7 +47,7 @@ $edit = ($action === 'editRoute' && $routeid > 0 && $database->getTradeRouteUid(
         <?php include("17_edit.tpl");?>
 
     <?php else:?>
-        <p><?php echo TRADE_ROUTES_DESC;?> <img src="../../<?php echo GP_LOCATE;?>img/a/gold.gif" alt="<?php echo GOLD; ?>" title="<?php echo GOLD;?>"><b>2</b>.</p>
+        <p><?php echo TRADE_ROUTES_DESC;?> <?php echo VillageGold::priceTag($village, TZ_GOLD_PRICE_ROUTE, 2);?>.</p>
 
         <form method="post" action="build.php?gid=17&t=4">
             <table id="npc" cellpadding="1" cellspacing="1">
@@ -97,7 +97,7 @@ $edit = ($action === 'editRoute' && $routeid > 0 && $database->getTradeRouteUid(
             </table>
         </form>
 
-        * <?php echo EXTEND_TRADE_ROUTES;?> <img src="../../<?php echo GP_LOCATE;?>img/a/gold.gif" alt="<?php echo GOLD; ?>" title="<?php echo GOLD;?>"><b>2</b>
+        * <?php echo EXTEND_TRADE_ROUTES;?> <?php echo VillageGold::priceTag($village, TZ_GOLD_PRICE_ROUTE, 2);?>
         <br>
         <div class="options">
             <a class="arrow" href="build.php?gid=17&t=4&create">» <?php echo CREATE_TRADE_ROUTES;?></a>

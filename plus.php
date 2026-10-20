@@ -30,7 +30,7 @@ AccessLogger::logRequest();
 
 if(isset($_GET['newdid'])) {
 	$_SESSION['wid'] = $_GET['newdid'];
-	header("Location: ".$_SERVER['PHP_SELF']);
+	header("Location: ".$_SERVER['PHP_SELF'].(isset($_GET['id']) ? '?id='.(int)$_GET['id'] : ''));
 	exit;
 }
 else $building->procBuild($_GET);

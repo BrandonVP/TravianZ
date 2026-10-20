@@ -31,6 +31,50 @@ class VillageGold
         return is_object($village) && floor(max(0, (float) $village->agold)) >= (int) $price;
     }
 
+    /**
+     * Account purchases are paid at the capital (local redesign, phase 3b).
+     * null: village gold is off (use Plus gold); false: not at the capital or
+     * not enough gold; else the price, already taken (guarded UPDATE).
+     */
+    public static function capitalPayStart($db, $village, $price)
+    {
+        if (!self::pays($village)) {
+            return null;
+        }
+        if (empty($village->capital) || (string) $village->capital === '0') {
+            return false;
+        }
+        if (!self::canAfford($village, $price)) {
+            return false;
+        }
+        return $db->takeVillageGold($village->wid, $price) ? (int) $price : false;
+    }
+
+    /** Can this village pay for a trade route (village gold, else 2 Plus gold)? */
+    public static function routeCanPay($village, $session)
+    {
+        return self::pays($village)
+            ? self::canAfford($village, TZ_GOLD_PRICE_ROUTE)
+            : $session->gold >= 2;
+    }
+
+    /** Price tag: coin + village gold price, or the old Plus gold icon + price. */
+    public static function priceTag($village, $villagePrice, $plusPrice)
+    {
+        if (self::pays($village)) {
+            return '<svg class="tz-coin-sm" viewBox="0 0 24 24" aria-label="Gold" role="img"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg> <b>' . (int) $villagePrice . '</b>';
+        }
+        return '<img src="img/x.gif" class="gold" alt="Gold" title="Gold" /><b>' . (int) $plusPrice . '</b>';
+    }
+
+    /** Give back a capital payment whose purchase could not be granted. */
+    public static function capitalPayRefund($db, $village, $paid)
+    {
+        if ($paid > 0) {
+            $db->addVillageGold($village->wid, $paid, TZ_GOLD_CAP);
+        }
+    }
+
     /** Highest Main Building (gid 15) and Marketplace (gid 17) level in a village. */
     public static function buildingLevels($resArray)
     {
