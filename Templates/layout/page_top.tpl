@@ -11,5 +11,6 @@
 <div id="dynamic_header">
 	</div>
 <?php include(__DIR__ . "/../header.tpl"); ?>
+<?php include(__DIR__ . "/../res.tpl"); ?>
 <div id="mid">
 <?php include(__DIR__ . "/../menu.tpl"); ?>

@@ -28,7 +28,6 @@ if(!NEW_FUNCTIONS_DISPLAY_LINKS) {
 
 <?php
 include(__DIR__ . "/../footer.tpl");
-include(__DIR__ . "/../res.tpl");
 ?>
 <div id="stime" class="tz-rendertime">
 <?php echo CALCULATED_IN;?> <b><?php

@@ -5,10 +5,11 @@
  */
 
 :root {
-    --tz-page: 1280px;
+    /* fluid up to 1280px; percentages resolve against each element's parent */
+    --tz-page: min(1280px, 100% - 32px);
     --tz-left: 230px;
     /* the three columns span exactly the page, like the resource cards */
-    --tz-centre: calc(var(--tz-page) - var(--tz-left) - var(--tz-right) - 2 * var(--tz-gap));
+    --tz-centre: calc(100% - var(--tz-left) - var(--tz-right) - 2 * var(--tz-gap));
     --tz-right: 300px;
     --tz-gap: 25px;
     --tz-bar-h: 60px;
@@ -267,7 +268,7 @@ body.mod3 div#mid {
     min-width: var(--tz-page);
     margin: 0 auto;
     float: none;
-    padding-top: 140px;
+    padding-top: 18px;
 }
 
 /* resource cards (Templates/res.tpl), just under the top bar */
@@ -275,13 +276,11 @@ div#res,
 body.mod1 div#res,
 body.mod2 div#res,
 body.mod3 div#res {
-    position: absolute;
-    left: 0;
-    top: calc(var(--tz-bar-h) + 15px);
+    position: static;
     width: 100%;
-    min-width: var(--tz-page);
+    min-width: 0;
     height: auto;
-    z-index: 3;
+    margin-top: 15px;
 }
 
 div#res div#resWrap {
@@ -865,7 +864,7 @@ div#content .tz-vhead h1 {
    (the art is 4x, css/vcentre.css); zoom scales the click areas too */
 div.village2 div#village_map {
     margin: 0 auto;
-    zoom: 1.18;
+    zoom: 1.18; /* tzfit.js recomputes this to fit the panel */
 }
 
 /* the level toggle sits right after the map, positioned for the old 540px
@@ -875,6 +874,15 @@ div#content.village2 img#lswitch {
     display: block;
     left: calc(50% + 290px);
     top: -34px;
+}
+
+/* tzfit.js moves the toggle inside the map, so it zooms along */
+div.village2 div#village_map img#lswitch.tz-in-map {
+    position: absolute;
+    left: auto;
+    top: auto;
+    right: 4px;
+    bottom: 4px;
 }
 
 /* right column */
@@ -895,4 +903,163 @@ div#stime.tz-rendertime {
     text-align: center;
     color: #8a7a62;
     font-size: 11px;
+}
+
+
+/* footer: the packs fix it at 980px / 905px; let it follow the page */
+div#footer {
+    min-width: 0;
+}
+
+div#footer div#mfoot {
+    width: auto;
+    max-width: var(--tz-page);
+}
+
+/* ===================== smaller screens ===================== */
+
+/* below 1100px: one column - page content, then the status cards, then the
+   village list and the other left-column cards */
+@media (max-width: 1100px) {
+    html body div#mid,
+    body.mod1 div#mid,
+    body.mod2 div#mid,
+    body.mod3 div#mid {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    div#mid > div#content {
+        order: 1;
+        width: 100%;
+        float: none;
+    }
+
+    div#side_info,
+    body.mod1 div#side_info,
+    body.mod2 div#side_info,
+    body.mod3 div#side_info {
+        order: 2;
+        width: 100%;
+        min-height: 0;
+        padding-left: 0;
+        float: none;
+    }
+
+    div#side_navi,
+    body.mod1 div#side_navi,
+    body.mod2 div#side_navi,
+    body.mod3 div#side_navi {
+        order: 3;
+        width: 100%;
+        min-height: 0;
+        margin-right: 0;
+        float: none;
+    }
+
+    .tz-rcards {
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+}
+
+/* tablets and phones: compact top bar */
+@media (max-width: 900px) {
+    .tzbar-inner {
+        flex-wrap: wrap;
+        gap: 6px 10px;
+        padding: 8px 4px 6px;
+    }
+
+    a.tzbar-logo,
+    a.tzbar-logo:visited {
+        font-size: 19px;
+    }
+
+    /* the menu becomes one row that scrolls sideways */
+    .tzbar-nav {
+        order: 3;
+        flex: 1 1 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .tzbar-nav::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* phones */
+@media (max-width: 760px) {
+    :root {
+        --tz-page: min(1280px, 100% - 16px);
+        --tz-bar-h: 52px;
+    }
+
+    .tzbar-time {
+        display: none;
+    }
+
+    .tzbar-right {
+        gap: 8px;
+    }
+
+    a.tzbar-coins,
+    a.tzbar-coins:visited {
+        padding: 6px 10px;
+        gap: 8px;
+        font-size: 13px;
+    }
+
+    .tz-rcards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .tz-rcard {
+        padding: 9px 10px 8px;
+    }
+
+    .tz-r-net {
+        grid-column: 1 / -1;
+    }
+
+    .tz-rhead {
+        font-size: 14px;
+    }
+
+    .tz-rnow,
+    .tz-rnet {
+        font-size: 19px;
+    }
+
+    .tz-rcap {
+        font-size: 12px;
+    }
+
+    .tz-rfull {
+        font-size: 12px;
+    }
+
+    /* page content: less padding; anything still wider scrolls inside the panel */
+    div#mid > div#content,
+    div#mid > div#content.village1,
+    div#mid > div#content.village2 {
+        padding: 14px 12px 16px;
+        overflow-x: auto;
+    }
+
+    div#content .tz-vhead h1 {
+        font-size: 24px;
+    }
+
+    .tz-vloyalty {
+        margin-left: 0;
+    }
+
+    .tz-vtabs a,
+    .tz-vtabs a:visited {
+        padding: 8px 12px;
+    }
 }

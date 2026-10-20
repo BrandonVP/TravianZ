@@ -22,7 +22,14 @@
  * Safety check (avoid undefined village context)
  * ---------------------------------------------------------
  */
+// printed once per page: Templates/layout/page_top.tpl puts the cards at the
+// top of the page; later includes (old page bottoms) print nothing
+if (!empty($GLOBALS['tzResPrinted'])) {
+    return;
+}
+
 if (!empty($village)) {
+    $GLOBALS['tzResPrinted'] = true;
 
     /**
      * -----------------------------------------------------

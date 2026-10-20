@@ -1,4 +1,5 @@
 	<link rel="shortcut icon" href="favicon.ico"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta http-equiv="cache-control" content="max-age=0" />
 	<meta http-equiv="pragma" content="no-cache" />
 	<meta http-equiv="expires" content="0" />
@@ -9,6 +10,7 @@
 	<script src="new.js?0faab" type="text/javascript"></script>
 	<script src="tzres.js?v=<?php echo @filemtime(__DIR__ . '/../../tzres.js'); ?>" type="text/javascript"></script>
 	<script src="tzbuttons.js?v=<?php echo @filemtime(__DIR__ . '/../../tzbuttons.js'); ?>" type="text/javascript"></script>
+	<script src="tzfit.js?v=<?php echo @filemtime(__DIR__ . '/../../tzfit.js'); ?>" type="text/javascript"></script>
 <?php
 	// Graphics-pack stylesheets, versioned by file time so a changed pack file
 	// replaces a browser's cached copy instead of living on for weeks.
