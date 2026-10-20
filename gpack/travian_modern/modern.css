@@ -397,3 +397,9 @@ div#footer .copyright a {
 div#footer .copyright a:hover {
     color: #ffffff !important;
 }
+
+/* render time on the dark footer */
+div#stime.tz-rendertime,
+div#stime.tz-rendertime b {
+    color: #b9a682;
+}

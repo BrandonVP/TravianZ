@@ -80,16 +80,18 @@ if (!function_exists('tzCoinIcon')) {
     <a class="tzbar-logo" href="<?php echo $dorf1Link; ?>"><?php echo TZ_TRAVIANZ; ?></a>
 
     <nav class="tzbar-nav" aria-label="Main">
-<?php foreach ($tzNav as $n) {
-    list($file, $href, $label, $key, $count) = $n;
-    $tip = isset($n[5]) ? $n[5] : '';
-    $current = ($tzPage === $file);
-    echo '        <a href="' . safeHTML($href) . '"'
-       . ($tip !== '' ? ' title="' . safeHTML($tip) . '"' : '')
-       . ($key ? ' accesskey="' . $key . '"' : '')
-       . ($current ? ' class="current" aria-current="page"' : '') . '>'
-       . safeHTML($label)
-       . ($count > 0 ? ' <span class="tzbar-count" title="' . $count . ' unread">' . $count . '</span>' : '')
+<?php foreach ($tzNav as $tzNavItem) {
+    // tz-prefixed: this runs before the page content, so plain names
+    // ($key, $file, $count, ...) could overwrite the page's own variables
+    list($tzFile, $tzHref, $tzLabel, $tzKey, $tzCount) = $tzNavItem;
+    $tzTip = isset($tzNavItem[5]) ? $tzNavItem[5] : '';
+    $tzCurrent = ($tzPage === $tzFile);
+    echo '        <a href="' . safeHTML($tzHref) . '"'
+       . ($tzTip !== '' ? ' title="' . safeHTML($tzTip) . '"' : '')
+       . ($tzKey ? ' accesskey="' . $tzKey . '"' : '')
+       . ($tzCurrent ? ' class="current" aria-current="page"' : '') . '>'
+       . safeHTML($tzLabel)
+       . ($tzCount > 0 ? ' <span class="tzbar-count" title="' . $tzCount . ' unread">' . $tzCount . '</span>' : '')
        . "</a>\n";
 } ?>
     </nav>

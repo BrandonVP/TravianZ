@@ -11,6 +11,18 @@
 <div id="dynamic_header">
 	</div>
 <?php include(__DIR__ . "/../header.tpl"); ?>
-<?php include(__DIR__ . "/../res.tpl"); ?>
+<?php
+// Resource cards. Included from a function on purpose: res.tpl's loop
+// variables ($id, $wood, ...) used to leak into the page (a2b.php read $id
+// and opened the found-new-village form).
+if (!function_exists('tz_print_resource_cards')) {
+	function tz_print_resource_cards()
+	{
+		global $village, $technology, $session, $database, $generator;
+		include __DIR__ . "/../res.tpl";
+	}
+}
+tz_print_resource_cards();
+?>
 <div id="mid">
 <?php include(__DIR__ . "/../menu.tpl"); ?>

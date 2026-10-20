@@ -906,8 +906,19 @@ body.mod3 div#side_info {
 
 /* render time under the footer */
 div#stime.tz-rendertime {
-    position: static;
-    padding: 6px 0 10px;
+    /* new_layout_ltr.css makes #stime inline with zero width (it drifted to
+       the left edge) and the footer is absolutely positioned at the bottom of
+       .wrapper; sit the render time on the footer's bottom edge, centred */
+    position: absolute;
+    top: auto; /* the pack sets top: 0, which stretched it over the page */
+    left: 0;
+    right: 0;
+    bottom: 6px;
+    z-index: 5;
+    display: block;
+    width: auto;
+    height: auto;
+    padding: 0;
     text-align: center;
     color: #8a7a62;
     font-size: 11px;
