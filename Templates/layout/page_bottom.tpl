@@ -14,7 +14,6 @@ $layoutTimerStart = isset($start_timer) ? $start_timer : (isset($pagestart) ? $p
 if (!empty($layoutRightTop)) {
 	echo '<div class="tz-cards">' . $layoutRightTop . '</div>';
 }
-include(__DIR__ . "/../quest.tpl");
 include(__DIR__ . "/../news.tpl");
 if(!NEW_FUNCTIONS_DISPLAY_LINKS) {
 	echo "<br><br><br><br>";

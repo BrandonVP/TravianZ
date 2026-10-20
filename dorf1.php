@@ -72,12 +72,6 @@ include("Templates/production.tpl");
 <?php
 // Build queue, troops and movements become cards in the right column
 // (printed by Templates/layout/page_bottom.tpl).
-$layoutRightTop = '';
-if($building->NewBuilding) {
-	ob_start();
-	include("Templates/Building.tpl");
-	$layoutRightTop .= '<div class="tz-card tz-card-build">' . ob_get_clean() . '</div>';
-}
-include("Templates/layout/troop_cards.tpl");
+include("Templates/layout/status_cards.tpl");
 ?>
 <br /><br /><br /><br /><?php include("Templates/layout/page_bottom.tpl"); ?>

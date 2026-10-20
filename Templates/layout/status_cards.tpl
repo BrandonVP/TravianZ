@@ -1,11 +1,17 @@
 <?php
 /**
- * Troops and troop-movement cards for the top of the right column
- * (dorf1 and dorf2). Appends to $layoutRightTop, which
+ * Status cards for the top of the right column on dorf1 and dorf2: build
+ * queue (when something is building), troops and troop movements. Appends to $layoutRightTop, which
  * Templates/layout/page_bottom.tpl prints. Include from page scope.
  */
 if (!isset($layoutRightTop)) {
 	$layoutRightTop = '';
+}
+
+if ($building->NewBuilding) {
+	ob_start();
+	include(__DIR__ . "/../Building.tpl");
+	$layoutRightTop .= '<div class="tz-card tz-card-build">' . ob_get_clean() . '</div>';
 }
 
 ob_start();

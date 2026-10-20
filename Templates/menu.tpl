@@ -126,6 +126,16 @@ $idUser      = isset($_SESSION['id_user']) ? (int)$_SESSION['id_user'] : 0;
     </div>
     <?php } ?>
 
+    <div class="tz-quest-slot">
+        <?php
+        /**
+         * Quest giver (task list); moved here from the right column to give
+         * the status cards more room.
+         */
+        include("Templates/quest.tpl");
+        ?>
+    </div>
+
     <div class="tz-side-extras">
         <?php
         if(defined('NEW_FUNCTIONS_DISPLAY_LINKS') && NEW_FUNCTIONS_DISPLAY_LINKS) {

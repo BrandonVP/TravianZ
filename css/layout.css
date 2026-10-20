@@ -617,6 +617,22 @@ div#mid > br {
     display: none;
 }
 
+/* quest giver, bottom of the left column (smaller than its 174px original) */
+div#side_navi .tz-quest-slot {
+    margin-top: 12px;
+    text-align: center;
+}
+
+div#side_navi .tz-quest-slot #anm {
+    height: 0 !important;
+}
+
+div#side_navi .tz-quest-slot div#qge img {
+    height: 130px !important;
+    width: auto !important;
+    cursor: pointer;
+}
+
 /* right column */
 div#side_info,
 body.mod1 div#side_info,

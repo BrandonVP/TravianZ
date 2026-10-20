@@ -52,14 +52,10 @@ else $building->procBuild($_GET);
 <?php include("Templates/layout/page_top.tpl"); ?>
 		<div id="content"  class="village2">
 <h1><?php echo $village->vname; if($village->loyalty!='100'){ if($village->loyalty>'33'){ $color="green"; }else{ $color="red"; } ?><div id="loyality"><span style="color:<?php echo $color; ?>;font-size:xx-small;" size><?php echo LOYALTY; ?> <?php echo floor($village->loyalty); ?>%</span></div><?php } ?></h1>
-<?php include("Templates/dorf2.tpl");
-if($building->NewBuilding) {
-	include("Templates/Building.tpl");
-}
-?>
+<?php include("Templates/dorf2.tpl"); ?>
 </div>
 <?php
-// Troops and movements as right-column cards, like the Fields page
-include("Templates/layout/troop_cards.tpl");
+// Build queue, troops and movements as right-column cards, like the Fields page
+include("Templates/layout/status_cards.tpl");
 ?>
 <br /><br /><br /><br /><?php include("Templates/layout/page_bottom.tpl"); ?>

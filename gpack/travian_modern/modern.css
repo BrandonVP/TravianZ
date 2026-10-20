@@ -357,3 +357,12 @@ div#side_info .tz-card td.tz-calm {
     border-radius: 8px;
     border-bottom: 0;
 }
+
+/* quest giver in the left column: blend its white onto the panel */
+div#side_navi .tz-quest-slot div#qge {
+    background: var(--tm-panel);
+}
+
+div#side_navi .tz-quest-slot div#qge img {
+    mix-blend-mode: multiply;
+}
