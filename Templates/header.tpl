@@ -143,6 +143,13 @@ if (!function_exists('tzCoinIcon')) {
                 <a href="logout.php" class="logout"><?php echo LOGOUT; ?></a>
             </div>
         </details>
+        <script type="text/javascript">
+        // close the account menu on any click outside it
+        document.addEventListener('click', function (e) {
+            var d = document.querySelector('details.tzbar-account[open]');
+            if (d && !d.contains(e.target)) d.removeAttribute('open');
+        });
+        </script>
 
     </div>
 
