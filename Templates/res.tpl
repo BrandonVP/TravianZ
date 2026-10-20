@@ -53,6 +53,15 @@ if (!empty($village)) {
 
     $maxStore  = $village->maxstore;
     $maxCrop   = $village->maxcrop;
+
+    /**
+     * Fill level per store as a CSS variable (--fill) on each cell; the
+     * Travian Modern pack draws it as a bar, other packs ignore it.
+     */
+    $fill = function ($amount, $max) {
+        $pct = $max > 0 ? max(0, min(100, $amount / $max * 100)) : 0;
+        return '--fill:' . round($pct, 1) . '%';
+    };
 ?>
 
 <div id="res">
@@ -67,7 +76,7 @@ if (!empty($village)) {
                 <img src="img/x.gif" class="r1" alt="<?php echo LUMBER; ?>" title="<?php echo LUMBER; ?>" />
             </td>
 
-            <td id="l4" title="<?php echo $wood; ?>">
+            <td id="l4" style="<?php echo $fill($woodStore, $maxStore); ?>" title="<?php echo $wood; ?>">
                 <?php echo $woodStore . "/" . $maxStore; ?>
             </td>
 
@@ -76,7 +85,7 @@ if (!empty($village)) {
                 <img src="img/x.gif" class="r2" alt="<?php echo CLAY; ?>" title="<?php echo CLAY; ?>" />
             </td>
 
-            <td id="l3" title="<?php echo $clay; ?>">
+            <td id="l3" style="<?php echo $fill($clayStore, $maxStore); ?>" title="<?php echo $clay; ?>">
                 <?php echo $clayStore . "/" . $maxStore; ?>
             </td>
 
@@ -85,7 +94,7 @@ if (!empty($village)) {
                 <img src="img/x.gif" class="r3" alt="<?php echo IRON; ?>" title="<?php echo IRON; ?>" />
             </td>
 
-            <td id="l2" title="<?php echo $iron; ?>">
+            <td id="l2" style="<?php echo $fill($ironStore, $maxStore); ?>" title="<?php echo $iron; ?>">
                 <?php echo $ironStore . "/" . $maxStore; ?>
             </td>
 
@@ -95,7 +104,7 @@ if (!empty($village)) {
             </td>
 
             <?php if ($village->acrop > 0) { ?>
-                <td id="l1" title="<?php echo $crop; ?>">
+                <td id="l1" style="<?php echo $fill($cropStore, $maxCrop); ?>" title="<?php echo $crop; ?>">
                     <?php echo $cropStore . "/" . $maxCrop; ?>
                 </td>
             <?php } else { ?>

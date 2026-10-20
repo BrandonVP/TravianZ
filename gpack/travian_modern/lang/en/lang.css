@@ -1,0 +1,4 @@
+@CHARSET "UTF-8";
+/* Travian Modern: the default pack's rules, then the modern theme on top. */
+@import url("lang_base.css");
+@import url("../../modern.css?v=1");

@@ -1,0 +1,398 @@
+@CHARSET "UTF-8";
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap");
+
+/*
+ * Travian Modern - theme layer over the default pack (loaded last via lang.css).
+ * Keeps the game art (map, buildings, units, icons); restyles the chrome:
+ * parchment panels, dark-wood header, one font pair, consistent tables.
+ */
+
+:root {
+    --tm-ground: #e9dcc0;      /* page */
+    --tm-panel: #f7efdc;       /* parchment panels */
+    --tm-panel-2: #fbf6ea;     /* table cells, inner cards */
+    --tm-line: #d6c39b;        /* panel borders */
+    --tm-line-2: #e3d2ac;      /* inner rules, table grid */
+    --tm-head: #efe2c4;        /* table headers */
+    --tm-wood: #2b1d12;        /* header band */
+    --tm-wood-2: #4a3220;
+    --tm-gold: #b8862b;
+    --tm-gold-2: #f0d9a0;
+    --tm-ink: #2a2118;
+    --tm-ink-2: #6b5a45;       /* secondary text, 5:1 on panel */
+    --tm-link: #7a4a12;
+    --tm-link-hover: #4e2f0b;
+    --tm-green: #3f6b2a;
+    --tm-red: #a3271c;
+    --tm-display: "Cinzel", Georgia, "Times New Roman", serif;
+    --tm-body: "Source Sans 3", "Segoe UI", Verdana, Arial, sans-serif;
+}
+
+/* ---------- base ---------- */
+
+html, body {
+    background: var(--tm-ground);
+}
+
+body {
+    color: var(--tm-ink);
+    font-family: var(--tm-body);
+    font-size: 14px;
+}
+
+a, a:visited {
+    color: var(--tm-link);
+}
+
+a:hover {
+    color: var(--tm-link-hover);
+}
+
+h1, h2, h3 {
+    font-family: var(--tm-display);
+    color: var(--tm-wood);
+    font-weight: 700;
+}
+
+div#content h1 {
+    font-size: 26px;
+    letter-spacing: 0.01em;
+}
+
+/* ---------- header band ---------- */
+
+div#header {
+    background: var(--tm-wood);
+    border-bottom: 3px solid var(--tm-gold);
+}
+
+div#ltime,
+div#ltime b,
+div#ltime span {
+    color: #e6d3a8;
+}
+
+div#ltime .b,
+div#ltime b {
+    color: #f7e9c6;
+}
+
+/* The nav icons, Plus button and hero ring are drawn on white; they sit in a
+   parchment tray and multiply-blend so the white takes the tray's colour. */
+body div#mtop {
+    background: var(--tm-panel);
+    border-radius: 0 0 18px 18px;
+    box-shadow: 0 2px 0 var(--tm-gold), 0 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+div#mtop > a,
+div#mtop > div#n5,
+div#mtop #tzHeroBox {
+    mix-blend-mode: multiply;
+}
+
+#goldHeader,
+#goldHeader .tzCoinValue {
+    color: var(--tm-wood);
+}
+
+/* ---------- resource bar: one card per resource ---------- */
+
+div#res {
+    top: 186px;
+}
+
+div#res #resWrap table {
+    display: block;
+    width: auto;
+    background: none;
+}
+
+div#res #resWrap tbody {
+    display: block;
+}
+
+div#res #resWrap tr {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+}
+
+div#res #resWrap td {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--tm-panel);
+    border: 1px solid var(--tm-line);
+    color: var(--tm-ink);
+    font-family: var(--tm-body);
+    font-size: 16px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+div#res #resWrap td:nth-child(odd) {
+    border-right: 0;
+    border-radius: 10px 0 0 10px;
+    padding: 8px 4px 8px 12px;
+}
+
+div#res #resWrap td:nth-child(even) {
+    border-left: 0;
+    border-radius: 0 10px 10px 0;
+    padding: 8px 14px 8px 6px;
+    margin-right: 10px;
+}
+
+div#res #resWrap td:last-child {
+    margin-right: 0;
+}
+
+/* fill bar along the bottom of each card (--fill comes from res.tpl) */
+div#res #resWrap td[id^="l"] {
+    background:
+        linear-gradient(var(--tm-bar, #8a5a2b), var(--tm-bar, #8a5a2b)) no-repeat left bottom / var(--fill, 0%) 4px,
+        linear-gradient(var(--tm-line-2), var(--tm-line-2)) no-repeat left bottom / 100% 4px,
+        var(--tm-panel);
+}
+
+div#res #resWrap td#l4 { --tm-bar: #8a5a2b; }
+div#res #resWrap td#l3 { --tm-bar: #b4532a; }
+div#res #resWrap td#l2 { --tm-bar: #56636e; }
+div#res #resWrap td#l1 { --tm-bar: #b8901f; }
+
+div#res #resWrap td[id^="l"]::after {
+    content: "+" attr(title) "/h";
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tm-green);
+}
+
+/* room for the card row between the header and the page */
+div#mid {
+    padding-top: 52px;
+    background-image: none;
+}
+
+/* ---------- left menu ---------- */
+
+div#side_navi {
+    background: var(--tm-panel);
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px var(--tm-line);
+    padding-bottom: 8px;
+}
+
+div#side_navi p {
+    margin: 0 8px 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--tm-line-2);
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+div#side_navi #logo + p {
+    border-top: 0;
+}
+
+div#side_navi p a {
+    display: block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: var(--tm-ink);
+    font-weight: 600;
+}
+
+div#side_navi p a:hover {
+    background: var(--tm-head);
+    color: var(--tm-link-hover);
+}
+
+/* ---------- centre panel ---------- */
+
+div#content {
+    background: var(--tm-panel);
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px var(--tm-line);
+}
+
+/* Village centre and world map art are drawn on white: blend onto the panel */
+div.village2 div#village_map,
+div.map div#map {
+    mix-blend-mode: multiply;
+}
+
+/* village centre: the name floats over the map art */
+div.village2 h1 {
+    background: var(--tm-panel);
+    border-radius: 10px;
+    padding: 2px 12px;
+    box-shadow: 0 1px 4px rgba(43, 29, 18, 0.2);
+}
+
+/* ---------- right column ---------- */
+
+div#side_info,
+body.mod1 div#side_info,
+body.mod2 div#side_info,
+body.mod3 div#side_info {
+    background: none;
+    color: var(--tm-ink);
+}
+
+/* quest giver art: drawn on white. The column is its own stacking layer, so the
+   blend needs a backdrop inside it. */
+div#side_info div#qge {
+    background: var(--tm-ground);
+}
+
+div#side_info div#qge img {
+    mix-blend-mode: multiply;
+}
+
+/* one width for every right-column panel */
+div#side_info table#vlist,
+div#side_info h5,
+div#side_info div.news {
+    width: 236px;
+    box-sizing: border-box;
+}
+
+/* Newsbox: the title is an image of green text; show a themed heading instead */
+div#side_info h5 {
+    margin: 14px 0 0;
+    padding: 10px 14px 6px;
+    background: var(--tm-panel);
+    border-radius: 12px 12px 0 0;
+    box-shadow: inset 1px 0 0 var(--tm-line), inset -1px 0 0 var(--tm-line), inset 0 1px 0 var(--tm-line);
+}
+
+div#side_info h5 img {
+    display: none;
+}
+
+div#side_info h5::before {
+    content: "Server info";
+    font-family: var(--tm-display);
+    font-size: 16px;
+    color: var(--tm-link-hover);
+}
+
+div#side_info div.news {
+    background: var(--tm-panel);
+    border: 0;
+    border-radius: 0 0 12px 12px;
+    box-shadow: inset 1px 0 0 var(--tm-line), inset -1px 0 0 var(--tm-line), inset 0 -1px 0 var(--tm-line);
+    margin: 0;
+    padding: 0 10px 10px;
+}
+
+div#side_info div.news table,
+div#side_info div.news td {
+    background: none;
+    border: 0;
+    font-size: 13px;
+}
+
+div#side_info div.news td {
+    padding: 3px 4px;
+    border-bottom: 1px solid var(--tm-line-2);
+}
+
+div#side_info div.news font {
+    color: var(--tm-link-hover);
+}
+
+div#side_info table#vlist {
+    background: var(--tm-panel);
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px var(--tm-line);
+    padding: 8px 6px;
+}
+
+div#side_info table#vlist thead td,
+div#side_info table#vlist thead td a {
+    background: none;
+    font-family: var(--tm-display);
+    font-size: 16px;
+    color: var(--tm-link-hover);
+    text-align: left;
+    padding: 2px 6px 6px;
+}
+
+div#side_info table#vlist td {
+    background: none;
+}
+
+div#side_info table#vlist td.link a {
+    color: var(--tm-ink);
+    font-weight: 600;
+}
+
+div#side_info table#vlist td.dot.hl,
+div#side_info table#vlist td.dot.hl + td.link a {
+    color: var(--tm-gold);
+}
+
+/* ---------- tables ---------- */
+
+div#content table {
+    background-color: var(--tm-line-2);
+    border-radius: 8px;
+}
+
+div#content table thead th,
+div#content table tfoot th {
+    background: var(--tm-head);
+    color: var(--tm-link-hover);
+    font-family: var(--tm-body);
+    font-weight: 700;
+    padding: 5px 6px;
+}
+
+div#content table thead td,
+div#content table tfoot td {
+    background-color: var(--tm-head);
+    color: var(--tm-ink);
+    padding: 4px 6px;
+}
+
+div#content table tbody td,
+div#content table tbody th {
+    background-color: var(--tm-panel-2);
+    padding: 3px 5px;
+}
+
+table td, table th {
+    font-size: 14px;
+}
+
+/* ---------- forms ---------- */
+
+input.text, select.dropdown, select, textarea {
+    background: #fffaf0;
+    border: 1px solid var(--tm-line);
+    border-radius: 6px;
+    color: var(--tm-ink);
+    font-family: var(--tm-body);
+    font-size: 14px;
+    padding: 4px 7px;
+}
+
+input.text:focus, select:focus, textarea:focus {
+    border-color: var(--tm-gold);
+    outline: 2px solid rgba(184, 134, 43, 0.25);
+}
+
+/* ---------- footer ---------- */
+
+div#footer {
+    background: var(--tm-wood);
+    color: #e6d3a8;
+}
+
+div#footer .copyright {
+    color: #e6d3a8;
+}
