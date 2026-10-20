@@ -633,6 +633,94 @@ div#side_navi .tz-quest-slot div#qge img {
     cursor: pointer;
 }
 
+/* village header (Templates/layout/village_head.tpl) on dorf1 / dorf2 */
+div#mid > div#content.village1,
+div#mid > div#content.village2 {
+    padding: 22px 28px 24px;
+}
+
+div#content .tz-vhead {
+    margin-bottom: 16px;
+}
+
+div#content .tz-vtitle {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 14px;
+}
+
+div#content .tz-vhead h1 {
+    position: static;
+    margin: 0;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    font-family: "Cinzel", Georgia, "Times New Roman", serif;
+    font-size: 30px;
+    line-height: 1.15;
+    color: #2b1d12;
+}
+
+.tz-vcoords {
+    color: #6b5a45;
+    font-size: 15px;
+}
+
+.tz-vbadge {
+    align-self: center;
+    padding: 3px 12px;
+    border-radius: 12px;
+    background: #f0d9a0;
+    color: #4e2f0b;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.tz-vloyalty {
+    margin-left: auto;
+    color: #6b5a45;
+    font-size: 15px;
+}
+
+.tz-vloyalty strong { color: #2a2118; }
+.tz-vloyalty.warn strong { color: #9a6a00; }
+.tz-vloyalty.low strong { color: #a3271c; }
+
+.tz-vtabs {
+    display: flex;
+    gap: 4px;
+    margin-top: 14px;
+    border-bottom: 2px solid #e3d2ac;
+}
+
+.tz-vtabs a,
+.tz-vtabs a:visited {
+    margin-bottom: -2px;
+    padding: 8px 18px;
+    border-bottom: 3px solid transparent;
+    color: #6b5a45;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.tz-vtabs a:hover {
+    color: #2b1d12;
+}
+
+.tz-vtabs a.current {
+    color: #2b1d12;
+    border-bottom-color: #b8862b;
+}
+
+/* village centre map centred in the wider panel */
+div.village2 div#village_map {
+    margin: 0 auto;
+}
+
 /* right column */
 div#side_info,
 body.mod1 div#side_info,

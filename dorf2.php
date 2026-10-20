@@ -51,7 +51,7 @@ else $building->procBuild($_GET);
 
 <?php include("Templates/layout/page_top.tpl"); ?>
 		<div id="content"  class="village2">
-<h1><?php echo $village->vname; if($village->loyalty!='100'){ if($village->loyalty>'33'){ $color="green"; }else{ $color="red"; } ?><div id="loyality"><span style="color:<?php echo $color; ?>;font-size:xx-small;" size><?php echo LOYALTY; ?> <?php echo floor($village->loyalty); ?>%</span></div><?php } ?></h1>
+<?php include("Templates/layout/village_head.tpl"); ?>
 <?php include("Templates/dorf2.tpl"); ?>
 </div>
 <?php
