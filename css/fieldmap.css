@@ -6,7 +6,7 @@ div.village1 div#village_map.fieldmap {
     float: none;
     position: relative;
     width: 100%;
-    max-width: 520px;
+    max-width: 640px;
     height: auto;
     aspect-ratio: 300 / 264;
     margin: 4px auto 18px;

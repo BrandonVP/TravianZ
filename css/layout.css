@@ -5,7 +5,11 @@
  */
 
 :root {
-    --tz-page: 980px;
+    --tz-page: 1280px;
+    --tz-left: 230px;
+    --tz-centre: 700px;
+    --tz-right: 300px;
+    --tz-gap: 25px;
     --tz-bar-h: 60px;
     --tz-wood: #2b1d12;
     --tz-wood-2: #4a3220;
@@ -276,11 +280,13 @@ div#side_navi,
 body.mod1 div#side_navi,
 body.mod2 div#side_navi,
 body.mod3 div#side_navi {
-    width: 190px;
-    margin-right: 10px;
+    width: var(--tz-left);
+    margin-right: var(--tz-gap);
     min-height: 0;
     height: auto !important;
     font-size: 13px;
+    margin-top: 0;
+    top: 0;
 }
 
 div#side_navi div#mtop.tz-hero-slot {
@@ -317,6 +323,7 @@ div#side_navi table#vlist thead td {
 
 div#side_navi table#vlist td.aligned_coords {
     font-size: 11px;
+    padding-right: 8px;
     white-space: nowrap;
     text-align: right;
 }
@@ -336,13 +343,58 @@ div#side_navi .tz-side-extras {
     font-size: 12px;
 }
 
+/* centre column: one width for every page type (the packs size each
+   content class differently, 537-552px) */
+div#mid > div#content {
+    box-sizing: border-box;
+    width: var(--tz-centre);
+}
+
+/* culture points card (left column) */
+.tz-cp-card {
+    margin-top: 14px;
+    padding: 2px 4px;
+    font-size: 13px;
+}
+
+.tz-cp-card h3 {
+    margin: 0 0 4px;
+    font-size: 15px;
+}
+
+.tz-cp-num {
+    font-variant-numeric: tabular-nums;
+}
+
+.tz-cp-sub {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6b5a45;
+}
+
+.tz-bar {
+    height: 6px;
+    margin-top: 6px;
+    border-radius: 3px;
+    background: #e3d2ac;
+    overflow: hidden;
+}
+
+.tz-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: #b8862b;
+}
+
 /* right column */
 div#side_info,
 body.mod1 div#side_info,
 body.mod2 div#side_info,
 body.mod3 div#side_info {
-    width: 212px;
-    padding-left: 16px;
+    box-sizing: border-box;
+    width: var(--tz-right);
+    padding-left: var(--tz-gap);
 }
 
 /* render time under the footer */

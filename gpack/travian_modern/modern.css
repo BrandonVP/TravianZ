@@ -238,7 +238,7 @@ div#side_info div#qge img {
 div#side_info table#vlist,
 div#side_info h5,
 div#side_info div.news {
-    width: 236px;
+    width: 100%;
     box-sizing: border-box;
 }
 
@@ -377,4 +377,22 @@ div#footer {
 
 div#footer .copyright {
     color: #e6d3a8;
+}
+
+/* left-column culture points card */
+div#side_navi .tz-cp-card {
+    margin: 12px 8px 4px;
+    padding: 10px 12px;
+    background: var(--tm-panel-2);
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px var(--tm-line-2);
+}
+
+div#side_navi .tz-cp-card h3 {
+    font-family: var(--tm-display);
+    color: var(--tm-link-hover);
+}
+
+div#side_info div.news table {
+    width: 100%;
 }

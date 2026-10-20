@@ -105,6 +105,27 @@ $idUser      = isset($_SESSION['id_user']) ? (int)$_SESSION['id_user'] : 0;
     include("Templates/multivillage.tpl");
     ?>
 
+    <?php
+    /**
+     * Culture points toward the next village (same numbers as the Residence
+     * "Culture points" tab: Templates/Build/25_2.tpl).
+     */
+    $tzCpTable   = isset(${'cp' . CP}) ? ${'cp' . CP} : array();
+    $tzVillCount = is_array($session->villages) ? count($session->villages) : 0;
+    $tzCpHave    = (int) $session->cp;
+    $tzCpNeed    = isset($tzCpTable[$tzVillCount + 1]) ? (int) $tzCpTable[$tzVillCount + 1] : 0;
+    $tzCpPerDay  = (int) $database->getVSumField($session->uid, 'cp');
+    if ($tzCpNeed > 0) {
+        $tzCpPct = max(0, min(100, $tzCpHave / $tzCpNeed * 100));
+    ?>
+    <div class="tz-cp-card">
+        <h3><?php echo CULTURE_POINTS; ?></h3>
+        <div class="tz-cp-num"><strong><?php echo number_format($tzCpHave); ?></strong> / <?php echo number_format($tzCpNeed); ?></div>
+        <div class="tz-bar" title="<?php echo round($tzCpPct); ?>%"><span style="width:<?php echo round($tzCpPct, 1); ?>%"></span></div>
+        <div class="tz-cp-sub"><?php echo ($tzCpHave >= $tzCpNeed) ? 'Enough for village ' . ($tzVillCount + 1) : 'for village ' . ($tzVillCount + 1); ?> &middot; +<?php echo number_format($tzCpPerDay); ?>/day</div>
+    </div>
+    <?php } ?>
+
     <div class="tz-side-extras">
         <?php
         if(defined('NEW_FUNCTIONS_DISPLAY_LINKS') && NEW_FUNCTIONS_DISPLAY_LINKS) {
