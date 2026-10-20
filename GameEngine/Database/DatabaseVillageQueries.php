@@ -1273,6 +1273,19 @@ trait DatabaseVillageQueries {
 	        "UPDATE " . TB_PREFIX . "vdata SET gold = LEAST(GREATEST(gold + $amount, 0), $cap) WHERE wref = $vid");
 	}
 
+	/**
+	 * Village gold: take $amount if the village has at least that much, in one
+	 * UPDATE (two quick sends cannot both spend the same gold). True on success.
+	 */
+	function takeVillageGold($vid, $amount) {
+	    $vid = (int) $vid;
+	    $amount = (int) $amount;
+	    if ($amount <= 0) return true;
+	    mysqli_query($this->dblink,
+	        "UPDATE " . TB_PREFIX . "vdata SET gold = gold - $amount WHERE wref = $vid AND gold >= $amount");
+	    return mysqli_affected_rows($this->dblink) > 0;
+	}
+
 	function setMaxStoreForVillage($vid, $maxLevel) {
 	    $vid = (int) $vid;
 	    $maxLevel = (int) $maxLevel;

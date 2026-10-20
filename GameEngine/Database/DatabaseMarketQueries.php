@@ -143,7 +143,10 @@ trait DatabaseMarketQueries {
 	Mode 1: Cancel
 	References: Wood/ID, Clay, Iron, Crop, Mode
 	***************************/
-	function sendResource($ref, $clay, $iron, $crop, $merchant, $mode) {
+	// $ref is the wood amount (historic name). $gold (village gold, local
+	// redesign) is optional; the gold column is only named when a shipment
+	// carries some, so this also works before send.gold exists.
+	function sendResource($ref, $clay, $iron, $crop, $merchant, $mode, $gold = null) {
 	    // always prepare for multiple inserts at once
 	    if (!is_array($ref)) {
 	        $ref = [$ref];
@@ -151,19 +154,28 @@ trait DatabaseMarketQueries {
 	        $iron = [$iron];
 	        $crop = [$crop];
 	        $merchant = [$merchant];
+	        $gold = [$gold];
+        }
+        if (!is_array($gold)) {
+            $gold = [];
+        }
+        $withGold = false;
+        foreach ($gold as $g) {
+            if ((int) $g > 0) $withGold = true;
         }
 
         $pairs = [];
         foreach ($ref as $index => $refValue) {
             if(!$mode) {
-                $pairs[] = '(0, ' . (int) $refValue . ', ' . (int) $clay[$index] . ', ' . (int) $iron[$index] . ', ' . (int) $crop[$index] . ', ' . (int) $merchant[$index] . ')';
+                $pairs[] = '(' . (int) $refValue . ', ' . (int) $clay[$index] . ', ' . (int) $iron[$index] . ', ' . (int) $crop[$index] . ', ' . (int) $merchant[$index]
+                         . ($withGold ? ', ' . (int) (isset($gold[$index]) ? $gold[$index] : 0) : '') . ')';
             } else {
                 $pairs[] = (int) $refValue;
             }
         }
 
 		if(!$mode) {
-			$q = "INSERT INTO " . TB_PREFIX . "send VALUES ".implode(', ', $pairs);
+			$q = "INSERT INTO " . TB_PREFIX . "send (wood, clay, iron, crop, merchant" . ($withGold ? ", gold" : "") . ") VALUES ".implode(', ', $pairs);
 			mysqli_query($this->dblink,$q);
 			return mysqli_insert_id($this->dblink);
 		} else {

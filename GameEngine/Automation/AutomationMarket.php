@@ -59,10 +59,15 @@ trait AutomationMarket {
     private function marketCompleteDeliveries($time) {
         global $database, $units;
 
-        $q = "SELECT s.wood, s.clay, s.iron, s.crop, `to`, `from`, endtime, merchant, send, moveid FROM ".TB_PREFIX."movement m, ".TB_PREFIX."send s WHERE m.ref = s.id AND m.proc = 0 AND sort_type = 0 AND endtime < $time";
+        // s.* (not a column list) so village gold (send.gold, local redesign)
+        // is picked up when the column exists, and nothing breaks before
+        $q = "SELECT s.*, m.`to`, m.`from`, m.endtime, m.send, m.moveid FROM ".TB_PREFIX."movement m, ".TB_PREFIX."send s WHERE m.ref = s.id AND m.proc = 0 AND m.sort_type = 0 AND m.endtime < $time";
         $dataarray = $database->query_return($q);
 
         foreach($dataarray as $data) {
+            // village gold carried by this shipment (0 without the column)
+            $goldIn = isset($data['gold']) ? (int) $data['gold'] : 0;
+            $goldNote = $goldIn > 0 ? ','.$goldIn : '';
             $userData_from = $database->getUserFields($database->getVillageField($data['from'], "owner"), "alliance, tribe", 0);
             $userData_to = $database->getUserFields($database->getVillageField($data['to'], "owner"), "alliance, tribe", 0);
 
@@ -85,12 +90,16 @@ trait AutomationMarket {
             $ownTransfer   = ($from['owner'] == $to['owner']);
             $skipRecipient = $ownTransfer ? !empty($userData_to['v4']) : !empty($userData_to['v6']);
             if(!$skipRecipient) {
-                $database->addNotice($to['owner'],$to['wref'],$targetally,$sort_type,''.addslashes($from['name']).' send resources to '.addslashes($to['name']).'',''.$from['owner'].','.$from['wref'].','.$data['wood'].','.$data['clay'].','.$data['iron'].','.$data['crop'].'',$data['endtime']);
+                $database->addNotice($to['owner'],$to['wref'],$targetally,$sort_type,''.addslashes($from['name']).' send resources to '.addslashes($to['name']).'',''.$from['owner'].','.$from['wref'].','.$data['wood'].','.$data['clay'].','.$data['iron'].','.$data['crop'].$goldNote.'',$data['endtime']);
             }
             if(!$ownTransfer && empty($userData_from['v5'])) {
-                $database->addNotice($from['owner'],$to['wref'],$ownally,$sort_type,''.addslashes($from['name']).' send resources to '.addslashes($to['name']).'',''.$from['owner'].','.$from['wref'].','.$data['wood'].','.$data['clay'].','.$data['iron'].','.$data['crop'].'',$data['endtime']);
+                $database->addNotice($from['owner'],$to['wref'],$ownally,$sort_type,''.addslashes($from['name']).' send resources to '.addslashes($to['name']).'',''.$from['owner'].','.$from['wref'].','.$data['wood'].','.$data['clay'].','.$data['iron'].','.$data['crop'].$goldNote.'',$data['endtime']);
             }
             $database->modifyResource($data['to'],$data['wood'],$data['clay'],$data['iron'],$data['crop'],1);
+            if ($goldIn > 0) {
+                include_once __DIR__ . '/../VillageGold.php';
+                $database->addVillageGold($data['to'], $goldIn, TZ_GOLD_CAP);
+            }
 
             // Push protection: record completed cross-player deliveries so the
             // admin dashboard can compute 7-day resource balance. Best-effort;

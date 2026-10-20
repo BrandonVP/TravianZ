@@ -257,6 +257,11 @@ class Market
         $itrans  = str_replace('-', '', $itrans);
         $crtrans = str_replace('-', '', $crtrans);
 
+        // Village gold (local redesign, phase 2): whole gold only; each takes
+        // TZ_GOLD_MERCHANT_SPACE of merchant capacity (GameEngine/Data/gold.php)
+        $gtrans = (isset($post['r5']) && !empty($village->goldActive)) ? max(0, (int) $post['r5']) : 0;
+        $goldSpace = defined('TZ_GOLD_MERCHANT_SPACE') ? TZ_GOLD_MERCHANT_SPACE : 100;
+
         // Preload village data
         $database->getVillage($village->wid);
 
@@ -360,14 +365,15 @@ class Market
             $availableWood >= $wtrans &&
             $availableClay >= $ctrans &&
             $availableIron >= $itrans &&
-            $availableCrop >= $crtrans
+            $availableCrop >= $crtrans &&
+            $gtrans <= floor($village->agold)
         ) {
             // UM-D1: comparatia foloseste valorile curatate de semnul minus
             // ($wtrans/... in loc de $post['r1']/...). Inainte, comparatia se
             // facea pe POST-ul brut (potential negativ), dar deducerea se facea
             // pe valoarea pozitiva - un "r1" negativ trecea verificarea si scadea
             // resurse pozitive.
-            $reqMerc = ceil((array_sum($resource) - 0.1) / $this->maxcarry);
+            $reqMerc = ceil((array_sum($resource) + $gtrans * $goldSpace - 0.1) / $this->maxcarry);
 
             // Acquire merchant lock to prevent race conditions
             $database->getMerchantLock($village->wid);
@@ -394,9 +400,11 @@ class Market
                         0
                     );
 
-                    $res = array_sum($resource);
+                    $res = array_sum($resource) + $gtrans;
 
-                    if ($res != 0) {
+                    // gold is taken first, in one guarded UPDATE: if it was
+                    // spent in the meantime nothing is sent
+                    if ($res != 0 && $database->takeVillageGold($village->wid, $gtrans)) {
 
                         $reference = $database->sendResource(
                             $resource[0],
@@ -404,7 +412,8 @@ class Market
                             $resource[2],
                             $resource[3],
                             $reqMerc,
-                            0
+                            0,
+                            $gtrans
                         );
 
                         $database->modifyResource(

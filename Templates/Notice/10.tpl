@@ -107,7 +107,9 @@ if ($fromName != "[?]") {
     <?php echo $dataarray[4]; ?> |
 
     <img class="r4" src="img/x.gif" alt="<?php echo CROP; ?>" title="<?php echo CROP; ?>" />
-    <?php echo $dataarray[5]; ?>
+    <?php echo $dataarray[5]; ?><?php if (!empty($dataarray[6])) { ?> |
+<svg class="tz-coin-sm" viewBox="0 0 24 24" aria-label="Gold" role="img"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg>
+<?php echo (int) $dataarray[6]; } ?>
 
 </td>
 </tr>

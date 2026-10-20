@@ -1089,6 +1089,20 @@ div#content.tz-vv table.tz-vv-actions td > a:hover {
     font-weight: 700;
 }
 
+/* small gold coin (marketplace rows, shipments, trade reports) */
+svg.tz-coin-sm {
+    width: 16px;
+    height: 16px;
+    vertical-align: -3px;
+}
+
+table#send_select tr.tz-gold-hint td {
+    padding: 2px 6px 6px;
+    font-size: 12px;
+    color: #6b5a45;
+    background: none;
+}
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

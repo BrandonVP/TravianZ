@@ -30,7 +30,12 @@ $r = [];
 for ($i = 1; $i <= 4; $i++) {
     $r[$i] = isset($_POST['r'.$i])? max(0, (int)$_POST['r'.$i]) : 0;
 }
-$allres = array_sum($r);
+// Village gold (local redesign, phase 2): whole gold, each taking
+// TZ_GOLD_MERCHANT_SPACE of merchant capacity; only while village gold is on.
+$tzGoldOn = !empty($village->goldActive);
+$tzGoldSpace = defined('TZ_GOLD_MERCHANT_SPACE') ? TZ_GOLD_MERCHANT_SPACE : 100;
+$r[5] = ($tzGoldOn && isset($_POST['r5'])) ? max(0, (int)$_POST['r5']) : 0;
+$allres = $r[1] + $r[2] + $r[3] + $r[4] + $r[5] * $tzGoldSpace;
 $x = isset($_POST['x'])? trim($_POST['x']) : '';
 $y = isset($_POST['y'])? trim($_POST['y']) : '';
 $dname = isset($_POST['dname'])? trim($_POST['dname']) : '';
@@ -80,8 +85,9 @@ $avail = [
     2 => (int)$database->getClayAvailable($village->wid),
     3 => (int)$database->getIronAvailable($village->wid),
     4 => (int)$database->getCropAvailable($village->wid),
+    5 => $tzGoldOn ? (int) floor($village->agold) : 0,
 ];
-$hasResources = ($r[1] <= $avail[1] && $r[2] <= $avail[2] && $r[3] <= $avail[3] && $r[4] <= $avail[4]);
+$hasResources = ($r[1] <= $avail[1] && $r[2] <= $avail[2] && $r[3] <= $avail[3] && $r[4] <= $avail[4] && $r[5] <= $avail[5]);
 
 $showConfirm = ($ft === 'check' && $canRepeat && $validTarget && $allres > 0 && $allres <= $maxTotalCarry && $hasResources && $validAccess && $userVacation == 0);
 
@@ -122,6 +128,14 @@ if (isset($_GET['z'])) {
                 <td class="max"> / <span class="none"><b><?php echo $maxcarry;?></b></span></td>
             </tr>
             <?php endfor;?>
+            <?php if ($r[5] > 0):?>
+            <tr class="tz-gold-row">
+                <td class="ico"><svg class="tz-coin-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg></td>
+                <td class="nam"><?php echo defined('TZ_VILLAGE_GOLD') ? TZ_VILLAGE_GOLD : 'Gold'; ?></td>
+                <td class="val"><input class="text disabled" type="text" name="r5" id="r5" value="<?php echo $r[5];?>" readonly="readonly"></td>
+                <td class="max"> &times; <?php echo $tzGoldSpace;?> <span class="none">space</span></td>
+            </tr>
+            <?php endif;?>
         </table>
         <table id="target_validate" class="res_target" cellpadding="1" cellspacing="1">
             <tbody>
@@ -164,7 +178,32 @@ if (isset($_GET['z'])) {
                 <td class="max"><a href="#" onMouseUp="add_res(<?php echo $i;?>);" onClick="return false;">(<?php echo $maxcarry;?>)</a></td>
             </tr>
             <?php endfor;?>
+            <?php if ($tzGoldOn):?>
+            <tr class="tz-gold-row">
+                <td class="ico"><a href="#" onclick="tzGoldMax(); return false;" title="max"><svg class="tz-coin-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg></a></td>
+                <td class="nam"><?php echo defined('TZ_VILLAGE_GOLD') ? TZ_VILLAGE_GOLD : 'Gold'; ?>:</td>
+                <td class="val"><input class="text" type="text" name="r5" id="r5" value="" maxlength="7" tabindex="4"></td>
+                <td class="max"><a href="#" onclick="tzGoldMax(); return false;">(<?php echo $avail[5];?>)</a></td>
+            </tr>
+            <tr class="tz-gold-hint"><td colspan="4">1 gold uses <?php echo $tzGoldSpace;?> merchant space</td></tr>
+            <?php endif;?>
         </table>
+        <?php if ($tzGoldOn):?>
+        <script type="text/javascript">
+        // fill the gold field with as much as the village has and the free
+        // merchant space allows (after the resources already entered)
+        function tzGoldMax() {
+            var used = 0;
+            for (var i = 1; i <= 4; i++) {
+                var v = parseInt(document.getElementById('r' + i).value, 10);
+                if (!isNaN(v)) used += v;
+            }
+            var free = Math.max(0, haendler * carry - used);
+            var n = Math.min(<?php echo (int) $avail[5];?>, Math.floor(free / <?php echo (int) $tzGoldSpace;?>));
+            document.getElementById('r5').value = n > 0 ? n : '';
+        }
+        </script>
+        <?php endif;?>
 
         <table id="target_select" class="res_target" cellpadding="1" cellspacing="1">
             <tr><td class="mer"><?php echo MERCHANT;?> <?php echo $merchantAvail;?>/<?php echo $totalMerchants;?></td></tr>
@@ -235,7 +274,7 @@ if (count($market->recieving) > 0) {
         echo '<img class="r1" src="img/x.gif" alt="'.LUMBER.'" title="'.LUMBER.'" />'.$recieve['wood'].' | ';
         echo '<img class="r2" src="img/x.gif" alt="'.CLAY.'" title="'.CLAY.'" />'.$recieve['clay'].' | ';
         echo '<img class="r3" src="img/x.gif" alt="'.IRON.'" title="'.IRON.'" />'.$recieve['iron'].' | ';
-        echo '<img class="r4" src="img/x.gif" alt="'.CROP.'" title="'.CROP.'" />'.$recieve['crop'];
+        echo '<img class="r4" src="img/x.gif" alt="'.CROP.'" title="'.CROP.'" />'.$recieve['crop'].(!empty($recieve['gold']) ? ' | <svg class="tz-coin-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg>'.(int)$recieve['gold'] : '');
         echo '</span></td></tr></table>';
     }
 }
@@ -256,7 +295,7 @@ if (count($market->sending) > 0) {
         echo '<img class="r1" src="img/x.gif" alt="'.LUMBER.'" />'.$send['wood'].' | ';
         echo '<img class="r2" src="img/x.gif" alt="'.CLAY.'" />'.$send['clay'].' | ';
         echo '<img class="r3" src="img/x.gif" alt="'.IRON.'" />'.$send['iron'].' | ';
-        echo '<img class="r4" src="img/x.gif" alt="'.CROP.'" />'.$send['crop'];
+        echo '<img class="r4" src="img/x.gif" alt="'.CROP.'" />'.$send['crop'].(!empty($send['gold']) ? ' | <svg class="tz-coin-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg>'.(int)$send['gold'] : '');
         echo '</td></tr></tbody></table>';
     }
 }

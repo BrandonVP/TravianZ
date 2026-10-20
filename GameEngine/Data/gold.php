@@ -19,3 +19,6 @@ if (!defined('TZ_GOLD_PER_HERO'))   define('TZ_GOLD_PER_HERO', 0.2);
 
 // Storage: the starting capacity every resource has, until the Treasury exists.
 if (!defined('TZ_GOLD_CAP'))        define('TZ_GOLD_CAP', STORAGE_BASE);
+
+// Phase 2: merchants carry gold; one gold takes this much merchant capacity.
+if (!defined('TZ_GOLD_MERCHANT_SPACE')) define('TZ_GOLD_MERCHANT_SPACE', 100);
