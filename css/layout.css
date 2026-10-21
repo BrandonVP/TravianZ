@@ -519,6 +519,7 @@ div#side_navi table#vlist tbody {
 /* card titles centred (villages, troop movements, culture points, troops, server info) */
 div.tz-card-moves table#movements thead th,
 div.tz-card-troops table#troops thead th,
+table#building_contract.tz-jobs thead th,
 div#side_navi .tz-cp-card h3,
 div#side_info h5 {
     text-align: center;

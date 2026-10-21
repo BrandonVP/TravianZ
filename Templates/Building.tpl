@@ -47,7 +47,7 @@ if (!function_exists('safeHTML')) {
 
     <thead>
         <tr>
-            <th colspan="3"><?php echo BUILDING_UPGRADING; ?></th>
+            <th colspan="3"><?php echo rtrim(BUILDING_UPGRADING, ': '); ?></th>
         </tr>
     </thead>
 
