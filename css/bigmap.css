@@ -1,0 +1,146 @@
+/*
+ * Large map popup (karte2.php) in the redesign's colours.
+ * Loaded after compact.css / layout.css; only the frame, title, details box,
+ * coordinates form and close button are restyled - the map itself is unchanged.
+ */
+
+html,
+body.tz-bigmap {
+    margin: 0;
+    background: var(--tz-wood);
+    color: var(--tz-ink);
+    font-family: "Source Sans 3", "Segoe UI", Verdana, Arial, sans-serif;
+}
+
+body.tz-bigmap {
+    padding: 8px;
+    min-width: 0;
+}
+
+body.tz-bigmap div#mbig {
+    position: relative;
+    margin: 0 auto;
+    border: 2px solid var(--tz-gold);
+    border-radius: 12px;
+    background: var(--tz-cream);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+}
+
+body.tz-bigmap div#mbig div#lightframe {
+    border: 2px solid var(--tz-cream-2);
+    border-radius: 8px;
+    background: var(--tz-panel);
+}
+
+body.tz-bigmap div#mbig div#darkframe {
+    border: 2px solid var(--tz-line);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* title as a cream pill over the map */
+body.tz-bigmap div#mbig h1 {
+    margin: 0;
+    padding: 2px 14px;
+    font-family: "Cinzel", Georgia, "Times New Roman", serif;
+    font-size: 22px;
+    color: var(--tz-ink);
+    background: rgba(247, 239, 220, 0.92);
+    border: 1px solid var(--tz-line);
+    border-radius: 999px;
+}
+
+/* details box */
+body.tz-bigmap div#mbig table#map_infobox {
+    border-collapse: separate;
+    border: 1px solid var(--tz-line);
+    border-radius: 8px;
+    background: rgba(247, 239, 220, 0.95);
+    overflow: hidden;
+    min-width: 170px;
+}
+
+body.tz-bigmap div#mbig table#map_infobox thead th {
+    background: var(--tz-wood);
+    color: var(--tz-gold-2);
+    font-weight: 700;
+    border: 0;
+    padding: 3px 8px;
+}
+
+body.tz-bigmap div#mbig table#map_infobox tbody th,
+body.tz-bigmap div#mbig table#map_infobox tbody td {
+    background: transparent;
+    color: var(--tz-ink);
+    border: 0;
+    border-top: 1px solid var(--tz-cream-2);
+    padding: 2px 8px;
+}
+
+body.tz-bigmap div#mbig table#map_infobox tbody th {
+    color: #6b5a45;
+    font-weight: 600;
+    text-align: left;
+}
+
+/* coordinates form */
+body.tz-bigmap div#mbig div#map div#map_coords {
+    width: auto;
+    padding: 4px 10px;
+    background: rgba(247, 239, 220, 0.92);
+    border: 1px solid var(--tz-line);
+    border-radius: 999px;
+    height: auto;
+    line-height: 24px;
+}
+
+body.tz-bigmap div#mbig div#map div#map_coords span {
+    font-weight: 700;
+}
+
+body.tz-bigmap div#mbig div#map div#map_coords input.text {
+    width: 34px;
+    height: 20px;
+    border: 1px solid var(--tz-line);
+    border-radius: 4px;
+    background: #fff;
+    color: var(--tz-ink);
+    padding: 0 4px;
+}
+
+body.tz-bigmap div#mbig div#map div#map_coords .tz-ibtn {
+    float: left;
+    padding: 0 12px;
+    line-height: 22px;
+}
+
+/* close button: a round wood button with an x */
+body.tz-bigmap div#mbig a#map_popclose {
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--tz-wood);
+    border: 1px solid var(--tz-gold);
+    cursor: pointer;
+    text-align: center;
+    line-height: 26px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--tz-gold-2);
+    text-decoration: none;
+}
+
+body.tz-bigmap div#mbig a#map_popclose:hover {
+    background: var(--tz-wood-2);
+}
+
+body.tz-bigmap div#mbig a#map_popclose img {
+    display: none;
+}
+
+body.tz-bigmap div#mbig a#map_popclose::after {
+    content: "\00d7";
+}

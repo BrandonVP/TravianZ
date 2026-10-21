@@ -571,7 +571,7 @@ while ($donnees = mysqli_fetch_assoc($result2)) {
 <div id="map_content">
 	<div id="mbig">
 		<div id="lightframe">
-			<div id="darkframe"><a id="map_popclose" onClick="pb=document.getElementById('drag2');if(pb!=null){pb.innerHTML='';};return false;"><img src="img/x.gif" alt="<?php echo CLOSE_MAP; ?>" title="<?php echo CLOSE_MAP; ?>"></a>
+			<div id="darkframe"><a id="map_popclose" href="#" title="<?php echo CLOSE_MAP; ?>" onClick="pb=document.getElementById('drag2');if(pb!=null){pb.innerHTML='';}else{window.close();};return false;"><img src="img/x.gif" alt="<?php echo CLOSE_MAP; ?>" title="<?php echo CLOSE_MAP; ?>"></a>
 				<h1>Map(<span id="x"><?php echo $x;?></span>|<span id="y"><?php echo $y;?></span>)</h1>
 				<div id="map">
 					<script type="text/javascript">

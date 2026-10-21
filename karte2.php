@@ -43,9 +43,14 @@ if($session->plus){
 	<script src="mt-more.js" type="text/javascript"></script>
 	<link href="<?php echo GP_LOCATE; ?>lang/en/lang.css?f4b7d" rel="stylesheet" type="text/css" />
 	<link href="<?php echo GP_LOCATE; ?>lang/en/compact.css?f4b7i" rel="stylesheet" type="text/css" />
+	<!-- local redesign: theme colours, fonts and text buttons -->
+	<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap" rel="stylesheet" type="text/css" />
+	<link href="css/layout.css?v=<?php echo @filemtime(__DIR__ . '/css/layout.css'); ?>" rel="stylesheet" type="text/css" />
+	<link href="css/bigmap.css?v=<?php echo @filemtime(__DIR__ . '/css/bigmap.css'); ?>" rel="stylesheet" type="text/css" />
+	<script src="tzbuttons.js?v=<?php echo @filemtime(__DIR__ . '/tzbuttons.js'); ?>" type="text/javascript"></script>
 	<script type="text/javascript">window.addEvent('domready', start);</script>
 </head>
-<body onload="start()"><?php
+<body class="tz-bigmap" onload="start()"><?php
 	include("Templates/Map/mapviewlarge.tpl");?>
 	<div id="ce"></div>
 </body>
