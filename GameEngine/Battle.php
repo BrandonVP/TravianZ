@@ -23,6 +23,10 @@
 
 class Battle {
 
+	// local redesign: war-games attack bonus (%) of the attack being resolved,
+	// set by Automation before calculateBattle() (GameEngine/WarGames.php)
+	public static $tzWarBonus = 0;
+
 	/*****************************************
 	Function sigma
 	*****************************************/
@@ -1279,6 +1283,12 @@ class Battle {
                 }
             }
         }
+    }
+
+    // local redesign: war games (Tournament Square) - real attacks only
+    if ($type != 1 && (int) $AttackerID > 0 && self::$tzWarBonus > 0) {
+        $ap  *= 1 + self::$tzWarBonus / 100;
+        $cap *= 1 + self::$tzWarBonus / 100;
     }
 
     // Bonusul de alianta "Metallurgy": forta trupelor creste peste

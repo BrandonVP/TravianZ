@@ -95,3 +95,14 @@ if (!defined('TZ_HERO_REROLL_GOLD'))           define('TZ_HERO_REROLL_GOLD', 50)
 // Building with gold: the Treasury also costs gold (on top of its resources),
 // TZ_TREASURY_GOLD_PER_LEVEL x the level being built (level 20: 500)
 if (!defined('TZ_TREASURY_GOLD_PER_LEVEL')) define('TZ_TREASURY_GOLD_PER_LEVEL', 25);
+
+// War games (Tournament Square): a paid exercise; when it is over, the next attack
+// or raid sent from the village within the window gets +L1..L20 % attack
+if (!defined('TZ_WARGAMES_BONUS_L1'))        define('TZ_WARGAMES_BONUS_L1', 5);      // % at level 1
+if (!defined('TZ_WARGAMES_BONUS_L20'))       define('TZ_WARGAMES_BONUS_L20', 15);    // % at level 20
+if (!defined('TZ_WARGAMES_RES_PER_LEVEL'))   define('TZ_WARGAMES_RES_PER_LEVEL', 500); // wood/clay/iron each (crop half) x level
+if (!defined('TZ_WARGAMES_GOLD_BASE'))       define('TZ_WARGAMES_GOLD_BASE', 50);
+if (!defined('TZ_WARGAMES_GOLD_PER_LEVEL'))  define('TZ_WARGAMES_GOLD_PER_LEVEL', 10); // level 20: 250 gold
+if (!defined('TZ_WARGAMES_DURATION'))        define('TZ_WARGAMES_DURATION', 7200);   // exercise length (divided by SPEED)
+if (!defined('TZ_WARGAMES_WINDOW'))          define('TZ_WARGAMES_WINDOW', 8 * 3600); // send the attack within 8 h
+if (!defined('TZ_WARGAMES_COOLDOWN'))        define('TZ_WARGAMES_COOLDOWN', 7 * 86400); // one exercise a week

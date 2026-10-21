@@ -847,7 +847,8 @@ trait AutomationBattleResolution {
         $q = "
             SELECT
                 `from`, `to`, endtime, ref, ctar1, ctar2, spy, moveid, attack_type,
-                t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, (SELECT oasistype FROM ".TB_PREFIX."wdata WHERE id = `to`) as oasistype
+                t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, (SELECT oasistype FROM ".TB_PREFIX."wdata WHERE id = `to`) as oasistype,
+                ".TB_PREFIX."attacks.tzwar AS tz_war
             FROM
                 ".TB_PREFIX."movement,
                 ".TB_PREFIX."attacks
@@ -2893,7 +2894,8 @@ trait AutomationBattleResolution {
                     //fix by ronix
                     if (!isset($walllevel)) $walllevel = 0;
 
-                    $battlepart = $battle->calculateBattle($Attacker, $Defender, $def_wall, $att_tribe, $def_tribe, $residence, $attpop, $defpop, $type, $def_ab, $att_ab1, $att_ab2, $att_ab3, $att_ab4, $att_ab5, $att_ab6, $att_ab7, $att_ab8, $tblevel, $stonemason, $walllevel, 0, 0, 0, $AttackerID, $DefenderID, $AttackerWref, $DefenderWref, $conqureby, $enforcementarray);
+                    Battle::$tzWarBonus = (int) ($data['tz_war'] ?? 0); // war games (local redesign)
+                    $battlepart = $battle->calculateBattle($Attacker, $Defender, $def_wall,$att_tribe, $def_tribe, $residence, $attpop, $defpop, $type, $def_ab, $att_ab1, $att_ab2, $att_ab3, $att_ab4, $att_ab5, $att_ab6, $att_ab7, $att_ab8, $tblevel, $stonemason, $walllevel, 0, 0, 0, $AttackerID, $DefenderID, $AttackerWref, $DefenderWref, $conqureby, $enforcementarray);
 
                     //Data for when troops return.
                     //catapults look :D
@@ -3133,6 +3135,10 @@ trait AutomationBattleResolution {
                     $data_fail = $report['data_fail'];
                     if (!empty($data['tz_gold'])) {
                         $data2 .= ',tzgold:' . (int) $data['tz_gold'];
+                    }
+                    if (!empty($data['tz_war'])) {
+                        $data2 .= ',tzwar:' . (int) $data['tz_war'];
+                        $data_fail .= ',tzwar:' . (int) $data['tz_war'];
                     }
 
                     // notify the defender of the incoming battle/scout — extracted to sendBattleNotifications() [#155]

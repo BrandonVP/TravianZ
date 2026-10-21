@@ -1390,6 +1390,16 @@ table.t4adv tr.tz-adv-details td {
 .tz-adv-dim { color: #8a7a62; }
 .tz-adv-risk { color: #b3261e; font-weight: 700; }
 
+/* war games (Tournament Square) */
+.tz-wargames { margin: 14px 0 6px; padding-top: 10px; border-top: 1px solid #d9c9a8; }
+.tz-wargames h4 { margin: 0 0 6px; }
+.tz-wg-desc { margin: 0 0 8px; }
+.tz-wg-msg { font-weight: 700; color: #a3361c; }
+.tz-wg-state { font-weight: 700; color: #5a4128; }
+.tz-wg-state.tz-on { color: #2e7d32; }
+.tz-wg-cost { margin: 0 0 8px; }
+.tz-wg-cost img { vertical-align: middle; }
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

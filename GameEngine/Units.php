@@ -805,6 +805,11 @@ class Units {
             $checkexist  = $database->checkVilExist($data['to_vid']);
             $checkoexist = $database->checkOasisExist($data['to_vid']);
             if($checkexist || $checkoexist) {
+                // local redesign: war games (Tournament Square) bonus rides on this attack/raid
+                if (in_array((int) $data['type'], [3, 4], true)) {
+                    include_once __DIR__ . '/WarGames.php';
+                    WarGames::claim($database, $village->wid, $reference);
+                }
                 $database->addMovement(3, $village->wid, $data['to_vid'], $reference, time(), ($time + time()));
                 if ($database->hasBeginnerProtection($village->wid) == 1 && $checkexist) {
                     mysqli_query($database->dblink, "UPDATE " . TB_PREFIX . "users SET protect = 0 WHERE id = ".(int) $session->uid);

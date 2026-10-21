@@ -25,6 +25,11 @@ $tzRaidGold = 0;
 foreach ($dataarray as $tzV) {
     if (is_string($tzV) && strncmp($tzV, 'tzgold:', 7) === 0) $tzRaidGold = (int) substr($tzV, 7);
 }
+// war games (Tournament Square) bonus of the attacker, also a tagged value
+$tzWarBonus = 0;
+foreach ($dataarray as $tzV) {
+    if (is_string($tzV) && strncmp($tzV, 'tzwar:', 6) === 0) $tzWarBonus = (int) substr($tzV, 6);
+}
 
 // ======================== BASIC SETTINGS ========================
 $hasHero = (isset($dataarray[270]) && $dataarray[270] > 0);
@@ -182,6 +187,15 @@ if (!$spy && array_sum(array_map('intval', array_slice($dataarray, 274, 11))) > 
 </tbody>
 
 <?php
+if ($tzWarBonus > 0) { ?>
+<tbody class="goods">
+<tr>
+<th><?php echo INFORMATION; ?></th>
+<td colspan="<?php echo $colspan; ?>">War games: +<?php echo $tzWarBonus; ?>% attack</td>
+</tr>
+</tbody>
+<?php }
+
 // ======================== SPECIAL ACTIONS ========================
 if (!empty($dataarray[262]) && !empty($dataarray[263])) {
 ?>
