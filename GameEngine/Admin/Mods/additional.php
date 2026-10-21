@@ -47,14 +47,20 @@ $vac_mode = (int)($_POST['vac_mode']?? 0);
 if($id <= 0) die("Invalid user");
 
 // --- GOLD LOGIC ---
-$oldGold = (int)$database->getUserField($id, 'gold', 1);
+// Village gold (local redesign): the field edits the capital's gold
+$tzCapRes = mysqli_query($database->dblink, "SELECT wref, gold FROM ".TB_PREFIX."vdata WHERE owner = $id AND capital = 1 LIMIT 1");
+$tzCap = $tzCapRes ? mysqli_fetch_assoc($tzCapRes) : null;
+$oldGold = $tzCap ? (int) floor($tzCap['gold']) : (int)$database->getUserField($id, 'gold', 1);
 $diffGold = $newGold - $oldGold;
+if ($tzCap && $diffGold !== 0) {
+    $database->query("UPDATE ".TB_PREFIX."vdata SET gold = " . max(0, $newGold) . " WHERE wref = " . (int) $tzCap['wref']);
+}
 
 // --- UPDATE USER ---
 $database->query("
     UPDATE ".TB_PREFIX."users SET
         access = $access,
-        gold = $newGold,
+        gold = " . ($tzCap ? "gold" : $newGold) . ",
         sit1 = $sit1,
         sit2 = $sit2,
         protect = $protect,

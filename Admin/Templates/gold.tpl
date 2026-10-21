@@ -54,7 +54,7 @@ $id = $_SESSION['id'];
     <form action="../GameEngine/Admin/Mods/gold.php" method="POST" class="gold-form">
       <?php echo csrf_field(); ?>
       <input type="hidden" name="admid" value="<?php echo $id; ?>">
-      <input type="number" name="gold" value="20" min="1" max="9999" required>
+      <input type="number" name="gold" value="1000" min="1" max="99999" required><small style="display:block;opacity:.8;margin-top:4px;">Village gold, added to every player's capital.</small>
       <button type="submit">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><?php echo ADM_GIVE_GOLD; ?></button>
     </form>

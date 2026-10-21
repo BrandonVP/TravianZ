@@ -46,7 +46,8 @@ $acc = mysqli_fetch_assoc($check);
 if(!$acc || $acc['access'] != 9) admin_deny('You must be signed in as an administrator to view this page. Your session may have expired — please return to the admin panel and sign in again.');
 
 // 1. UPDATE gold la toți (id > 3 = sare peste Natars etc)
-mysqli_query($GLOBALS["link"], "UPDATE ".TB_PREFIX."users SET gold = gold + $amount WHERE id > 3") or die(mysqli_error($GLOBALS["link"]));
+// Village gold (local redesign): into every player's capital
+mysqli_query($GLOBALS["link"], "UPDATE ".TB_PREFIX."vdata SET gold = GREATEST(gold + $amount, 0) WHERE capital = 1 AND owner > 3") or die(mysqli_error($GLOBALS["link"]));
 
 // 2. LOG în admin_log
 mysqli_query($GLOBALS["link"], "INSERT INTO ".TB_PREFIX."admin_log VALUES (0, $admid, 'Added <b>$amount</b> gold to ALL players', ".time().")");
@@ -59,7 +60,7 @@ $details = mysqli_real_escape_string($GLOBALS["link"], 'Mass gift by '.$adminNam
 
 while($u = mysqli_fetch_assoc($users)){
     $uid = (int)$u['id'];
-    $vill = mysqli_fetch_assoc(mysqli_query($GLOBALS["link"], "SELECT wref FROM ".TB_PREFIX."vdata WHERE owner = $uid LIMIT 1"));
+    $vill = mysqli_fetch_assoc(mysqli_query($GLOBALS["link"], "SELECT wref FROM ".TB_PREFIX."vdata WHERE owner = $uid ORDER BY capital DESC LIMIT 1"));
     $wid = (int)($vill['wref'] ?? 0);
     
     mysqli_query($GLOBALS["link"], "INSERT INTO ".TB_PREFIX."gold_fin_log (wid, uid, action, gold, time, details) VALUES ($wid, $uid, 'Admin added Gold', $amount, $now, '$details')");

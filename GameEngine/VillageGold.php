@@ -83,6 +83,42 @@ class VillageGold
         return true;
     }
 
+    /**
+     * Automation safety net: Plus gold (users.gold) granted by any old code path
+     * moves into the player's capital at TZ_GOLD_PLUS_RATE, never cut to the cap.
+     * Players without a capital keep it until they have one.
+     */
+    public static function sweepPlusGold($db)
+    {
+        if (!self::villageMode()) {
+            return;
+        }
+        $l = $db->dblink;
+        $p = TB_PREFIX;
+        $r = mysqli_query($l, "SELECT u.id, u.gold, v.wref FROM {$p}users u
+            JOIN {$p}vdata v ON v.owner = u.id AND v.capital = 1
+            WHERE u.gold > 0 AND u.id > 3");
+        if (!$r) {
+            return;
+        }
+        $now = time();
+        while ($row = mysqli_fetch_assoc($r)) {
+            $plus = (int) $row['gold'];
+            // claim exactly what was read (a grant landing meanwhile is caught next run)
+            mysqli_query($l, "UPDATE {$p}users SET gold = gold - $plus WHERE id = " . (int) $row['id'] . " AND gold >= $plus");
+            if (mysqli_affected_rows($l) != 1) {
+                continue;
+            }
+            $gold = $plus * (int) TZ_GOLD_PLUS_RATE;
+            mysqli_query($l, "UPDATE {$p}vdata SET gold = gold + $gold WHERE wref = " . (int) $row['wref']);
+            mysqli_query($l, "INSERT INTO {$p}gold_fin_log (uid, wid, action, gold, time, details)
+                VALUES (" . (int) $row['id'] . ", " . (int) $row['wref'] . ", 'Plus gold to capital', $gold, $now, '$plus Plus gold x " . (int) TZ_GOLD_PLUS_RATE . "')");
+            if (method_exists($db, 'clearUserCache')) {
+                $db->clearUserCache((int) $row['id']);
+            }
+        }
+    }
+
     /** Whole gold a village has right now in the database. */
     public static function goldOf($db, $wref)
     {

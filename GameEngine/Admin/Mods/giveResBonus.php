@@ -62,7 +62,8 @@ $time = time();
 // ---------------------------------------------------------------------------
 // Update
 // ---------------------------------------------------------------------------
-$database->query("UPDATE " . TB_PREFIX . "users SET gold = gold + $gold WHERE id > 3");
+// Village gold (local redesign): into every player's capital
+$database->query("UPDATE " . TB_PREFIX . "vdata SET gold = gold + $gold WHERE capital = 1 AND owner > 3");
 
 // ---------------------------------------------------------------------------
 // Log admin

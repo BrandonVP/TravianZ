@@ -57,3 +57,8 @@ if (!defined('TZ_GOLD_PRICE_ALLY_TRIPLE')) define('TZ_GOLD_PRICE_ALLY_TRIPLE', 7
 // silver, the exchange office is hidden, and the auction house uses the
 // capital's village gold (1 silver price = 1 gold).
 if (!defined('TZ_SILVER_ENABLED')) define('TZ_SILVER_ENABLED', false);
+
+// Plus gold still granted by old code paths (registration bonus, quests, invite
+// rewards, payment packages) is moved into the player's capital by Automation
+// at the conversion rate: 1 Plus gold = this much village gold.
+if (!defined('TZ_GOLD_PLUS_RATE')) define('TZ_GOLD_PLUS_RATE', 25);

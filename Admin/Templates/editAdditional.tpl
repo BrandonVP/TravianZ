@@ -112,7 +112,12 @@ if(isset($id)) {
                     <div class="form-row">
                         <label><?php echo ADM_GOLD; ?></label>
                         <div class="field input-icon">
-                            <input type="number" name="gold" value="<?php echo (int)$user['gold']; ?>">
+                            <?php
+                            // Village gold (local redesign): the capital's gold
+                            $tzCapR = mysqli_query($database->dblink, "SELECT gold FROM ".TB_PREFIX."vdata WHERE owner = ".(int)$user['id']." AND capital = 1 LIMIT 1");
+                            $tzCapG = $tzCapR ? mysqli_fetch_row($tzCapR) : null;
+                            ?>
+                            <input type="number" name="gold" min="0" value="<?php echo $tzCapG ? (int) floor($tzCapG[0]) : (int)$user['gold']; ?>" title="Gold in the player's capital">
                             <img src="../img/admin/gold.gif" alt="<?php echo ADM_GOLD_2; ?>">
                         </div>
                     </div>

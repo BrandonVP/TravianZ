@@ -175,6 +175,8 @@ class Automation {
         // Village gold (local redesign): auto-buy of the 7-day Plus features
         include_once __DIR__ . '/VillageGold.php';
         VillageGold::runAutoBuy($GLOBALS['database']);
+        // ...and Plus gold from old reward paths goes to the capital
+        VillageGold::sweepPlusGold($GLOBALS['database']);
 
         // Finalizeaza upgrade-urile de bonus de alianta ajunse la termen.
         if (class_exists('AllianceBonus') && AllianceBonus::enabled()) {

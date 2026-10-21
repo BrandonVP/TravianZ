@@ -40,7 +40,12 @@ $acc = mysqli_fetch_assoc($check);
 if(!$acc || $acc['access'] != 9) admin_deny('You must be signed in as an administrator to view this page. Your session may have expired — please return to the admin panel and sign in again.');
 
 // 1. UPDATE GOLD
-mysqli_query($GLOBALS["link"], "UPDATE ".TB_PREFIX."users SET gold = gold + $amount WHERE id = $id") or die(mysqli_error($GLOBALS["link"]));
+// Village gold (local redesign): into the player's capital; Plus gold only
+// for a player without a capital (moved there once they have one)
+mysqli_query($GLOBALS["link"], "UPDATE ".TB_PREFIX."vdata SET gold = GREATEST(gold + $amount, 0) WHERE owner = $id AND capital = 1") or die(mysqli_error($GLOBALS["link"]));
+if (mysqli_affected_rows($GLOBALS["link"]) < 1 && $amount > 0) {
+    mysqli_query($GLOBALS["link"], "UPDATE ".TB_PREFIX."users SET gold = gold + $amount WHERE id = $id") or die(mysqli_error($GLOBALS["link"]));
+}
 
 // 2. ADMIN LOG
 $name = mysqli_fetch_assoc(mysqli_query($GLOBALS["link"], "SELECT username FROM ".TB_PREFIX."users WHERE id = $id"))['username'];
@@ -48,7 +53,7 @@ $name = mysqli_real_escape_string($GLOBALS["link"], $name);
 mysqli_query($GLOBALS["link"], "INSERT INTO ".TB_PREFIX."admin_log VALUES (0, $admid, 'Added <b>$amount</b> gold to user <a href=\'admin.php?p=player&uid=$id\'>$name</a>', ".time().")");
 
 // 3. GOLD_FIN_LOG (pentru a2b2.php)
-$vill = mysqli_fetch_assoc(mysqli_query($GLOBALS["link"], "SELECT wref FROM ".TB_PREFIX."vdata WHERE owner = $id LIMIT 1"));
+$vill = mysqli_fetch_assoc(mysqli_query($GLOBALS["link"], "SELECT wref FROM ".TB_PREFIX."vdata WHERE owner = $id ORDER BY capital DESC LIMIT 1"));
 $wid = (int)($vill['wref'] ?? 0);
 $action = $amount > 0 ? 'Admin added Gold' : 'Admin removed Gold';
 $adminName = $acc['username'];

@@ -70,7 +70,7 @@ $id = $_SESSION['id'];
       
       <div class="field">
         <label><?php echo ADM_AMOUNT_GOLD; ?></label>
-        <input type="number" name="gold" value="20" min="1" max="999999" required>
+        <input type="number" name="gold" value="1000" min="1" max="999999" required><small style="display:block;opacity:.8;margin-top:4px;">Village gold, added to the player's capital.</small>
       </div>
       
       <button type="submit">

@@ -52,13 +52,15 @@ if (!$admin || (int)$admin['access'] !== 9) {
 // Reset gold
 // ---------------------------------------------------------------------------
 $database->query("UPDATE " . TB_PREFIX . "users SET gold = 0 WHERE id > 0");
+// Village gold (local redesign): "gold" now lives in the villages
+$database->query("UPDATE " . TB_PREFIX . "vdata SET gold = 0");
 
 // ---------------------------------------------------------------------------
 // Log admin
 // ---------------------------------------------------------------------------
 $adminId = (int)$_SESSION['id'];
 $time = time();
-$logText = "Reset gold to 0 for all users";
+$logText = "Reset gold to 0 for all users and villages";
 $logEsc = $database->escape($logText);
 
 $database->query(
