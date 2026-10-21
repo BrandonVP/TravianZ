@@ -69,4 +69,5 @@ $current = $level > 0 ? (int)$bid28[$level]['attri'] : 100;
     <?php endif;?>
 
     <?php include("upgrade.tpl");?>
+    <?php if (class_exists('VillageGold') && !empty($village->goldActive) && $level > 0) include("28_contracts.tpl"); // local redesign ?>
 </div>

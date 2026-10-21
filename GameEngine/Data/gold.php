@@ -106,3 +106,7 @@ if (!defined('TZ_WARGAMES_GOLD_PER_LEVEL'))  define('TZ_WARGAMES_GOLD_PER_LEVEL'
 if (!defined('TZ_WARGAMES_DURATION'))        define('TZ_WARGAMES_DURATION', 7200);   // exercise length (divided by SPEED)
 if (!defined('TZ_WARGAMES_WINDOW'))          define('TZ_WARGAMES_WINDOW', 8 * 3600); // send the attack within 8 h
 if (!defined('TZ_WARGAMES_COOLDOWN'))        define('TZ_WARGAMES_COOLDOWN', 7 * 86400); // one exercise a week
+
+// Resource contracts live in the Trade Office: unlocked at this level; the daily
+// allowance is Trade Office level x TZ_CONTRACT_GOLD_PER_LEVEL (level 20: 4,000)
+if (!defined('TZ_CONTRACT_MIN_LEVEL')) define('TZ_CONTRACT_MIN_LEVEL', 10);

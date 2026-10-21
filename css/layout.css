@@ -1400,6 +1400,11 @@ table.t4adv tr.tz-adv-details td {
 .tz-wg-cost { margin: 0 0 8px; }
 .tz-wg-cost img { vertical-align: middle; }
 
+/* resource contracts (Trade Office section) */
+.tz-to-contracts { margin: 14px 0 6px; padding-top: 10px; border-top: 1px solid #d9c9a8; }
+.tz-to-contracts h4 { margin: 0 0 6px; }
+.tz-contract-locked { font-weight: 700; color: #6b5a45; }
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

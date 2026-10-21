@@ -958,13 +958,19 @@ class Market
     /**
      * Local redesign: resource contract - buy resources from the NPC with this
      * village's gold (TZ_CONTRACT_RES_PER_GOLD per gold), within a daily
-     * allowance of Marketplace level x TZ_CONTRACT_GOLD_PER_LEVEL gold.
+     * allowance of Trade Office level x TZ_CONTRACT_GOLD_PER_LEVEL gold.
+     * Signed in the Trade Office (gid 28), from level TZ_CONTRACT_MIN_LEVEL.
      */
     private function buyContract($post)
     {
         global $session, $database, $village, $building;
 
-        $back = 'Location: build.php?id=' . (int) $post['id'] . '&t=5';
+        $back = 'Location: build.php?id=' . (int) $post['id'];
+        $tzOffice = (int) $building->getTypeLevel(28);
+        if ($tzOffice < TZ_CONTRACT_MIN_LEVEL) {
+            header($back . '&e=5');
+            exit;
+        }
         if (!VillageGold::pays($village)
             || (isset($session) && method_exists($session, 'sitterCan') && !$session->sitterCan(SITTER_PERM_GOLD))) {
             header($back . '&e=1');
@@ -992,7 +998,7 @@ class Market
         }
 
         $gold = (int) ceil($total / TZ_CONTRACT_RES_PER_GOLD);
-        list($limit, $used) = VillageGold::contractAllowance($database, $village->wid, $building->getTypeLevel(17));
+        list($limit, $used) = VillageGold::contractAllowance($database, $village->wid, $tzOffice);
         if ($used + $gold > $limit) {
             header($back . '&e=3');
             exit;

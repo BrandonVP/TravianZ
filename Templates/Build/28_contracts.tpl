@@ -1,19 +1,17 @@
 <?php
 #################################################################################
-##  Local redesign: Resource contracts - buy resources from the NPC with this  ##
-##  village's gold (Market::buyContract). Rate and daily allowance:           ##
-##  GameEngine/Data/gold.php (TZ_CONTRACT_*).                                  ##
+##  Local redesign: Resource contracts (Trade Office section, from level     ##
+##  TZ_CONTRACT_MIN_LEVEL) - buy resources from the NPC with this village's   ##
+##  gold (Market::buyContract). Settings: Data/gold.php (TZ_CONTRACT_*).      ##
 #################################################################################
 
 global $database, $session, $village, $building, $id;
 
-if (!VillageGold::pays($village)) {
-    header("Location: build.php?id=" . (int) $id);
-    exit;
-}
+if (!VillageGold::pays($village)) return;
 
+$tzOffice = (int) $village->resarray['f' . $id];
 $tzRate = (int) TZ_CONTRACT_RES_PER_GOLD;
-list($tzLimit, $tzUsed) = VillageGold::contractAllowance($database, $village->wid, $building->getTypeLevel(17));
+list($tzLimit, $tzUsed) = VillageGold::contractAllowance($database, $village->wid, $tzOffice);
 $tzLeft = max(0, $tzLimit - $tzUsed);
 $tzGold = (int) floor($village->agold);
 $tzFree = [
@@ -26,24 +24,29 @@ $tzNames = [1 => LUMBER, 2 => CLAY, 3 => IRON, 4 => CROP];
 $tzErr = [1 => 'Contracts are paid with village gold, and your sitter permissions do not allow it.',
           2 => 'That does not fit in your storage. Buy less, or make room first.',
           3 => 'That is more than this village\'s daily contract allowance.',
-          4 => 'Not enough gold in this village.'];
+          4 => 'Not enough gold in this village.',
+          5 => 'Contracts need a Trade Office at level ' . (int) TZ_CONTRACT_MIN_LEVEL . '.'];
 $tzCoin = '<svg class="tz-coin-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg>';
 ?>
-<div id="build" class="gid17">
-    <a href="#" onClick="return Popup(17,4);" class="build_logo">
-        <img class="building g17" src="img/x.gif" alt="<?php echo MARKETPLACE; ?>" title="<?php echo MARKETPLACE;?>" />
-    </a>
-    <h1><?php echo MARKETPLACE;?> <span class="level"><?php echo LEVEL;?> <?php echo (int)$village->resarray['f'.$id];?></span></h1>
-    <p class="build_desc"><?php echo MARKETPLACE_DESC;?></p>
-
-    <?php include("17_menu.tpl");?>
-
+<div class="tz-to-contracts">
+    <h4>Resource contracts</h4>
     <p class="tz-contract-intro">
         Buy resources from the NPC merchant with this village's gold:
         <b><?php echo $tzCoin; ?> 1 gold = <?php echo $tzRate; ?> resources</b>, delivered at once.
-        Each village can spend up to <b><?php echo number_format($tzLimit); ?></b> gold a day on contracts
-        (Marketplace level &times; <?php echo (int) TZ_CONTRACT_GOLD_PER_LEVEL; ?>).
+        <?php if ($tzOffice >= TZ_CONTRACT_MIN_LEVEL):?>
+        This village can spend up to <b><?php echo number_format($tzLimit); ?></b> gold a day on contracts
+        (Trade Office level &times; <?php echo (int) TZ_CONTRACT_GOLD_PER_LEVEL; ?>).
+        <?php else:?>
+        Each village can spend Trade Office level &times; <?php echo (int) TZ_CONTRACT_GOLD_PER_LEVEL; ?> gold a day on contracts.
+        <?php endif;?>
     </p>
+
+    <?php if ($tzOffice < TZ_CONTRACT_MIN_LEVEL):?>
+    <p class="tz-contract-locked">Unlocks at Trade Office level <?php echo (int) TZ_CONTRACT_MIN_LEVEL; ?>
+        (<?php echo (int) TZ_CONTRACT_MIN_LEVEL * (int) TZ_CONTRACT_GOLD_PER_LEVEL; ?> gold a day, up to
+        <?php echo 20 * (int) TZ_CONTRACT_GOLD_PER_LEVEL; ?> at level 20).</p>
+</div>
+<?php return; endif;?>
 
     <?php if (isset($_GET['ok'])):?>
         <p class="tz-contract-ok">Contract signed: <?php echo $tzCoin . number_format((int) $_GET['ok']); ?> gold spent, resources delivered.</p>
@@ -51,7 +54,7 @@ $tzCoin = '<svg class="tz-coin-sm" viewBox="0 0 24 24" aria-hidden="true"><circl
         <p class="error2"><?php echo $tzErr[(int) $_GET['e']]; ?></p>
     <?php endif;?>
 
-    <form method="post" action="build.php" name="contract">
+    <form method="post" action="build.php" name="tzcontract">
         <input type="hidden" name="ft" value="mk5">
         <input type="hidden" name="id" value="<?php echo (int) $id;?>">
         <table class="tz-contract" cellpadding="1" cellspacing="1">

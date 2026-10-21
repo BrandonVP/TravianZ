@@ -38,6 +38,6 @@ $hasRoutes = $session->goldclub == 1 && count($database->getProfileVillages($ses
     | <a href="build.php?id=<?php echo (int)$id;?>&amp;t=4" <?php if($t===4) echo 'class="selected"';?>><?php echo TRADE_ROUTES;?></a>
     <?php endif;?>
     <?php if (!empty($village->goldActive)):?>
-    | <a href="build.php?id=<?php echo (int)$id;?>&amp;t=5" <?php if($t===5) echo 'class="selected"';?>>Contracts</a>
+
     <?php endif;?>
 </div>

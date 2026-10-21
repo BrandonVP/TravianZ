@@ -196,14 +196,14 @@ class VillageGold
     }
 
     /** Resource contracts: [allowance today, used today] in gold for a village. */
-    public static function contractAllowance($db, $wid, $marketLevel)
+    public static function contractAllowance($db, $wid, $officeLevel)
     {
         $l = $db->dblink;
         $t = TB_PREFIX . 'tz_contracts';
         mysqli_query($l, "CREATE TABLE IF NOT EXISTS `$t` (`wid` INT NOT NULL, `day` INT NOT NULL, `gold` INT NOT NULL DEFAULT 0, PRIMARY KEY (`wid`, `day`)) ENGINE=InnoDB DEFAULT CHARSET=utf8");
         $r = mysqli_query($l, "SELECT gold FROM `$t` WHERE wid = " . (int) $wid . " AND day = " . (int) date('Ymd'));
         $row = $r ? mysqli_fetch_row($r) : null;
-        return [(int) $marketLevel * (int) TZ_CONTRACT_GOLD_PER_LEVEL, $row ? (int) $row[0] : 0];
+        return [(int) $officeLevel * (int) TZ_CONTRACT_GOLD_PER_LEVEL, $row ? (int) $row[0] : 0];
     }
 
     /** Record gold spent on contracts today. */
