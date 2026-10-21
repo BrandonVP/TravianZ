@@ -55,6 +55,47 @@ class Technology {
 		return $holder;
 	}
 
+	/**
+	 * Local redesign: cost / time of one Blacksmith / Armoury level, with the
+	 * TZ_AB_COST_MULT / TZ_AB_TIME_MULT settings applied. null past the max.
+	 */
+	public function abLevelData($unit, $level) {
+		include_once __DIR__ . '/Data/upgrades.php';
+		$data = $GLOBALS['ab' . (int) $unit][(int) $level] ?? null;
+		if (!$data) {
+			return null;
+		}
+		foreach (['wood', 'clay', 'iron', 'crop'] as $k) {
+			$data[$k] = (int) round($data[$k] * TZ_AB_COST_MULT);
+		}
+		$data['time'] = (int) round($data['time'] * TZ_AB_TIME_MULT);
+		return $data;
+	}
+
+	/**
+	 * Upgrades of this tech (e.g. 'b3') already queued: in every village of the
+	 * account when upgrades are account-wide, else in this village.
+	 */
+	public function abPending($tech) {
+		global $database, $session, $village;
+		include_once __DIR__ . '/Data/upgrades.php';
+		if (!preg_match('/^[ab][1-8]$/', (string) $tech)) {
+			return 0;
+		}
+		if (!TZ_AB_ACCOUNT_WIDE) {
+			$n = 0;
+			foreach ($village->researching as $r) {
+				if ($r['tech'] == $tech) $n++;
+			}
+			return $n;
+		}
+		$p = TB_PREFIX;
+		$r = mysqli_query($database->dblink, "SELECT COUNT(*) FROM {$p}research r JOIN {$p}vdata v ON v.wref = r.vref
+			WHERE v.owner = " . (int) $session->uid . " AND r.tech = '$tech'");
+		$row = $r ? mysqli_fetch_row($r) : null;
+		return $row ? (int) $row[0] : 0;
+	}
+
 	public function getABUpgrades($type='a') {
 		global $village;
 		$holder = [];
@@ -1141,20 +1182,16 @@ class Technology {
 			$ABUpgrades = $this->getABUpgrades($type);
 			$ABUpgradesCount = count($ABUpgrades);
 
-			$ups = 0;
-			if($ABUpgradesCount > 0){
-			    foreach($ABUpgrades as $upgrade){
-			        if(in_array(($type.$get['a']), $upgrade)) $ups++;
-			    }
-			}
+			// local redesign: levels and queued upgrades are counted for the
+			// whole account; cost / time come from abLevelData() (x2 / x1.5)
+			$ups = $this->abPending($type.intval($get['a']));
 
 			$CurrentTech = $ABTech[$type.$get['a']]+$ups;
 			$unit = ($session->tribe-1)*10+intval($get['a']);
-			if(($ABUpgradesCount < 2 && $session->plus || $ABUpgradesCount == 0) && ($this->getTech($unit) || ($unit % 10) == 1) && ($CurrentTech < $building->getTypeLevel($buildingType)) && hash_equals((string) $session->mchecker, (string) ($get['c'] ?? ''))) {
-				global ${'ab'.strval($unit)};
-				$data = ${'ab'.strval($unit)};
-				$time = time() + round(($data[$CurrentTech+1]['time'] * ($bidBuilding[$building->getTypeLevel($buildingType)]['attri'] / 100))/SPEED) + ($ABUpgradesCount > 0 ? ($ABUpgrades[$ABUpgradesCount-1]['timestamp'] - time()) + ceil(60/SPEED) : 0);
-				if ($database->modifyResource($village->wid,$data[$CurrentTech+1]['wood'],$data[$CurrentTech+1]['clay'],$data[$CurrentTech+1]['iron'],$data[$CurrentTech+1]['crop'],0)) {
+			$next = $this->abLevelData($unit, $CurrentTech + 1);
+			if($next && ($ABUpgradesCount < 2 && $session->plus || $ABUpgradesCount == 0) && ($this->getTech($unit) || ($unit % 10) == 1) && ($CurrentTech < $building->getTypeLevel($buildingType)) && hash_equals((string) $session->mchecker, (string) ($get['c'] ?? ''))) {
+				$time = time() + round(($next['time'] * ($bidBuilding[$building->getTypeLevel($buildingType)]['attri'] / 100))/SPEED) + ($ABUpgradesCount > 0 ? ($ABUpgrades[$ABUpgradesCount-1]['timestamp'] - time()) + ceil(60/SPEED) : 0);
+				if ($database->modifyResource($village->wid,$next['wood'],$next['clay'],$next['iron'],$next['crop'],0)) {
 					$database->addResearch($village->wid,$type.$get['a'],$time);
 					$logging->addTechLog($village->wid,$type.$get['a'],$CurrentTech+1);
 				}

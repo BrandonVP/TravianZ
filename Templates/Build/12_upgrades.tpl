@@ -44,14 +44,11 @@ $end = $session->tribe * 10 - 2;
         $current = (int)$abdata['b'.$j];
 
         //how many upgrades are already in the queue for this unit
-        $ups = 0;
-        foreach ($ABups as $up) {
-            if (in_array('b'.$j, $up)) $ups++;
-        }
+        $ups = $technology->abPending('b'.$j); // local redesign: whole account
         $shownLevel = $current + $ups;
         $nextLevel = $shownLevel + 1;
-        $ab = ${'ab'.$i};
-        $next = $ab[$nextLevel]?? null;
+        // local redesign: cost x2 / time x1.5 (GameEngine/Data/upgrades.php)
+        $next = $technology->abLevelData($i, $nextLevel);
   ?>
         <tr>
             <td class="desc">
@@ -127,6 +124,7 @@ $end = $session->tribe * 10 - 2;
     <?php endfor;?>
     </tbody>
 </table>
+<p class="tz-ab-note">Upgrades apply to all your villages. Any village with a Blacksmith can work on them; its own level is the highest it can reach.</p>
 
 <?php if ($totalUps > 0):?>
 <table cellpadding="1" cellspacing="1" class="under_progress">

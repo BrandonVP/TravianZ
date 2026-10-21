@@ -743,6 +743,11 @@ trait AutomationBattleResolution {
 
         $database->query("DELETE FROM " . TB_PREFIX . "abdata WHERE vref = " . (int)$data['to']);
         $database->addABTech($data['to']);
+        // local redesign: a conquered village takes its new owner's upgrade levels
+        include_once __DIR__ . '/../Data/upgrades.php';
+        if (TZ_AB_ACCOUNT_WIDE) {
+            $database->abSyncFromAccount($data['to'], (int) $database->getVillageField($data['from'], 'owner'));
+        }
 
         $database->query("DELETE FROM " . TB_PREFIX . "tdata WHERE vref = " . (int)$data['to']);
         $database->addTech($data['to']);

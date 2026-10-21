@@ -355,6 +355,56 @@ trait DatabaseTroopQueries {
 		return mysqli_query($this->dblink,$q);
 	}
 
+	/**
+	 * Local redesign (GameEngine/Data/upgrades.php): a finished Blacksmith /
+	 * Armoury upgrade raises that unit's level in every village of the owner.
+	 */
+	function abAccountLevelUp($vid, $tech) {
+	    $vid = (int) $vid;
+	    if (!preg_match('/^[ab][1-8]$/', (string) $tech)) {
+	        return false;
+	    }
+	    $p = TB_PREFIX;
+	    $r = mysqli_query($this->dblink,
+	        "UPDATE {$p}abdata SET `$tech` = `$tech` + 1
+	          WHERE vref IN (SELECT wref FROM {$p}vdata WHERE owner = (SELECT owner FROM {$p}vdata WHERE wref = $vid))");
+	    self::$abTechCache = [];
+	    return $r;
+	}
+
+	/** A new / conquered village takes its owner's upgrade levels (best of the other villages). */
+	function abSyncFromAccount($vid, $owner = 0) {
+	    $vid = (int) $vid;
+	    $p = TB_PREFIX;
+	    if ($owner <= 0) {
+	        $o = mysqli_query($this->dblink, "SELECT owner FROM {$p}vdata WHERE wref = $vid");
+	        $row = $o ? mysqli_fetch_row($o) : null;
+	        $owner = $row ? (int) $row[0] : 0;
+	    }
+	    if ($owner <= 0) {
+	        return false;
+	    }
+	    $cols = [];
+	    for ($i = 1; $i <= 8; $i++) { // abdata has a1-a8 / b1-b8
+	        foreach (['a', 'b'] as $t) {
+	            $cols[] = "COALESCE(MAX(x.$t$i), 0) AS $t$i";
+	        }
+	    }
+	    $r = mysqli_query($this->dblink, "SELECT " . implode(', ', $cols) . " FROM {$p}abdata x
+	        JOIN {$p}vdata v ON v.wref = x.vref WHERE v.owner = " . (int) $owner . " AND x.vref <> $vid");
+	    $best = $r ? mysqli_fetch_assoc($r) : null;
+	    if (!$best) {
+	        return false;
+	    }
+	    $set = [];
+	    foreach ($best as $k => $v) {
+	        $set[] = "`$k` = GREATEST(`$k`, " . (int) $v . ")";
+	    }
+	    $ok = mysqli_query($this->dblink, "UPDATE {$p}abdata SET " . implode(', ', $set) . " WHERE vref = $vid");
+	    self::$abTechCache = [];
+	    return $ok;
+	}
+
 	function getABTech($vid, $use_cache = true) {
         $array_passed = is_array($vid);
 

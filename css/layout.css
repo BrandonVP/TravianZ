@@ -1239,6 +1239,13 @@ table.tz-mbplus-table tr.tz-on td.tz-f { font-weight: bold; }
     white-space: nowrap;
 }
 
+/* Blacksmith / Armoury: upgrades are account-wide */
+p.tz-ab-note {
+    margin: 8px 0 12px;
+    font-size: 12px;
+    color: #6b5a45;
+}
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

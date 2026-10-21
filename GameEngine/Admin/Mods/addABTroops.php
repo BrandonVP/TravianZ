@@ -48,7 +48,9 @@ for ($i = 1; $i <= 8; $i++) {
     $fields[] = "b$i = $b";
 }
 
-$q = "UPDATE " . TB_PREFIX . "abdata SET " . implode(", ", $fields) . " WHERE vref = $id";
+// local redesign: upgrades are account-wide, so set every village of the owner
+$q = "UPDATE " . TB_PREFIX . "abdata SET " . implode(", ", $fields)
+   . " WHERE vref IN (SELECT wref FROM " . TB_PREFIX . "vdata WHERE owner = (SELECT owner FROM " . TB_PREFIX . "vdata WHERE wref = $id))";
 $database->query($q);
 
 /* ---------------------------------------------------------------------------

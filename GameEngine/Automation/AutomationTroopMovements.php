@@ -389,5 +389,13 @@ trait AutomationTroopMovements {
         $database->addTech($addTechWrefs);
         $database->addABTech($addABTechWrefs);
 
+        // local redesign: new villages take the account's Blacksmith / Armoury levels
+        include_once __DIR__ . '/../Data/upgrades.php';
+        if (TZ_AB_ACCOUNT_WIDE) {
+            foreach ($addABTechWrefs as $tzNewVid) {
+                $database->abSyncFromAccount($tzNewVid);
+            }
+        }
+
     }
 }

@@ -166,6 +166,12 @@ trait AutomationBuildQueue {
                     break;
                 case "a":
                 case "b":
+                    // local redesign: the upgrade belongs to the whole account
+                    include_once __DIR__ . '/../Data/upgrades.php';
+                    if (TZ_AB_ACCOUNT_WIDE) {
+                        $database->abAccountLevelUp($data['vref'], $data['tech']);
+                        break;
+                    }
                     if (!isset($abdata[$data['vref']])) $abdata[$data['vref']] = [];
                     $abdata[$data['vref']][] = $data['tech']." = ".$data['tech']." + 1";
                     break;
