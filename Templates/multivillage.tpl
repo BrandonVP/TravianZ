@@ -113,7 +113,7 @@ if (count($session->villages) > 1) {
         <tr>
             <td colspan="3">
                 <a href="dorf3.php" accesskey="9">
-                    <?php echo VILLAGES; ?>:
+                    <?php echo VILLAGES; ?>
                 </a>
             </td>
         </tr>

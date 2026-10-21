@@ -153,7 +153,7 @@ if ($totalMovements > 0) {
     <table id="movements" cellpadding="1" cellspacing="1">
         <thead>
             <tr>
-                <th colspan="3">' . TROOP_MOVEMENTS . '</th>
+                <th colspan="3">' . rtrim(TROOP_MOVEMENTS, ': ') . '</th>
             </tr>
         </thead>
         <tbody>';
