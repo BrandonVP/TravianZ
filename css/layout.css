@@ -485,6 +485,9 @@ div#side_navi .tz-side-extras {
 div#mid > div#content {
     box-sizing: border-box;
     width: var(--tz-centre);
+    /* the card hides overflow (pack CSS) and has rounded corners: a page that
+       ends on a table was cut off along the bottom edge */
+    padding-bottom: 18px;
 }
 
 /* left column: one card per block (hero, villages, culture points) */
@@ -1480,6 +1483,12 @@ div.popup3.quest table.altquest tbody td {
     border-top: 1px solid var(--tz-cream-2);
 }
 div.popup3.quest table.altquest tbody tr.c td { color: #8a7a62; }
+
+/* Alliance page for a player without an alliance (allianz.php) */
+.tz-noally { max-width: 640px; }
+.tz-noally p { margin: 0 0 10px; }
+.tz-noally .tz-btn { display: inline-block; margin: 4px 0 6px; }
+.tz-noally-hint { color: #6b5a45; font-size: 12px; }
 
 /* ===================== smaller screens ===================== */
 

@@ -287,7 +287,36 @@ include("Templates/layout/page_top.tpl");
 <br /><br /><br /><br /><?php include("Templates/layout/page_bottom.tpl"); ?>
 <?php
 }else{
-	header("Location: spieler.php?uid=".$session->uid);
-	exit;
+	// local redesign: no alliance - explain where alliances are joined/founded
+	// instead of silently sending the player to their own profile
+	$tzEmbassy = (int) $building->getTypeLevel(18);
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<title><?php echo SERVER_NAME; ?> &raquo; Alliance</title>
+	<?php include("Templates/layout/assets.tpl"); ?>
+	<script type="text/javascript">window.addEvent('domready', start);</script>
+</head>
+<?php include("Templates/layout/page_top.tpl"); ?>
+<div id="content" class="alliance">
+	<h1>Alliance</h1>
+	<div class="tz-noally">
+		<p>You are not in an alliance yet.</p>
+		<p>Alliances are founded and joined at the <b>Embassy</b>: there you can accept invitations,
+			and from level 3 you can found an alliance of your own.</p>
+		<?php if ($tzEmbassy > 0): ?>
+		<p><a class="tz-btn" href="build.php?gid=18">Go to the Embassy (level <?php echo $tzEmbassy; ?>)</a></p>
+		<?php else: ?>
+		<p class="tz-noally-hint">This village has no Embassy. Build one in the village centre
+			(it needs a Main Building at level 1).</p>
+		<p><a class="tz-btn" href="dorf2.php">Go to the village centre</a></p>
+		<?php endif; ?>
+		<p class="tz-noally-hint">Players' profiles show which alliance they belong to; the
+			<a href="statistiken.php?id=4">alliance statistics</a> list every alliance on the server.</p>
+	</div>
+</div>
+<br /><br /><br /><br /><?php include("Templates/layout/page_bottom.tpl"); ?>
+<?php
 }
 ?>
