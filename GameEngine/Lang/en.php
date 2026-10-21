@@ -1137,7 +1137,7 @@ tz_def('START_TIME_TRADE', 'Start time');
 tz_def('CREATE_TRADE_ROUTE', 'Create trade route');
 tz_def('TARGET_VILLAGE', 'Target village');
 tz_def('EDIT_TRADE_ROUTES', 'Edit trade route');
-tz_def('TRADE_ROUTES_DESC', 'Trade route allows you to set up routes for your merchant that he will walk every day at a certain hour. <br><br> Standard this holds on for <b>7</b> days, but you can extend it with <b>7</b> days for the cost of');
+tz_def('TRADE_ROUTES_DESC', 'Trade routes send your merchants to another of your villages with resources and gold, either every day at a set hour or whenever this village\'s storage reaches the level you choose. <br><br> A route runs for <b>7</b> days. You can extend it by <b>7</b> days, or turn on auto-renew to extend it automatically, for');
 tz_def('NPC_TRADE_DESC', 'With the NPC merchant you can distribute the resources in your warehouse as you desire. <br><br> The first line shows the current stock. In the second line you can choose another distribution. The third line shows the difference between the old and new stock.');
 tz_def('MARKETPLACE_DESC', 'At the marketplace, you can trade resources with other players. The higher its level, the more resources can be transported by your merchants at the same time');
 
