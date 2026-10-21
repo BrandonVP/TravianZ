@@ -91,7 +91,6 @@ $process = $units->procUnits($_POST);
 <title><?php echo SERVER_NAME.' - Send Troops'?></title>
 	<?php include("Templates/layout/assets.tpl"); ?>
 	
-?>
 	<script type="text/javascript">
 		window.addEvent('domready', start);
 	</script>

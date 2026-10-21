@@ -961,19 +961,41 @@ class Market
 
         $newTotal = $m2[0] + $m2[1] + $m2[2] + $m2[3];
 
-        $currentTotal =
-            round($village->awood) +
-            round($village->aclay) +
-            round($village->airon) +
-            round($village->acrop);
+        $current = [
+            round($village->awood),
+            round($village->aclay),
+            round($village->airon),
+            round($village->acrop),
+        ];
+        $currentTotal = array_sum($current);
 
-        // Too many resources requested, or (local fix) too few: an NPC trade
-        // redistributes the stock, it must not throw resources away. Up to 1
-        // per resource is allowed for rounding in the browser's distribution.
-        if ($newTotal > $currentTotal || $newTotal < $currentTotal - 4) {
+        // Local fix: the player distributes the stock shown when the page was
+        // loaded (posted back as m1[]). The village keeps producing (or spending)
+        // meanwhile, so the trade is checked against that snapshot and the change
+        // since then is carried over per resource - nothing is lost or created.
+        $m1 = [];
+        for ($i = 0; $i < 4; $i++) {
+            $m1[$i] = max(0, (int)($post['m1'][$i] ?? $current[$i]));
+        }
+        $snapTotal = array_sum($m1);
+
+        // The snapshot cannot be more than the village has now (+ rounding), the
+        // new distribution cannot be more than the snapshot, and it must not
+        // throw resources away (up to 1 per resource for browser rounding).
+        if ($snapTotal > $currentTotal + 4 || $newTotal > $snapTotal || $newTotal < $snapTotal - 4) {
 
             header('Location: build.php?id=' . $post['id'] . '&t=3');
             exit;
+        }
+
+        for ($i = 0; $i < 4; $i++) {
+            $m2[$i] += $current[$i] - $m1[$i];
+            if ($m2[$i] < 0) {
+                // more was spent meanwhile than this trade leaves: start over
+                header('Location: build.php?id=' . $post['id'] . '&t=3');
+                exit;
+            }
+            $m2[$i] = min($i < 3 ? $maxstore : $maxcrop, $m2[$i]);
         }
 
         // village gold is taken first, in one guarded UPDATE

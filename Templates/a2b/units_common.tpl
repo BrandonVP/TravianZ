@@ -139,7 +139,8 @@ if (!function_exists('a2b_unit_cell')) {
             <td class="line-last column-first regular"></td>
             <?php } ?>
             <td class="line-last regular"></td>
-            <td class="line-last column-last"></td>
+            <?php // the rows above have 6 cells: fill the rest of this row (no white gap) ?>
+            <td class="line-last column-last" colspan="4"></td>
         </tr>
         </tbody>
     </table>

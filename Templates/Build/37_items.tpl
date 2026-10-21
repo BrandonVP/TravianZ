@@ -67,6 +67,20 @@ if (isset($_POST['t4action'], $_POST['rowid'])) {
                 $t4Msg = HERO_ITEM_USE_FAIL;
             }
             break;
+
+        case 'discard':
+            // local redesign: throw away an unequipped item (or part of a stack)
+            $t4Msg = 'That item could not be discarded.';
+            foreach ($t4HeroItems->getInventory($session->uid) as $t4R) {
+                if ((int) $t4R['id'] === $t4RowId && (int) $t4R['equipped'] === 0) {
+                    $t4Qty = max(1, min((int) $t4R['quantity'], (int) ($_POST['qty'] ?? $t4R['quantity'])));
+                    if ($t4HeroItems->removeItem($session->uid, $t4RowId, $t4Qty)) {
+                        $t4Msg = 'Discarded ' . ($t4Qty > 1 ? $t4Qty . 'x ' : '') . $t4R['name'] . '.';
+                    }
+                    break;
+                }
+            }
+            break;
     }
 }
 
@@ -208,6 +222,11 @@ table.t4items .t4qtynum {
 }
 
 table.t4items .t4none { color: #a5a19a; }
+
+/* local redesign: discard button, quiet until hovered */
+.t4discard { margin-top: 4px; }
+.t4btn.t4btn-discard { background: #f6efe6; color: #8a3b2b; border-color: #d8b9a8; }
+.t4btn.t4btn-discard:hover { background: #b3261e; color: #fff; border-color: #8f1e18; }
 </style>
 <table id="distribution" class="t4items" cellpadding="1" cellspacing="1">
     <thead>
@@ -305,6 +324,15 @@ table.t4items .t4none { color: #a5a19a; }
                     <?php } else { ?>
                         <span class="t4none">&mdash;</span>
                     <?php } ?>
+                </form>
+                <form action="" method="POST" class="t4form t4discard"
+                      onsubmit="return confirm('Discard <?php echo htmlspecialchars(addslashes(strip_tags($t4Row['name'])), ENT_QUOTES, 'UTF-8'); ?>? This cannot be undone.');">
+                    <input type="hidden" name="rowid" value="<?php echo (int) $t4Row['id']; ?>">
+                    <input type="hidden" name="t4action" value="discard">
+                    <?php if ($t4IsBag && (int) $t4Row['quantity'] > 1) { ?>
+                        <input type="text" name="qty" value="<?php echo (int) $t4Row['quantity']; ?>" class="t4qtynum" title="How many to discard">
+                    <?php } ?>
+                    <button type="submit" class="t4btn t4btn-discard">Discard</button>
                 </form>
             </td>
         </tr>
