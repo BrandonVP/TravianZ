@@ -251,7 +251,10 @@ trait AutomationMarket {
             $reqMerc = ceil((array_sum($resource) + $gold * $goldSpace - 0.1) / $maxcarry2);
             
             if($merchantAvail2 > 0 && $reqMerc <= $merchantAvail2) {                
-                if($database->getVillageState($to)) {
+                // local fix: getVillageState() reads a village row without the
+                // world "occupied" flag, so it said "no village" for every target
+                // and trade routes never sent anything; check the village exists
+                if($database->checkVilExist($to)) {
                     $timetaken = $units->getWalkingTroopsTime($from, $to, 0, 0, [$tribe], 0);
                     $res = $resource[0] + $resource[1] + $resource[2] + $resource[3];
                     // the gold leaves the village first (guarded); without it the
