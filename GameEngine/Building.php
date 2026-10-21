@@ -105,7 +105,7 @@ class Building {
         20 => array('levels' => array(array(12, 3), array(22, 5))),
         21 => array('levels' => array(array(22, 10), array(15, 5))),
         22 => array('levels' => array(array(15, 3), array(19, 3))),
-        23 => array('rebuildAtLevel' => 10),
+        23 => array('rebuildAtLevel' => 20), // local redesign: Cranny goes to level 20
         24 => array('levels' => array(array(22, 10), array(15, 10))),
         27 => array('levels' => array(array(15, 10))),
         28 => array('exact' => array(array(17, 20)), 'levels' => array(array(20, 10))),
