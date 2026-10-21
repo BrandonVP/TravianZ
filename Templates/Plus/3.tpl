@@ -135,13 +135,11 @@ if (!function_exists('plusActionCell')) {
         }
 
         global $tzVG, $tzAtCapital, $tzCapital;
-        if ($tzVG && !$tzAtCapital) {
+        if ($tzVG) {
+            // bought (and auto-bought) in the capital's Main Building
             return $tzCapital
-                ? '<a href="plus.php?id=3&amp;newdid=' . (int) $tzCapital['wref'] . '"><span>Go to capital</span></a>'
+                ? '<a href="build.php?newdid=' . (int) $tzCapital['wref'] . '&amp;gid=15"><span>Main Building</span></a>'
                 : '<span class="none">Capital only</span>';
-        }
-        if ($tzVG && (int) $gold < (int) $cost) {
-            return '<span class="none">' . TOO_LITTLE_GOLD . '</span>';
         }
 
         if ((int) $gold < (int) $cost) {
@@ -174,7 +172,7 @@ if ($tzVG) {
     echo '<p class="tz-plus-gold">' . $tzCoin . 'Plus features are bought with your <b>capital</b>\'s gold'
        . ($tzCapital ? ' (<b>' . htmlspecialchars($tzCapital['name']) . '</b> has <b>' . (int) $golds['gold'] . '</b> gold)' : '')
        . '. Finish now and the NPC merchant use the gold of the village you are in (<b>' . (int) $tzHereGold . '</b> here).'
-       . ($tzAtCapital ? '' : ' Go to your capital to buy Plus features.')
+       . ' Plus features are bought (and set to auto-buy) in your capital\'s <b>Main Building</b>.'
        . '</p>';
 } elseif ((int) $golds['gold'] === 0) {
     echo "<p>You currently don't own gold.</p>";

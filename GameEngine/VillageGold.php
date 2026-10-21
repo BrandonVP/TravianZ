@@ -162,6 +162,104 @@ class VillageGold
         return $row;
     }
 
+    /**
+     * The 7-day Plus features bought with capital gold (Main Building), keyed
+     * by the auto-buy name: users column, plus.php id, price, duration, bit.
+     */
+    public static function plusFeatures()
+    {
+        $res = function ($css, $const, $name) {
+            return '+25% <img class="' . $css . '" src="img/x.gif" alt="" /> ' . $name;
+        };
+        $prod = defined('PLUS_PRODUCTION') ? PLUS_PRODUCTION : 604800;
+        return array(
+            'plus' => array('field' => 'plus', 'id' => 8,  'price' => TZ_GOLD_PRICE_PLUS,       'duration' => defined('PLUS_TIME') ? PLUS_TIME : 604800, 'bit' => 1,
+                            'label' => '<b><font color="#71D000">P</font><font color="#FF6F0F">l</font><font color="#71D000">u</font><font color="#FF6F0F">s</font></b> account', 'log' => 'Travian Plus'),
+            'b1'   => array('field' => 'b1',   'id' => 9,  'price' => TZ_GOLD_PRICE_PRODUCTION, 'duration' => $prod, 'bit' => 2,  'label' => $res('r1', '', 'Lumber'), 'log' => '+25% Lumber'),
+            'b2'   => array('field' => 'b2',   'id' => 10, 'price' => TZ_GOLD_PRICE_PRODUCTION, 'duration' => $prod, 'bit' => 4,  'label' => $res('r2', '', 'Clay'),     'log' => '+25% Clay'),
+            'b3'   => array('field' => 'b3',   'id' => 11, 'price' => TZ_GOLD_PRICE_PRODUCTION, 'duration' => $prod, 'bit' => 8,  'label' => $res('r3', '', 'Iron'),     'log' => '+25% Iron'),
+            'b4'   => array('field' => 'b4',   'id' => 12, 'price' => TZ_GOLD_PRICE_PRODUCTION, 'duration' => $prod, 'bit' => 16, 'label' => $res('r4', '', 'Crop'),     'log' => '+25% Crop'),
+        );
+    }
+
+    /** Auto-buy switches live in their own small table (created on first use). */
+    private static function autoTable($db)
+    {
+        static $done = false;
+        if (!$done) {
+            mysqli_query($db->dblink, "CREATE TABLE IF NOT EXISTS `" . TB_PREFIX . "tz_autobuy` (
+                `uid` int(11) NOT NULL, `mask` int(11) NOT NULL DEFAULT 0, PRIMARY KEY (`uid`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+            $done = true;
+        }
+        return TB_PREFIX . 'tz_autobuy';
+    }
+
+    /** Bitmask of the features a player auto-buys (see plusFeatures()). */
+    public static function autoBuyMask($db, $uid)
+    {
+        $r = mysqli_query($db->dblink, "SELECT mask FROM " . self::autoTable($db) . " WHERE uid = " . (int) $uid);
+        $row = $r ? mysqli_fetch_row($r) : null;
+        return $row ? (int) $row[0] : 0;
+    }
+
+    /** Turn auto-buy for one feature on or off. */
+    public static function setAutoBuy($db, $uid, $key, $on)
+    {
+        $features = self::plusFeatures();
+        if (!isset($features[$key])) {
+            return;
+        }
+        $bit = (int) $features[$key]['bit'];
+        $t = self::autoTable($db);
+        mysqli_query($db->dblink, $on
+            ? "INSERT INTO $t (uid, mask) VALUES (" . (int) $uid . ", $bit) ON DUPLICATE KEY UPDATE mask = mask | $bit"
+            : "UPDATE $t SET mask = mask & ~$bit WHERE uid = " . (int) $uid);
+    }
+
+    /**
+     * Automation: renew auto-bought features that end within 5 minutes (or
+     * have ended), paid from the capital. Not enough gold: tried again later.
+     */
+    public static function runAutoBuy($db)
+    {
+        if (!TZ_GOLD_ENABLED || !TZ_GOLD_PAYS_VILLAGE) {
+            return;
+        }
+        $t = self::autoTable($db);
+        $now = time();
+        $soon = $now + 300;
+        $features = self::plusFeatures();
+        $r = mysqli_query($db->dblink, "SELECT a.uid, a.mask, u.plus, u.b1, u.b2, u.b3, u.b4, v.wref
+            FROM $t a
+            JOIN " . TB_PREFIX . "users u ON u.id = a.uid
+            JOIN " . TB_PREFIX . "vdata v ON v.owner = a.uid AND v.capital = 1
+            WHERE a.mask > 0" . (defined('BANNED') ? " AND u.access <> " . (int) BANNED : ""));
+        if (!$r) {
+            return;
+        }
+        while ($row = mysqli_fetch_assoc($r)) {
+            $changed = false;
+            foreach ($features as $f) {
+                if (!((int) $row['mask'] & $f['bit']) || (int) $row[$f['field']] > $soon) {
+                    continue;
+                }
+                $price = (int) $f['price'];
+                if (!$db->takeVillageGold((int) $row['wref'], $price)) {
+                    continue;
+                }
+                $field = $f['field'];
+                mysqli_query($db->dblink, "UPDATE " . TB_PREFIX . "users SET `$field` = GREATEST(`$field`, $now) + " . (int) $f['duration'] . " WHERE id = " . (int) $row['uid']);
+                mysqli_query($db->dblink, "INSERT INTO " . TB_PREFIX . "gold_fin_log (uid, wid, action, gold, time, details)
+                    VALUES (" . (int) $row['uid'] . ", " . (int) $row['wref'] . ", 'Auto-buy " . $f['log'] . "', -$price, $now, 'Auto-buy with capital gold')");
+                $changed = true;
+            }
+            if ($changed && method_exists($db, 'clearUserCache')) {
+                $db->clearUserCache((int) $row['uid']);
+            }
+        }
+    }
+
     /** Highest Main Building (gid 15) and Marketplace (gid 17) level in a village. */
     public static function buildingLevels($resArray)
     {

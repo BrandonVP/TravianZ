@@ -172,6 +172,10 @@ class Automation {
         $this->checkInvitedPlayes();
         $this->updateStore();
 
+        // Village gold (local redesign): auto-buy of the 7-day Plus features
+        include_once __DIR__ . '/VillageGold.php';
+        VillageGold::runAutoBuy($GLOBALS['database']);
+
         // Finalizeaza upgrade-urile de bonus de alianta ajunse la termen.
         if (class_exists('AllianceBonus') && AllianceBonus::enabled()) {
             $allianceBonus = new AllianceBonus();

@@ -18,6 +18,9 @@
 ## --------------------------------------------------------------------------- ##
 #################################################################################
 
+// Village gold (local redesign): bought in the capital's Main Building, so go back there
+$tzBack = (class_exists('VillageGold') && VillageGold::pays($village)) ? 'build.php?gid=15#plus' : 'plus.php?id=3';
+
 // Gold Club activation – 100 gold, atomic
 $uid = (int)$session->uid;
 $wid = (int)$village->wid;
@@ -29,13 +32,13 @@ $cost = 100;
 // scris cu INSERT IGNORE - deci nu se actualiza daca randul exista deja.
 // sitterCan() se bazeaza pe sesiune, deci e mereu corect.
 if(!$session->sitterCan(SITTER_PERM_GOLD)) {
-    header("Location: plus.php?id=3"); exit;
+    header("Location: " . $tzBack); exit;
 }
 
 // Village gold (local redesign, phase 3b): paid with the capital's gold;
 // the Plus-gold part of the UPDATE below then costs nothing
 $tzPaid = VillageGold::capitalPayStart($database, $village, TZ_GOLD_PRICE_GOLDCLUB);
-if ($tzPaid === false) { header("Location: plus.php?id=3"); exit; }
+if ($tzPaid === false) { header("Location: " . $tzBack); exit; }
 $tzLogCost = ($tzPaid !== null) ? $tzPaid : $cost;
 if ($tzPaid !== null) $cost = 0;
 
@@ -67,6 +70,6 @@ if(mysqli_affected_rows($database->dblink) == 1) {
 }
 
 if (!empty($tzPaid) && empty($tzGranted)) VillageGold::capitalPayRefund($database, $village, $tzPaid);
-header("Location: plus.php?id=3");
+header("Location: " . $tzBack);
 exit;
 ?>

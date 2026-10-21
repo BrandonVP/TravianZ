@@ -1117,6 +1117,82 @@ table#send_select tr.tz-gold-hint td {
     color: #6b5a45;
 }
 
+/* Main Building: Plus features (capital gold, auto-buy) */
+.tz-mbplus {
+    margin: 18px 0 8px;
+    padding: 12px 14px;
+    border: 1px solid #d9c49a;
+    border-radius: 10px;
+    background: #fbf3df;
+}
+.tz-mbplus h2 {
+    margin: 0 0 6px;
+    font-size: 17px;
+}
+.tz-mbplus-intro {
+    margin: 0 0 10px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.tz-mbplus-away {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+table.tz-mbplus-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+table.tz-mbplus-table th,
+table.tz-mbplus-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #eadcbc;
+    text-align: left;
+    white-space: nowrap;
+}
+table.tz-mbplus-table td.tz-f { white-space: normal; }
+table.tz-mbplus-table thead th {
+    background: #f1e4c4;
+    font-size: 12px;
+}
+table.tz-mbplus-table tr.tz-on td.tz-f { font-weight: bold; }
+.tz-mbplus .tz-active { color: #2e7d32; font-weight: bold; }
+.tz-mbplus .tz-off { color: #8a7a62; }
+.tz-mbplus .tz-btn { padding: 3px 12px; }
+.tz-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 10px 2px 3px;
+    border-radius: 999px;
+    border: 1px solid #c9b48a;
+    background: #efe6d2;
+    color: #6b5a45;
+    font-size: 12px;
+    text-decoration: none;
+}
+.tz-switch .tz-knob {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .3);
+}
+.tz-switch.is-on {
+    background: #5b9a3c;
+    border-color: #4a8030;
+    color: #fff;
+    flex-direction: row-reverse;
+    padding: 2px 3px 2px 10px;
+}
+@media (max-width: 700px) {
+    table.tz-mbplus-table th:nth-child(2),
+    table.tz-mbplus-table td:nth-child(2) { display: none; }
+    table.tz-mbplus-table th, table.tz-mbplus-table td { padding: 5px 4px; }
+}
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

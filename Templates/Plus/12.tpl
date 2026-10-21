@@ -18,6 +18,9 @@
 ## --------------------------------------------------------------------------- ##
 #################################################################################
 
+// Village gold (local redesign): bought in the capital's Main Building, so go back there
+$tzBack = (class_exists('VillageGold') && VillageGold::pays($village)) ? 'build.php?gid=15#plus' : 'plus.php?id=3';
+
 // PERMISIUNI SITTER: cumparaturile cu aur.
 // Inlocuieste vechiul "$session->sit", care citea un flag din tabela online
 // scris cu INSERT IGNORE - deci nu se actualiza daca randul exista deja.
@@ -31,7 +34,7 @@ if($session->sitterCan(SITTER_PERM_GOLD)) {
     // Village gold (local redesign, phase 3b): paid with the capital's gold;
     // the Plus-gold part of the UPDATE below then costs nothing
     $tzPaid = VillageGold::capitalPayStart($database, $village, TZ_GOLD_PRICE_PRODUCTION);
-    if ($tzPaid === false) { header("Location: plus.php?id=3"); exit; }
+    if ($tzPaid === false) { header("Location: " . $tzBack); exit; }
     $tzLogCost = ($tzPaid !== null) ? $tzPaid : $cost;
     if ($tzPaid !== null) $cost = 0;
 
@@ -68,6 +71,6 @@ if($session->sitterCan(SITTER_PERM_GOLD)) {
     }
 }
 if (!empty($tzPaid) && empty($tzGranted)) VillageGold::capitalPayRefund($database, $village, $tzPaid);
-header("Location: plus.php?id=3");
+header("Location: " . $tzBack);
 exit;
 ?>
