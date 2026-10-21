@@ -1405,6 +1405,82 @@ table.t4adv tr.tz-adv-details td {
 .tz-to-contracts h4 { margin: 0 0 6px; }
 .tz-contract-locked { font-weight: 700; color: #6b5a45; }
 
+/* quest popup (soldier in the side column): theme colours over the old frame art */
+div.popup3.quest {
+    background: var(--tz-panel) !important;
+    border: 2px solid var(--tz-gold);
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+    color: var(--tz-ink);
+    font-family: "Source Sans 3", "Segoe UI", Verdana, Arial, sans-serif;
+}
+div.popup3.quest > a {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 82;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--tz-wood);
+    border: 1px solid var(--tz-gold);
+    color: var(--tz-gold-2);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 26px;
+    text-align: center;
+    text-decoration: none;
+}
+div.popup3.quest > a:hover { background: var(--tz-wood-2); }
+div.popup3.quest div#drag { background: transparent; }
+div.popup3.quest > a::after { content: "\00d7"; }
+/* the old sprite stays clickable but invisible, covering the round button */
+div.popup3.quest > a img.popup4 {
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+div.popup3.quest div#qstd h1 {
+    font-family: "Cinzel", Georgia, "Times New Roman", serif;
+    font-size: 24px;
+    color: var(--tz-ink);
+}
+div.popup3.quest div#qstd a { color: #8a5a12; font-weight: 700; }
+div.popup3.quest div#qstd a:hover { color: var(--tz-wood); }
+div.popup3.quest div#qstbg {
+    background-color: transparent;
+    border-radius: 0 0 10px 10px;
+}
+div.popup3.quest table.altquest {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--tz-line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--tz-cream);
+}
+div.popup3.quest table.altquest thead th {
+    background: var(--tz-wood);
+    color: var(--tz-gold-2);
+    border: 0;
+    padding: 4px 6px;
+}
+div.popup3.quest table.altquest thead td {
+    background: var(--tz-cream-2);
+    color: var(--tz-ink);
+    font-weight: 700;
+    border: 0;
+}
+div.popup3.quest table.altquest tbody td {
+    background: transparent;
+    border: 0;
+    border-top: 1px solid var(--tz-cream-2);
+}
+div.popup3.quest table.altquest tbody tr.c td { color: #8a7a62; }
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

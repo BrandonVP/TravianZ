@@ -859,8 +859,11 @@ else{
 		auto_reload=-1;
 	}
 
-	if (quest.reward.plus) {
-		var of=document.getElementById('logo').className='plus';
+	// local redesign: the old #logo is gone; without this guard the error left the
+	// popup half-updated and it could not be closed any more
+	if (quest.reward && quest.reward.plus) {
+		var of=document.getElementById('logo');
+		if (of) of.className='plus';
 	}
 
 	quest.markup=false;
@@ -874,7 +877,7 @@ function qst_weiter(){
 	fd(fi(), function(mf){
 		document.getElementById('popup3').innerHTML=mf.markup;
 		var $i=document.getElementById('qgei');
-		$i.className=mf.qgsrc;
+		if ($i) $i.className=mf.qgsrc;
 		wi(mf);
 		uc();
 	}

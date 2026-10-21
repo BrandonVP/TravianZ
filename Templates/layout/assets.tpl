@@ -6,7 +6,7 @@
 	<meta http-equiv="imagetoolbar" content="no" />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<script src="mt-full.js?0faab" type="text/javascript"></script>
-	<script src="unx.js?f4b7m" type="text/javascript"></script>
+	<script src="unx.js?v=<?php echo @filemtime(__DIR__ . '/../../unx.js'); ?>" type="text/javascript"></script>
 	<script src="new.js?0faab" type="text/javascript"></script>
 	<script src="tzres.js?v=<?php echo @filemtime(__DIR__ . '/../../tzres.js'); ?>" type="text/javascript"></script>
 	<script src="tzbuttons.js?v=<?php echo @filemtime(__DIR__ . '/../../tzbuttons.js'); ?>" type="text/javascript"></script>
