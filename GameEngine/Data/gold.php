@@ -28,7 +28,7 @@ if (!defined('TZ_GOLD_MERCHANT_SPACE')) define('TZ_GOLD_MERCHANT_SPACE', 100);
 if (!defined('TZ_GOLD_PAYS_VILLAGE'))        define('TZ_GOLD_PAYS_VILLAGE', true);
 if (!defined('TZ_GOLD_PRICE_FINISH'))        define('TZ_GOLD_PRICE_FINISH', 50);   // was 2 Plus gold
 if (!defined('TZ_GOLD_PRICE_FINISH_MASTER')) define('TZ_GOLD_PRICE_FINISH_MASTER', 75); // with Master Builder jobs, was 3
-if (!defined('TZ_GOLD_PRICE_NPC'))           define('TZ_GOLD_PRICE_NPC', 75);      // was 3
+if (!defined('TZ_GOLD_PRICE_NPC'))           define('TZ_GOLD_PRICE_NPC', 250);
 
 // Phase 3b: account purchases, paid with the CAPITAL's gold (buy at the capital)
 if (!defined('TZ_GOLD_PRICE_PLUS'))       define('TZ_GOLD_PRICE_PLUS', 1500);       // Plus, was 10
