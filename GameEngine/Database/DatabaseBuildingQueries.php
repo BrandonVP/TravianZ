@@ -170,71 +170,85 @@ trait DatabaseBuildingQueries {
 	}
 	
 	/**
-	 * Called when removing a queued building by a player or because destroyed by catapults
-	 * 
-	 * @param int $d The ID of the building which needs to be deleted
-	 * @param int $tribe The tribe of the player
-	 * @param int $wid The village ID of the player
-	 * @param array $fieldsArray Optional, the array containing the village building/resource fields
-	 * @return bool Returns true if the building was delete successfully, false otherwise
+	 * Local redesign: the build queue has two lanes - resource fields (1-18)
+	 * and village buildings (19+). Each lane builds ONE job at a time; the
+	 * others wait and start when the one before them finishes.
 	 */
-	
+	static function buildLane($field) {
+	    return ((int) $field <= 18) ? 'f' : 'b';
+	}
+
+	/**
+	 * Re-time a village's queue lanes: each job ends at most (end of the job
+	 * before it, or now) + its build time. Never delays a job (jobs that were
+	 * already running in parallel keep their time), so after a cancel or a
+	 * "finish now" the rest of the lane moves up. loopcon = 1 marks a job that
+	 * has not started yet.
+	 */
+	function reflowBuildQueue($wid, $lanes = array('f', 'b')) {
+	    $wid = (int) $wid;
+	    $now = time();
+	    $fields = $this->getResourceLevel($wid, false);
+	    $r = mysqli_query($this->dblink, "SELECT id, field, type, level, timestamp, loopcon FROM " . TB_PREFIX . "bdata
+	        WHERE wid = $wid AND master = 0 ORDER BY timestamp ASC, id ASC");
+	    $byLane = array('f' => array(), 'b' => array());
+	    while ($r && ($row = mysqli_fetch_assoc($r))) {
+	        $byLane[self::buildLane($row['field'])][] = $row;
+	    }
+	    foreach ($lanes as $lane) {
+	        $prevEnd = $now;
+	        foreach ($byLane[$lane] as $job) {
+	            $plus = max(1, (int) $job['level'] - (int) $fields['f' . (int) $job['field']]);
+	            $dur = (int) $this->getBuildingTime((int) $job['field'], (int) $job['type'], $plus, $wid, $fields);
+	            $old = (int) $job['timestamp'];
+	            $new = min($old, max($prevEnd, $now) + $dur);
+	            $loop = ($new - $dur > $now) ? 1 : 0;
+	            if ($new != $old || $loop != (int) $job['loopcon']) {
+	                mysqli_query($this->dblink, "UPDATE " . TB_PREFIX . "bdata SET timestamp = $new, loopcon = $loop WHERE id = " . (int) $job['id']);
+	            }
+	            $prevEnd = $new;
+	        }
+	    }
+	    unset(self::$buildingsUnderConstructionCache[$wid]);
+	}
+
+	/**
+	 * Called when removing a queued building by a player or because destroyed by catapults.
+	 * Local redesign: later levels of the same building/field move down one
+	 * level, and the rest of the lane moves up (reflowBuildQueue).
+	 *
+	 * @param int $d The ID of the building which needs to be deleted
+	 * @param int $tribe The tribe of the player (unused, kept for callers)
+	 * @param int $wid The village ID of the player
+	 * @param array $fieldsArray Optional, the village building/resource fields
+	 * @return bool Returns true if the building was deleted successfully
+	 */
 	function removeBuilding($d, $tribe, $wid, $fieldsArray = []) {
-		list($d, $tribe, $wid, $fieldsArray) = $this->escape_input((int) $d, (int) $tribe, (int) $wid, $fieldsArray);
+	    $d = (int) $d;
+	    $wid = (int) $wid;
+	    if (empty($fieldsArray)) $fieldsArray = $this->getResourceLevel($wid);
 
-		//Variables initialization
-		$jobToDelete = [];
-		$canBeRemoved = true;
-		$time = time();
-		$newTime = $loopTime = 0;
-		if(empty($fieldsArray)) $fieldsArray = $this->getResourceLevel($wid);
-		$jobs = $this->getJobsOrderByID($wid);
-		
-		//Search the job which needs to be deleted	
-		foreach($jobs as $job){	
-			//We need to modify waiting loop orders
-			if(!empty($jobToDelete) && $job['loopcon'] == 1 && ($tribe != 1 || ($tribe == 1 && (($jobToDelete['field'] <= 18 && $job['field'] <= 18) || ($jobToDelete['field'] >= 19 && $job['field'] >= 19))))){
-				
-				//Does this job have the same field of the deleted one?
-				$sameBuilding = $jobToDelete['field'] == $job['field'] ? 1 : 0;
-				
-				//Can the building be completely removed from the village?
-				if($sameBuilding && $canBeRemoved) $canBeRemoved = !$sameBuilding;		
-				
-				//Get the time required to upgrade the building at the given level	
-				$newTime = $this->getBuildingTime(
-						$job['field'],
-						$job['type'], 
-						$job['level'] - $fieldsArray['f'.$job['field']] - $sameBuilding, 
-						$wid, 
-						$fieldsArray);
-				
-				//Increase the looptime
-				$loopTime += $newTime;
-				
-				//Update the values
-				$q = "UPDATE
-							" .TB_PREFIX. "bdata
- 					  SET
-							".($job['master'] ? "" : "loopcon = 0,")."
-							timestamp = ".($job['master'] ? $newTime : $loopTime + $time)."
-							".($sameBuilding ? ", level = level - 1" : "")."
-					  WHERE
-							id = ".$job['id'];
-				mysqli_query($this->dblink, $q);
-						
-			}
-			
-			//We found the job that needs to be deleted
-			if($job['id'] == $d) $jobToDelete = $job;
-		}	
+	    $r = mysqli_query($this->dblink, "SELECT * FROM " . TB_PREFIX . "bdata WHERE id = $d AND wid = $wid");
+	    $job = $r ? mysqli_fetch_assoc($r) : null;
+	    if (!$job) {
+	        return false;
+	    }
 
-		if($canBeRemoved && !empty($jobToDelete) && $jobToDelete['field'] > 18 && $jobToDelete['field'] != 99 && $jobToDelete['level'] - 1 == 0){
-			$this->setVillageLevel($wid, ["f".$jobToDelete['field']."t"], [0]);
-		}
-		
-        $q = "DELETE FROM " . TB_PREFIX . "bdata where id = $d";
-        return mysqli_query($this->dblink, $q);
+	    $ok = mysqli_query($this->dblink, "DELETE FROM " . TB_PREFIX . "bdata WHERE id = $d");
+
+	    // later levels of the same building/field (incl. Master Builder jobs)
+	    mysqli_query($this->dblink, "UPDATE " . TB_PREFIX . "bdata SET level = level - 1
+	        WHERE wid = $wid AND field = " . (int) $job['field'] . " AND level > " . (int) $job['level']);
+
+	    // a new building with no level left goes away completely
+	    $left = mysqli_query($this->dblink, "SELECT COUNT(*) FROM " . TB_PREFIX . "bdata WHERE wid = $wid AND field = " . (int) $job['field']);
+	    $leftN = $left ? (int) mysqli_fetch_row($left)[0] : 0;
+	    if ($leftN == 0 && $job['field'] > 18 && $job['field'] != 99 && (int) $fieldsArray['f' . $job['field']] == 0) {
+	        $this->setVillageLevel($wid, ["f" . $job['field'] . "t"], [0]);
+	    }
+
+	    $this->reflowBuildQueue($wid, array(self::buildLane($job['field'])));
+	    return $ok;
 	}
 
 	function addDemolition($wid, $field) {

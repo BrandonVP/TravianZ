@@ -145,7 +145,8 @@ class Building {
         }
 
         if ($this->sess->plus) {
-            $maxConcurrent += PLUS_MAX;
+            // local redesign: the Plus extra slot is per lane (fields / buildings)
+            $maxConcurrent += 2 * PLUS_MAX;
         }
 
         $this->loadBuilding();
@@ -404,6 +405,16 @@ class Building {
         return;
     }
 
+    // FINISH ONE JOB (local redesign: only the item that is building)
+    if (
+        isset($get['finishJob']) &&
+        $validChecker &&
+        $this->sess->sit == 0 &&
+        $this->canPayFinish()
+    ) {
+        $this->finishJob((int) $get['finishJob']);
+    }
+
     // FINISH ALL
     if (
         isset($get['buildingFinish']) &&
@@ -437,32 +448,10 @@ class Building {
         return 1;
     }
 
-    if (
-        $this->isMax($gid, $fieldId, 1) &&
-        ($loop || $current)
-    ) {
+    // Local redesign: levels already queued for this field count towards the max
+    $sameField = $this->queuedOnField($fieldId);
+    if ($sameField > 0 && $this->isMax($gid, $fieldId, $sameField)) {
         return 10;
-    }
-
-    if (
-        $this->isMax($gid, $fieldId, 2) &&
-        $loop &&
-        $current
-    ) {
-        return 10;
-    }
-
-    if (
-        $loop &&
-        $current &&
-        $this->isMax($gid, $fieldId, 3)
-    ) {
-
-        $masterJobs = $this->db->getMasterJobs($this->vil->wid);
-
-        if (!empty($masterJobs)) {
-            return 10;
-        }
     }
 
     // FIX B4 (B-D1): '>=' in loc de '>' - la allocated == maxConcurrent coada e
@@ -542,43 +531,16 @@ class Building {
 
         case 4:
 
-            // Local change: the parallel slots below are for *different*
-            // buildings/fields. If this one is already upgrading, only the
-            // Plus waiting slot may be used (cost/level/time are only
-            // computed correctly for one active + one waiting job per field).
-            $alreadyQueued = $this->isCurrent($fieldId) || $this->isLoop($fieldId);
-
-            if ($fieldId >= 19) {
-
-                // Local change: allow up to INNER_MAX (Roman-style queue) or
-                // BASIC_MAX parallel village-building jobs instead of exactly 1.
-                $romanQueue = ($this->sess->tribe == 1 || ALLOW_ALL_TRIBE);
-                $hasMainBuilding = $romanQueue ? $this->inner : $this->basic;
-                $mainBuildingLimit = $romanQueue ? INNER_MAX : BASIC_MAX;
-
-                if (!$alreadyQueued && $hasMainBuilding < $mainBuildingLimit) {
-                    return 8;
-                }
-
-                if ($this->sess->plus || $gid == 40) {
-                    return ($this->plus == 0 ? 9 : 3);
-                }
-
-                return 2;
+            // Local redesign: one job at a time per lane (fields / buildings);
+            // more wait in line, up to BASIC_MAX / INNER_MAX (+PLUS_MAX with Plus).
+            $inLane = $this->laneJobs($fieldId);
+            if ($inLane == 0) {
+                return 8;
             }
-
-            // Local change: allow up to BASIC_MAX parallel resource-field jobs
-            // instead of exactly 1.
-            if ($alreadyQueued || $this->basic >= BASIC_MAX) {
-
-                if (($this->sess->plus || $gid == 40) && $this->plus == 0) {
-                    return 9;
-                }
-
-                return 3;
+            if ($inLane < $this->laneMax($fieldId)) {
+                return 9;
             }
-
-            return 8;
+            return 3;
     }
 }
 
@@ -742,9 +704,11 @@ class Building {
             continue;
         }
 
+        // local redesign: refund what THIS level cost (a later queued level costs more)
         $uprequire = $this->resourceRequired(
             $jobs['field'],
-            $jobs['type']
+            $jobs['type'],
+            max(1, (int) $jobs['level'] - (int) $this->vil->resarray['f'.$jobs['field']])
         );
 
         if (
@@ -797,10 +761,6 @@ class Building {
 
         $fieldType = $this->vil->resarray['f'.$fieldId.'t'];
 
-        $uprequire = $this->resourceRequired($fieldId, $fieldType);
-
-        $time = time() + $uprequire['time'];
-
         $bindicate = $this->canBuild($fieldId, $fieldType);
 
         // early exit
@@ -810,54 +770,12 @@ class Building {
             exit;
         }
 
-        $loop = ($bindicate == 9 ? 1 : 0);
-        $loopsame = 0;
-
-        if ($loop == 1) {
-
-            foreach ($this->buildArray as $build) {
-
-                if ($build['field'] == $fieldId) {
-
-                    $loopsame++;
-
-                    $uprequire = $this->resourceRequired(
-                        $fieldId,
-                        $fieldType,
-                        ($loopsame > 0 ? 2 : 1)
-                    );
-                }
-            }
-
-            $romanQueue = ($this->sess->tribe == 1 || ALLOW_ALL_TRIBE);
-
-            if ($romanQueue) {
-
-                // Local change: with several parallel jobs per category, wait
-                // for the one that finishes LAST (was: whichever is listed last).
-                $latest = 0;
-
-                foreach ($this->buildArray as $build) {
-
-                    $sameCategory = ($fieldId >= 19)
-                        ? $build['field'] >= 19
-                        : $build['field'] <= 18;
-
-                    if ($sameCategory && $build['timestamp'] > $latest) {
-                        $latest = $build['timestamp'];
-                    }
-                }
-
-                if ($latest > 0) {
-                    $time = $latest + $uprequire['time'];
-                }
-            } else {
-
-                if (isset($this->buildArray[0]['timestamp'])) {
-                    $time = $this->buildArray[0]['timestamp'] + $uprequire['time'];
-                }
-            }
-        }
+        // Local redesign: the level after those already queued for this field,
+        // started when the last job of its lane (fields / buildings) finishes
+        $loopsame = $this->queuedOnField($fieldId);
+        $uprequire = $this->resourceRequired($fieldId, $fieldType, 1 + $loopsame);
+        $time = $this->laneEnd($fieldId) + $uprequire['time'];
+        $loop = ($this->laneJobs($fieldId) > 0) ? 1 : 0;
 
         $level = $this->db->getResourceLevel($this->vil->wid);
 
@@ -866,10 +784,11 @@ class Building {
             $fieldId
         );
 
+        // same count as the cost above (incl. Master Builder jobs on this field)
         $nextLevel =
             $level['f'.$fieldId] +
             1 +
-            count($queuedBuildings);
+            $loopsame;
 
         if (
             $this->db->addBuilding(
@@ -877,7 +796,7 @@ class Building {
                 $fieldId,
                 $fieldType,
                 $loop,
-                $time + ($loop == 1 ? ceil(60 / SPEED) : 0),
+                $time,
                 0,
                 $nextLevel
             )
@@ -895,7 +814,7 @@ class Building {
             $this->log->addBuildLog(
                 $this->vil->wid,
                 self::procResType($fieldType),
-                ($this->vil->resarray['f'.$fieldId] + ($loopsame > 0 ? 2 : 1)),
+                $nextLevel,
                 0
             );
 
@@ -944,30 +863,17 @@ class Building {
 
         $uprequire = $this->resourceRequired($buildField, $gid);
 
-        $time = time() + $uprequire['time'];
-
         $bindicate = $this->canBuild($buildField, $gid);
 
-        $loop = ($bindicate == 9 ? 1 : 0);
+        // Local redesign: starts when the last job of the buildings lane finishes
+        if (!in_array($bindicate, array(8, 9))) {
 
-        if ($loop == 1) {
-
-            $romanQueue = ($this->sess->tribe == 1 || ALLOW_ALL_TRIBE);
-
-            foreach ($this->buildArray as $build) {
-
-                if (
-                    $build['field'] >= 19 ||
-                    !$romanQueue
-                ) {
-
-                    $time =
-                        $build['timestamp'] +
-                        ceil(60 / SPEED) +
-                        $uprequire['time'];
-                }
-            }
+            header('Location: dorf2.php');
+            exit;
         }
+
+        $time = $this->laneEnd($buildField) + $uprequire['time'];
+        $loop = ($this->laneJobs($buildField) > 0) ? 1 : 0;
 
         // early exit
         if (!$this->meetRequirement($gid)) {
@@ -1399,6 +1305,52 @@ class Building {
 	Function to is current ?
 	*****************************************/
 
+	/** Local redesign: build lane of a slot - 'f' resource fields (1-18), 'b' village buildings. */
+	public static function laneOf($fieldId) {
+	    return ((int) $fieldId <= 18) ? 'f' : 'b';
+	}
+
+	/** Local redesign: queued (non Master Builder) jobs in the lane of $fieldId. */
+	public function laneJobs($fieldId) {
+	    $lane = self::laneOf($fieldId);
+	    $n = 0;
+	    foreach ((array) $this->buildArray as $job) {
+	        if ((int) $job['master'] == 0 && self::laneOf($job['field']) === $lane) {
+	            $n++;
+	        }
+	    }
+	    return $n;
+	}
+
+	/** Most jobs a lane may hold: BASIC_MAX fields / INNER_MAX buildings, +PLUS_MAX with Plus. */
+	public function laneMax($fieldId) {
+	    $max = ((int) $fieldId <= 18) ? BASIC_MAX : INNER_MAX;
+	    return $max + ($this->sess->plus ? PLUS_MAX : 0);
+	}
+
+	/** When the last queued job of this lane finishes (now if the lane is empty). */
+	public function laneEnd($fieldId) {
+	    $lane = self::laneOf($fieldId);
+	    $end = time();
+	    foreach ((array) $this->buildArray as $job) {
+	        if ((int) $job['master'] == 0 && self::laneOf($job['field']) === $lane) {
+	            $end = max($end, (int) $job['timestamp']);
+	        }
+	    }
+	    return $end;
+	}
+
+	/** Levels already queued for this field (incl. Master Builder jobs). */
+	public function queuedOnField($fieldId) {
+	    $n = 0;
+	    foreach ((array) $this->buildArray as $job) {
+	        if ((int) $job['field'] == (int) $fieldId) {
+	            $n++;
+	        }
+	    }
+	    return $n;
+	}
+
 	public function isCurrent($fieldId) {
 
     if (empty($this->buildArray)) {
@@ -1451,11 +1403,8 @@ class Building {
 
 	/** Finish-now price in village gold: higher when Master Builder jobs wait. */
 	public function finishPrice() {
-	    foreach ((array) $this->buildArray as $job) {
-	        if ($job['wid'] == $this->vil->wid && (int) $job['master'] != 0) {
-	            return TZ_GOLD_PRICE_FINISH_MASTER;
-	        }
-	    }
+	    // local redesign: Finish now only touches jobs that are building, never
+	    // waiting Master Builder jobs, so there is one price
 	    return TZ_GOLD_PRICE_FINISH;
 	}
 
@@ -1475,8 +1424,89 @@ class Building {
 	/** Confirmation text for Finish now with the right price. */
 	public function finishConfirmText() {
 	    return VillageGold::pays($this->vil)
-	        ? 'Finish all construction and research orders in this village now for ' . $this->finishPrice() . ' gold?'
+	        ? 'Finish what is being built and researched in this village now for ' . $this->finishPrice() . ' gold?'
 	        : FINISH_GOLD;
+	}
+
+	/**
+	 * Local redesign: the job has started (it is not waiting in its lane).
+	 * reflowBuildQueue() keeps loopcon = 1 on every job that has not started.
+	 */
+	public function isBuildingNow($job) {
+	    return (int) $job['master'] == 0 && (int) $job['loopcon'] == 0;
+	}
+
+	/** Can this job be finished with gold right now (button in the build queue)? */
+	public function canFinishJob($job) {
+	    if ((int) $job['master'] != 0 || !$this->isBuildingNow($job)) return false;
+	    if (in_array((int) $job['type'], array(25, 26, 40))) return false;
+	    if ((int) ($this->vil->resarray['f99t'] ?? 0) == 40) return false;
+	    return $this->canPayFinish();
+	}
+
+	/** Confirmation text for finishing one job. */
+	public function finishJobConfirmText($name, $level) {
+	    return 'Finish ' . $name . ' level ' . (int) $level . ' now for ' . $this->finishPriceLabel() . '?';
+	}
+
+	/**
+	 * Local redesign: Finish now for ONE job that is building. The next job of
+	 * its lane starts straight away (reflowBuildQueue).
+	 */
+	public function finishJob($jobId) {
+	    $back = 'Location: ' . ($this->sess->referrer ? $this->sess->referrer : 'dorf1.php');
+	    $job = null;
+	    foreach ((array) $this->buildArray as $j) {
+	        if ((int) $j['id'] === (int) $jobId && (int) $j['wid'] === (int) $this->vil->wid) {
+	            $job = $j;
+	        }
+	    }
+	    if (!$job || !$this->canFinishJob($job)) {
+	        header($back);
+	        exit;
+	    }
+	    if (isset($this->sess) && method_exists($this->sess, 'sitterCan') && !$this->sess->sitterCan(SITTER_PERM_GOLD)) {
+	        header($back);
+	        exit;
+	    }
+
+	    // pay first (guarded), village gold or (village gold off) 2 Plus gold
+	    $price = TZ_GOLD_PRICE_FINISH;
+	    if (VillageGold::pays($this->vil)) {
+	        if (!$this->db->takeVillageGold($this->vil->wid, $price)) {
+	            header($back);
+	            exit;
+	        }
+	    } elseif (!$this->db->spendGold($this->sess->uid, 2, 'Finish construction')) {
+	        header($back);
+	        exit;
+	    }
+
+	    $wid = (int) $this->vil->wid;
+	    $data = $GLOBALS['bid' . (int) $job['type']] ?? array();
+	    if ($this->db->finishBuildingLevel($wid, $job['field'], $job['level'], $job['type'])) {
+	        $pop = isset($data[(int) $job['level']]['pop']) ? (int) $data[(int) $job['level']]['pop'] : 0;
+	        if ($pop > 0) {
+	            $this->db->modifyPop($wid, $pop, 0);
+	        }
+	        if ((int) $job['type'] == 18) {
+	            $this->db->updateAllianceMax($this->db->getVillageField($wid, 'owner'), $GLOBALS['bid18'][(int) $job['level']]['attri']);
+	        }
+	        if (in_array((int) $job['type'], array(10, 11, 38, 39), true)) {
+	            $this->db->recalculateStorage($wid);
+	        }
+	        $this->db->deleteBuildings($wid, array((int) $job['id']));
+	    }
+	    if (VillageGold::pays($this->vil)) {
+	        $this->db->addGoldFinLog($wid, $this->sess->uid, 'Finish construction', -$price,
+	            self::procResType($job['type']) . ' level ' . (int) $job['level']);
+	    }
+
+	    $this->db->reflowBuildQueue($wid, array(self::laneOf($job['field'])));
+	    self::recountCP($this->db, $wid);
+
+	    header($back);
+	    exit;
 	}
 
 	public function finishAll($redirect_url = '') {
@@ -1529,6 +1559,11 @@ class Building {
         // cu gold e blocat pentru TOATE cladirile satului, nu doar pentru WW -
         // anti-exploit pentru rush-ul de WW. Nu "repara" acest skip.
         if ($wwvillage['f99t'] == 40) {
+            continue;
+        }
+
+        // local redesign: only jobs that are building now, not the waiting ones
+        if ((int) $jobs['master'] != 0 || !$this->isBuildingNow($jobs)) {
             continue;
         }
 
@@ -1668,7 +1703,8 @@ class Building {
 
     $this->chargeFinishGold($countMasterGold, $countPlus2Gold);
 
-    $this->promotePendingLoopJob();
+    // local redesign: the next job of each lane starts now
+    $this->db->reflowBuildQueue($this->vil->wid);
 
     self::recountCP($this->db, $this->vil->wid);
 

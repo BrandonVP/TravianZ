@@ -1204,6 +1204,15 @@ table.tz-mbplus-table tr.tz-on td.tz-f { font-weight: bold; }
     line-height: 1.5;
 }
 
+/* build queue: Finish now per job */
+.tz-btn.tz-btn-sm.tz-job-finish {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

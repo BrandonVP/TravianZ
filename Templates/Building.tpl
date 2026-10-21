@@ -107,6 +107,12 @@ if (!function_exists('safeHTML')) {
             <td class="tz-job-time">
                 <?php if ($master == 0 && !$queued) { ?>
                     <span id="timer<?php echo ++$session->timer; ?>"><?php echo $generator->getTimeFormat($remainingTime); ?></span>
+                    <?php if ($building->canFinishJob($jobs)) {
+                        $tzFinTxt = $building->finishJobConfirmText($buildingName, $level); ?>
+                    <a class="tz-btn tz-btn-sm tz-job-finish" href="?finishJob=<?php echo $jobId; ?>&amp;c=<?php echo safeHTML($session->checker); ?>"
+                       onclick="return confirm('<?php echo safeHTML(addslashes($tzFinTxt)); ?>');"
+                       title="<?php echo safeHTML($tzFinTxt); ?>">Finish now &middot; <?php echo safeHTML($building->finishPriceLabel()); ?></a>
+                    <?php } ?>
                 <?php } elseif ($master == 0) { ?>
                     <span class="tz-job-wait">Queued</span>
                     <span id="timer<?php echo ++$session->timer; ?>" class="tz-job-hidden"><?php echo $generator->getTimeFormat($remainingTime); ?></span>
@@ -122,17 +128,6 @@ if (!function_exists('safeHTML')) {
 
     </tbody>
 
-    <?php if ($building->canPayFinish()) { ?>
-    <tfoot>
-        <tr>
-            <td colspan="3">
-                <a class="tz-btn" href="?buildingFinish=1"
-                   onclick="return confirm('<?php echo safeHTML($building->finishConfirmText()); ?>');"
-                   title="<?php echo safeHTML($building->finishConfirmText()); ?>">Finish now &middot; <?php echo safeHTML($building->finishPriceLabel()); ?></a>
-            </td>
-        </tr>
-    </tfoot>
-    <?php } ?>
 
 </table>
 

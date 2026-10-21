@@ -42,8 +42,10 @@ $doublebuild = ($building->isCurrent($id) && $building->isLoop($id))? 1 : 0;
 $master = count($database->getMasterJobsByField($village->wid, $id));
 if ($master == 1 && $loopsame == 1) $loopsame = 0;
 
-$nextLevel = (int)$village->resarray['f'.$id] + 1 + $loopsame + $doublebuild + $master;
-$uprequire = $building->resourceRequired($id, $bid, 1 + $loopsame + $doublebuild + $master);
+// local redesign: any number of levels can be queued per field
+$tzQueued = $building->queuedOnField($id);
+$nextLevel = (int)$village->resarray['f'.$id] + 1 + $tzQueued;
+$uprequire = $building->resourceRequired($id, $bid, 1 + $tzQueued);
 $total_required = (int)($uprequire['wood'] + $uprequire['clay'] + $uprequire['iron'] + $uprequire['crop']);
 ?>
 <p id="contract">
@@ -77,7 +79,7 @@ switch ($bindicate) {
         break;
     case 7:
         if ($village->allcrop - $village->pop - $technology->getUpkeep($village->unitall, 0) > 0) {
-            $neededtime = $building->calculateAvaliable($id, $bid, 1 + $loopsame + $doublebuild + $master);
+            $neededtime = $building->calculateAvaliable($id, $bid, 1 + $tzQueued);
             echo '<span class="none">'.ENOUGH_RESOURCES.' '.$neededtime[0].' at '.$neededtime[1].'</span>';
         } else {
             echo '<span class="none">'.YOUR_CROP_NEGATIVE.'</span>';
@@ -86,7 +88,7 @@ switch ($bindicate) {
     case 8:
     case 9:
         $href = $session->access == BANNED? 'banned.php' : (($id <= 18)? "dorf1.php?a=$id&c=$session->checker" : "dorf2.php?a=$id&c=$session->checker");
-        $lvl = $bindicate == 8? $village->resarray['f'.$id] + 1 : $village->resarray['f'.$id] + ($loopsame > 0? 2 : 1);
+        $lvl = $nextLevel;
         echo '<a class="build" href="'.$href.'">'.UPGRADE_LEVEL.' '.$lvl.'.</a>';
         if ($bindicate == 9) echo ' <span class="none">'.WAITING.'</span>';
         break;

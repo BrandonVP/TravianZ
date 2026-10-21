@@ -103,23 +103,15 @@ trait AutomationBuildQueue {
         // update statistical data for affected villages
         foreach ($villagesAffected as $affected_id) $this->recountPop($affected_id, false);
 
-        // update data that can be done in one swoop instead of using multiple update queries
-        // no special checks for Romans
-        foreach ($loopconUpdates as $villageId => $updateCondition) {
-            $database->query(
-                "UPDATE
-                    ".TB_PREFIX."bdata
-                 SET
-                    loopcon = 0
-                 WHERE
-                    loopcon = 1 AND
-                    master = 0 AND
-                    wid = ".$villageId.$updateCondition);
-        }
-
         // delete all processed entries
         if (count($dbIdsToDelete)) {
             $database->query( "DELETE FROM " . TB_PREFIX . "bdata WHERE id IN(" . implode( ',', $dbIdsToDelete ) . ")" );
+        }
+
+        // Local redesign: the next job of each lane is now the one building
+        // (timestamps were already chained when it was queued)
+        foreach (array_keys($loopconUpdates) as $villageId) {
+            $database->reflowBuildQueue($villageId);
         }
     }
 
