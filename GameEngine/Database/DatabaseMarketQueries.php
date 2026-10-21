@@ -57,10 +57,12 @@ trait DatabaseMarketQueries {
 	function createTradeRoute($uid,$wid,$from,$r1,$r2,$r3,$r4,$start,$deliveries,$merchant,$time) {
 	    list($uid,$wid,$from,$r1,$r2,$r3,$r4,$start,$deliveries,$merchant,$time) = $this->escape_input((int) $uid,(int) $wid,(int) $from,(int) $r1,(int) $r2,(int) $r3,(int) $r4,(int) $start,(int) $deliveries,(int) $merchant,(int) $time);
 
-	    $x = "UPDATE " . TB_PREFIX . "users SET gold = gold - 2 WHERE id = " . $uid;
-        mysqli_query( $this->dblink, $x );
+	    // local redesign: the route is paid with village gold in build.php (the old
+	    // "users.gold - 2" here charged Plus gold on top); named columns so new
+	    // route columns can be added safely
         $timeleft = time() + 604800;
-        $q        = "INSERT into " . TB_PREFIX . "route values (0,$uid,$wid,$from,$r1,$r2,$r3,$r4,$start,$deliveries,$merchant,$time,$timeleft)";
+        $q        = "INSERT INTO " . TB_PREFIX . "route (id, uid, wid, `from`, wood, clay, iron, crop, start, deliveries, merchant, timestamp, timeleft)
+                     VALUES (0,$uid,$wid,$from,$r1,$r2,$r3,$r4,$start,$deliveries,$merchant,$time,$timeleft)";
 
         return mysqli_query( $this->dblink, $q );
 	}

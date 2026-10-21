@@ -1332,6 +1332,17 @@ table.tz-emp-villages tr.tz-cur { background: #fbf3df; }
 .tz-emp-dim { color: #8a7a62; }
 td.tz-near-full { color: #a5571c; font-weight: 600; }
 
+/* full card width for building pages: the pack fixes div#build at 502px so
+   the building picture (top right) gets its own column; only the title and
+   description need to stay clear of it */
+div#content.build div#build {
+    width: auto;
+}
+div#content.build div#build h1,
+div#content.build div#build p.build_desc {
+    padding-right: 130px;
+}
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the
