@@ -27,10 +27,60 @@ trait AutomationMarket {
         $database->delTradeRoute();
     }
 
+    /**
+     * Local redesign: auto-renew - shortly before a route expires, its village
+     * pays TZ_GOLD_PRICE_ROUTE and the route runs 7 more days. Without the
+     * gold the route expires as usual (delTradeRoute).
+     */
+    private function TradeRouteRenew() {
+        global $database;
+        include_once __DIR__ . '/../VillageGold.php';
+        $soon = time() + (defined('TZ_ROUTE_RENEW_BEFORE') ? TZ_ROUTE_RENEW_BEFORE : 3600);
+        $rows = $database->query_return("SELECT id, uid, `from` FROM ".TB_PREFIX."route WHERE autorenew = 1 AND timeleft < $soon");
+        foreach ((array) $rows as $r) {
+            if ($database->takeVillageGold((int) $r['from'], TZ_GOLD_PRICE_ROUTE)) {
+                $database->query("UPDATE ".TB_PREFIX."route SET timeleft = GREATEST(timeleft, UNIX_TIMESTAMP()) + 604800 WHERE id = " . (int) $r['id']);
+                $database->addGoldFinLog((int) $r['from'], (int) $r['uid'], 'Trade route auto-renew', -TZ_GOLD_PRICE_ROUTE, 'Trade route extended 7 days');
+            }
+        }
+    }
+
+    /**
+     * Local redesign: "when storage is full" routes - send when any resource the
+     * route carries reaches trig_pct % of the Warehouse / Granary, then wait
+     * TZ_ROUTE_FULL_COOLDOWN before firing again.
+     */
+    private function TradeRouteFull() {
+        global $database;
+        $time = time();
+        $cool = $time - (defined('TZ_ROUTE_FULL_COOLDOWN') ? TZ_ROUTE_FULL_COOLDOWN : 900);
+        $rows = $database->query_return("SELECT * FROM ".TB_PREFIX."route WHERE trig = 1 AND last_sent < $cool AND timeleft > $time");
+        foreach ((array) $rows as $r) {
+            $from = (int) $r['from'];
+            $this->updateRes($from);
+            $v = $database->getVillageFields($from, 'wood, clay, iron, crop, maxstore, maxcrop', false);
+            if (!$v) continue;
+            $carries = [];
+            foreach (['wood', 'clay', 'iron', 'crop'] as $k) if ((int) $r[$k] > 0) $carries[] = $k;
+            if (!$carries) $carries = ['wood', 'clay', 'iron', 'crop'];
+            $hit = false;
+            foreach ($carries as $k) {
+                $cap = ($k === 'crop') ? (float) $v['maxcrop'] : (float) $v['maxstore'];
+                if ($cap > 0 && (float) $v[$k] / $cap * 100 >= (int) $r['trig_pct']) $hit = true;
+            }
+            if (!$hit) continue;
+            $tribe = $database->getUserField($database->getVillageField($from, "owner"), "tribe", 0);
+            if ($this->sendResource2($r['wood'], $r['clay'], $r['iron'], $r['crop'], $from, $r['wid'], $tribe, $r['deliveries'], (int) $r['gold'])) {
+                $database->query("UPDATE ".TB_PREFIX."route SET last_sent = $time WHERE id = " . (int) $r['id']);
+            }
+        }
+    }
+
     private function TradeRoute() {
         global $database;
         $time = time();
-        $q = "SELECT `from`, wood, clay, iron, crop, wid, deliveries, id FROM ".TB_PREFIX."route where timestamp < $time";
+        // local redesign: daily routes only (trig = 0); "when full" routes run in TradeRouteFull()
+        $q = "SELECT `from`, wood, clay, iron, crop, wid, deliveries, id, gold FROM ".TB_PREFIX."route where timestamp < $time AND trig = 0";
         $dataarray = $database->query_return($q);
 
         $vilIDs = [];
@@ -43,9 +93,10 @@ trait AutomationMarket {
 
         foreach($dataarray as $data) {
             $targettribe = $database->getUserField($database->getVillageField($data['from'], "owner"), "tribe", 0);
-			$this->sendResource2($data['wood'], $data['clay'], $data['iron'], $data['crop'], $data['from'], $data['wid'], $targettribe, $data['deliveries']);
+			$this->sendResource2($data['wood'], $data['clay'], $data['iron'], $data['crop'], $data['from'], $data['wid'], $targettribe, $data['deliveries'], (int) $data['gold']);
 			$database->editTradeRoute($data['id'], "timestamp", 86400, 1);
         }
+        $this->TradeRouteFull();
     }
 
     private function marketComplete() {
@@ -143,15 +194,21 @@ trait AutomationMarket {
         }
     }
 
-    private function sendResource2($wtrans, $ctrans, $itrans, $crtrans, $from, $to, $tribe, $send) {
+    private function sendResource2($wtrans, $ctrans, $itrans, $crtrans, $from, $to, $tribe, $send, $gold = 0) {
         global $bid17, $bid28, $database, $units;
+
+        // local redesign: a route can carry village gold (TZ_GOLD_MERCHANT_SPACE per gold)
+        include_once __DIR__ . '/../VillageGold.php';
+        $gold = max(0, min((int) $gold, VillageGold::goldOf($database, $from)));
+        $goldSpace = defined('TZ_GOLD_MERCHANT_SPACE') ? TZ_GOLD_MERCHANT_SPACE : 100;
+        $sent = false;
 
         $availableWood = $database->getWoodAvailable($from);
         $availableClay = $database->getClayAvailable($from);
         $availableIron = $database->getIronAvailable($from);
         $availableCrop = $database->getCropAvailable($from);
         
-        if($availableWood + $availableClay + $availableIron + $availableCrop > 0)
+        if($availableWood + $availableClay + $availableIron + $availableCrop > 0 || $gold > 0)
         {
             if($availableWood < $wtrans) $wtrans = $availableWood;
             if($availableClay < $ctrans) $ctrans = $availableClay;
@@ -191,19 +248,24 @@ trait AutomationMarket {
 
             
             $resource = [$wtrans, $ctrans, $itrans, $crtrans];
-            $reqMerc = ceil((array_sum($resource) - 0.1) / $maxcarry2);
+            $reqMerc = ceil((array_sum($resource) + $gold * $goldSpace - 0.1) / $maxcarry2);
             
             if($merchantAvail2 > 0 && $reqMerc <= $merchantAvail2) {                
                 if($database->getVillageState($to)) {
                     $timetaken = $units->getWalkingTroopsTime($from, $to, 0, 0, [$tribe], 0);
                     $res = $resource[0] + $resource[1] + $resource[2] + $resource[3];
-                    if($res > 0){
-                        $reference = $database->sendResource($resource[0], $resource[1], $resource[2], $resource[3], $reqMerc, 0);
+                    // the gold leaves the village first (guarded); without it the
+                    // resources still go
+                    if ($gold > 0 && !$database->takeVillageGold($from, $gold)) $gold = 0;
+                    if($res > 0 || $gold > 0){
+                        $reference = $database->sendResource($resource[0], $resource[1], $resource[2], $resource[3], $reqMerc, 0, $gold > 0 ? $gold : null);
                         $database->modifyResource($from, $resource[0], $resource[1], $resource[2], $resource[3], 0);
                         $database->addMovement(0, $from, $to, $reference, microtime(true), microtime(true) + $timetaken, $send);
+                        $sent = true;
                     }
-                }           
+                }
             }
         }
+        return $sent;
     }
 }

@@ -67,3 +67,8 @@ if (!defined('TZ_GOLD_PLUS_RATE')) define('TZ_GOLD_PLUS_RATE', 1);
 if (!defined('TZ_GOLD_QUEST_SMALL'))   define('TZ_GOLD_QUEST_SMALL', 375);    // was 15
 if (!defined('TZ_GOLD_QUEST_BIG'))     define('TZ_GOLD_QUEST_BIG', 500);      // was 20
 if (!defined('TZ_GOLD_INVITE_REWARD')) define('TZ_GOLD_INVITE_REWARD', 1250); // was 50
+
+// Trade routes (local redesign): a "when storage is full" route waits this long
+// after sending before it can fire again; auto-renew pays this long before expiry
+if (!defined('TZ_ROUTE_FULL_COOLDOWN')) define('TZ_ROUTE_FULL_COOLDOWN', 900);
+if (!defined('TZ_ROUTE_RENEW_BEFORE'))  define('TZ_ROUTE_RENEW_BEFORE', 3600);

@@ -130,7 +130,13 @@ if ($session->goldclub == 1 && count($session->villages) > 1) {
             }
             
             $totalres = preg_replace("/[^0-9]/", "", $_POST['r1']) + preg_replace("/[^0-9]/", "", $_POST['r2']) + preg_replace("/[^0-9]/", "", $_POST['r3']) + preg_replace("/[^0-9]/", "", $_POST['r4']);
-            $reqMerc  = ceil(($totalres - 0.1) / $market->maxcarry);
+            // local redesign: gold (merchant space like resources), trigger, auto-renew
+            $tzRouteGold  = !empty($village->goldActive) ? max(0, (int) ($_POST['r5'] ?? 0)) : 0;
+            $tzRouteTrig  = (($_POST['trig'] ?? 'time') === 'full') ? 1 : 0;
+            $tzRoutePct   = max(50, min(100, (int) ($_POST['trig_pct'] ?? 90)));
+            $tzRouteRenew = !empty($_POST['autorenew']) ? 1 : 0;
+            $tzGoldSpace  = defined('TZ_GOLD_MERCHANT_SPACE') ? TZ_GOLD_MERCHANT_SPACE : 100;
+            $reqMerc  = ceil(($totalres + $tzRouteGold * $tzGoldSpace - 0.1) / $market->maxcarry);
             $second   = date("s");
             $minute   = date("i");
             $hour     = date("G") - $_POST['start'];
@@ -140,13 +146,13 @@ if ($session->goldclub == 1 && count($session->villages) > 1) {
             
             $timestamp = strtotime("-$hour hours -$second second -$minute minutes +$day day");
             
-            if ($totalres > 0 && $_POST['tvillage'] != $village->wid && in_array($_POST['tvillage'], $session->villages) && ($_POST['start'] >= 0 && $_POST['start'] <= 23) && ($_POST['deliveries'] >= 1 && $_POST['deliveries'] <= 3)) {
+            if ($totalres + $tzRouteGold > 0 && $_POST['tvillage'] != $village->wid&& in_array($_POST['tvillage'], $session->villages) && ($_POST['start'] >= 0 && $_POST['start'] <= 23) && ($_POST['deliveries'] >= 1 && $_POST['deliveries'] <= 3)) {
                 // village gold (local redesign): creating a route is paid here
                 if (VillageGold::pays($village) && !$database->takeVillageGold($village->wid, TZ_GOLD_PRICE_ROUTE)) {
                     header("Location: build.php?gid=17&t=4");
                     exit;
                 }
-                $database->createTradeRoute($session->uid, $_POST['tvillage'], $village->wid, $_POST['r1'], $_POST['r2'], $_POST['r3'], $_POST['r4'], $_POST['start'], $_POST['deliveries'], $reqMerc, $timestamp);
+                $database->createTradeRoute($session->uid, $_POST['tvillage'], $village->wid, $_POST['r1'], $_POST['r2'], $_POST['r3'], $_POST['r4'], $_POST['start'], $_POST['deliveries'], $reqMerc, $tzRouteTrig ? time() : $timestamp, $tzRouteGold, $tzRouteTrig, $tzRoutePct, $tzRouteRenew);
                 $route = 1;
                 header("Location: build.php?gid=17&t=4");
                 exit;
@@ -194,10 +200,16 @@ if ($session->goldclub == 1 && count($session->villages) > 1) {
                 }
             }
             $totalres = preg_replace("/[^0-9]/", "", $_POST['r1']) + preg_replace("/[^0-9]/", "", $_POST['r2']) + preg_replace("/[^0-9]/", "", $_POST['r3']) + preg_replace("/[^0-9]/", "", $_POST['r4']);
-            $reqMerc  = ceil(($totalres - 0.1) / $market->maxcarry);
-            
+            // local redesign: gold, trigger, auto-renew
+            $tzRouteGold  = !empty($village->goldActive) ? max(0, (int) ($_POST['r5'] ?? 0)) : 0;
+            $tzRouteTrig  = (($_POST['trig'] ?? 'time') === 'full') ? 1 : 0;
+            $tzRoutePct   = max(50, min(100, (int) ($_POST['trig_pct'] ?? 90)));
+            $tzRouteRenew = !empty($_POST['autorenew']) ? 1 : 0;
+            $tzGoldSpace  = defined('TZ_GOLD_MERCHANT_SPACE') ? TZ_GOLD_MERCHANT_SPACE : 100;
+            $reqMerc  = ceil(($totalres + $tzRouteGold * $tzGoldSpace - 0.1) / $market->maxcarry);
+
             $traderoute = $database->getTradeRouteUid($_POST['routeid']);
-            if ($totalres > 0 && $traderoute == $session->uid && ($_POST['start'] >= 0 && $_POST['start'] <= 23) && ($_POST['deliveries'] >= 1 && $_POST['deliveries'] <= 3)) {
+            if ($totalres + $tzRouteGold > 0 && $traderoute == $session->uid&& ($_POST['start'] >= 0 && $_POST['start'] <= 23) && ($_POST['deliveries'] >= 1 && $_POST['deliveries'] <= 3)) {
                 $database->editTradeRoute($_POST['routeid'], "wood", $_POST['r1'], 0);
                 $database->editTradeRoute($_POST['routeid'], "clay", $_POST['r2'], 0);
                 $database->editTradeRoute($_POST['routeid'], "iron", $_POST['r3'], 0);
@@ -205,6 +217,10 @@ if ($session->goldclub == 1 && count($session->villages) > 1) {
                 $database->editTradeRoute($_POST['routeid'], "start", $_POST['start'], 0);
                 $database->editTradeRoute($_POST['routeid'], "deliveries", $_POST['deliveries'], 0);
                 $database->editTradeRoute($_POST['routeid'], "merchant", $reqMerc, 0);
+                $database->editTradeRoute($_POST['routeid'], "gold", $tzRouteGold, 0);
+                $database->editTradeRoute($_POST['routeid'], "trig", $tzRouteTrig, 0);
+                $database->editTradeRoute($_POST['routeid'], "trig_pct", $tzRoutePct, 0);
+                $database->editTradeRoute($_POST['routeid'], "autorenew", $tzRouteRenew, 0);
                 $second = date("s");
                 $minute = date("i");
                 $hour   = date("G") - $_POST['start'];
@@ -219,6 +235,15 @@ if ($session->goldclub == 1 && count($session->villages) > 1) {
             header("Location: build.php?gid=17&t=4");
             exit;
         } 
+    }
+
+    // local redesign: switch auto-renew for the selected route
+    if (isset($_POST['routeid']) && isset($_POST['action']) && $_POST['action'] == 'toggleRenew') {
+        if ($session->goldclub == 1 && $database->getTradeRouteUid($_POST['routeid']) == $session->uid) {
+            $database->query("UPDATE " . TB_PREFIX . "route SET autorenew = 1 - autorenew WHERE id = " . (int) $_POST['routeid']);
+        }
+        header("Location: build.php?gid=17&t=4");
+        exit;
     }
 
     if (isset($_POST['routeid']) && isset($_POST['action']) && $_POST['action'] == 'delRoute') {

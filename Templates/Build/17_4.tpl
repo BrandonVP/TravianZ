@@ -55,9 +55,10 @@ $edit = ($action === 'editRoute' && $routeid > 0 && $database->getTradeRouteUid(
                     <tr>
                         <th></th>
                         <th><?php echo DESCRIPTION;?></th>
-                        <th><?php echo START;?></th>
+                        <th>Send</th>
                         <th><?php echo MERCHANT;?></th>
                         <th><?php echo TIME_LEFT;?></th>
+                        <th>Auto-renew</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,30 +66,41 @@ $edit = ($action === 'editRoute' && $routeid > 0 && $database->getTradeRouteUid(
                 $routes = $database->getTradeRoute($village->wid);
                 if (empty($routes)):
                 ?>
-                    <tr><td colspan="5" class="none"><?php echo NO_TRADE_ROUTES;?>.</td></tr>
+                    <tr><td colspan="6" class="none"><?php echo NO_TRADE_ROUTES;?>.</td></tr>
                 <?php else:
                     foreach ($routes as $route):
                         $rid = (int)$route['id'];
                         $wid = (int)$route['wid'];
                         $vname = htmlspecialchars($database->getVillageField($wid, "name"));
-                        $start = str_pad((int)$route['start'], 2, '0', STR_PAD_LEFT).":00";
+                        // local redesign: daily at an hour, or when storage is full
+                        $start = ((int)($route['trig'] ?? 0) === 1)
+                            ? 'when &ge;' . (int)$route['trig_pct'] . '% full'
+                            : 'daily ' . str_pad((int)$route['start'], 2, '0', STR_PAD_LEFT).":00";
+                        $tzCarry = [];
+                        foreach (['wood' => 'r1', 'clay' => 'r2', 'iron' => 'r3', 'crop' => 'r4'] as $tzK => $tzC) {
+                            if ((int)$route[$tzK] > 0) $tzCarry[] = '<img class="' . $tzC . '" src="img/x.gif" alt="" /> ' . number_format((int)$route[$tzK]);
+                        }
+                        if ((int)($route['gold'] ?? 0) > 0) $tzCarry[] = '<svg class="tz-coin-sm" viewBox="0 0 24 24" aria-label="Gold" role="img"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg> ' . number_format((int)$route['gold']);
                         $deliveries = (int)$route['deliveries']."x".(int)$route['merchant'];
                         $daysLeft = max(0, ceil(($route['timeleft'] - time()) / 86400));
                 ?>
                     <tr>
                         <th><label><input class="radio" type="radio" name="routeid" value="<?php echo $rid;?>" <?php if($routeid === $rid) echo 'checked';?>></label></th>
-                        <th><?php echo TRADE_ROUTE_TO;?> <a href="karte.php?d=<?php echo $wid;?>&c=<?php echo $generator->getMapCheck($wid);?>"><?php echo $vname;?></a></th>
+                        <th><?php echo TRADE_ROUTE_TO;?> <a href="karte.php?d=<?php echo $wid;?>&c=<?php echo $generator->getMapCheck($wid);?>"><?php echo $vname;?></a>
+                            <div class="tz-route-carry"><?php echo implode(' &nbsp;', $tzCarry);?></div></th>
                         <th><?php echo $start;?></th>
                         <th><?php echo $deliveries;?></th>
                         <th><?php echo $daysLeft.' '.DAYS;?></th>
+                        <th><?php echo ((int)($route['autorenew'] ?? 0) === 1) ? '<span class="tz-on">On</span>' : '<span class="none">Off</span>';?></th>
                     </tr>
                 <?php endforeach; endif;?>
                 </tbody>
                 <tfoot>
                     <tr>
                         <th></th>
-                        <th colspan="4">
+                        <th colspan="5">
                             <button type="submit" name="action" value="extendRoute" class="trav_buttons"><b><?php echo EXTEND;?>*</b></button>
+                            | <button type="submit" name="action" value="toggleRenew" class="trav_buttons"><b>Auto-renew on/off</b></button>
                             | <button type="submit" name="action" value="editRoute" class="trav_buttons"><b><?php echo EDIT;?></b></button>
                             | <button type="submit" name="action" value="delRoute" class="trav_buttons"><b><?php echo DELETE;?></b></button>
                         </th>

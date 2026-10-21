@@ -1343,6 +1343,12 @@ div#content.build div#build p.build_desc {
     padding-right: 130px;
 }
 
+/* trade routes: trigger, gold, auto-renew */
+td.tz-route-when label { display: block; margin: 2px 0; }
+.tz-route-hint { display: block; font-size: 11px; color: #6b5a45; font-weight: normal; }
+.tz-route-carry { margin-top: 2px; font-size: 11px; font-weight: normal; color: #5a4128; }
+#npc .tz-on { color: #2e7d32; font-weight: 700; }
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

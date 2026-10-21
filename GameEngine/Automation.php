@@ -144,6 +144,7 @@ class Automation {
         $this->pruneResource();
         $this->pruneOResource();
         $this->checkWWAttacks();
+        $this->TradeRouteRenew(); // local redesign: auto-renew before expired routes are removed
         $this->delTradeRoute();
         $this->TradeRoute();
         
