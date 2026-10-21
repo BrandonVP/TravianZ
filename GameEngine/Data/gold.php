@@ -89,5 +89,5 @@ if (!defined('TZ_NPC_DISCOUNT_PER_LEVEL'))      define('TZ_NPC_DISCOUNT_PER_LEVE
 // Hero services (Hero's Mansion): finish a revive now, heal, new adventures
 if (!defined('TZ_HERO_REVIVE_GOLD_BASE'))      define('TZ_HERO_REVIVE_GOLD_BASE', 100);
 if (!defined('TZ_HERO_REVIVE_GOLD_PER_LEVEL')) define('TZ_HERO_REVIVE_GOLD_PER_LEVEL', 10);
-if (!defined('TZ_HERO_HEAL_GOLD_PER_HP'))      define('TZ_HERO_HEAL_GOLD_PER_HP', 3);   // 300 gold from 0 % to 100 %
+if (!defined('TZ_HERO_HEAL_GOLD_PER_HP'))      define('TZ_HERO_HEAL_GOLD_PER_HP', 6);   // 600 gold from 0 % to 100 %
 if (!defined('TZ_HERO_REROLL_GOLD'))           define('TZ_HERO_REROLL_GOLD', 50);

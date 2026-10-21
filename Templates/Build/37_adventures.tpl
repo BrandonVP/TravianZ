@@ -55,6 +55,37 @@ if (isset($_POST['tzhero']) && HeroServices::allowed($village, $session, $_POST[
 $t4Adventures->generateOffers($session->uid);
 
 $t4Offers  = $t4Adventures->getOffers($session->uid);
+
+// local redesign: reward details per offer (ranges from $heroAdventureConfig,
+// XP with the hero's helmet bonus, a warning when the health loss could kill)
+global $heroAdventureConfig;
+$tzAdvXpBonus = 0;
+if (class_exists('HeroItems') && defined('HB_XP')) {
+    $tzAdvBon = (new HeroItems())->getBonuses($session->uid);
+    $tzAdvXpBonus = (int) ($tzAdvBon[HB_XP] ?? 0);
+}
+$tzAdvHero = mysqli_fetch_assoc(mysqli_query($database->dblink, "SELECT health FROM " . TB_PREFIX . "hero WHERE uid = " . (int) $session->uid . " AND dead = 0 ORDER BY heroid DESC LIMIT 1"));
+$tzAdvHealth = $tzAdvHero ? (float) $tzAdvHero['health'] : 0;
+$tzAdvFirst = !mysqli_fetch_row(mysqli_query($database->dblink, "SELECT 1 FROM " . TB_PREFIX . "hero_adventure WHERE uid = " . (int) $session->uid . " AND status = 2 LIMIT 1"));
+$tzAdvDetails = function ($difficulty) use ($heroAdventureConfig, $tzAdvXpBonus, $tzAdvHealth, $tzAdvFirst) {
+    $c = $heroAdventureConfig[(int) $difficulty] ?? null;
+    if (!$c) return '';
+    $xp = function ($n) use ($tzAdvXpBonus) { return (int) floor($n * (100 + $tzAdvXpBonus) / 100); };
+    $gear = (int) ($c['equip_chance'] ?? 0);
+    $cons = (int) round((100 - $gear) * (int) $c['item_chance'] / 100);
+    $parts = [];
+    $parts[] = '<b>XP</b> ' . $xp($c['exp'][0]) . '&ndash;' . $xp($c['exp'][1]) . ($tzAdvXpBonus > 0 ? ' <span class="tz-adv-dim">(+' . $tzAdvXpBonus . '% helmet)</span>' : '');
+    $risky = $tzAdvHealth > 0 && $c['hp_loss'][1] >= $tzAdvHealth;
+    $parts[] = '<span class="' . ($risky ? 'tz-adv-risk' : '') . '"><b>Health</b> &minus;' . (int) $c['hp_loss'][0] . '&ndash;' . (int) $c['hp_loss'][1] . '%'
+             . ($risky ? ' &mdash; could be fatal at ' . floor($tzAdvHealth) . '% health' : '') . '</span>';
+    $parts[] = '<b>Resources</b> ' . number_format($c['resources'][0]) . '&ndash;' . number_format($c['resources'][1]) . ' of each';
+    if ($tzAdvFirst) {
+        $parts[] = '<b>First adventure:</b> ' . (function_exists('heroItemName') ? heroItemName(HeroAdventure::FIRST_ADVENTURE_ITEM) : 'a special item');
+    } else {
+        $parts[] = '<b>Item</b> ' . $gear . '% gear, ' . $cons . '% consumable';
+    }
+    return implode(' &middot; ', $parts);
+};
 $t4Running = $t4Adventures->getRunning($session->uid);
 $t4Now     = time();
 
@@ -257,6 +288,7 @@ table.t4adv td.t4empty { color: #a5a19a; text-align: center; }
                 <?php } ?>
             </td>
         </tr>
+        <tr class="tz-adv-details"><td colspan="5"><?php echo $tzAdvDetails($t4Offer['difficulty']); ?></td></tr>
         <?php } ?>
     <?php } else { ?>
         <tr><td colspan="5" class="t4empty"><?php echo HERO_ADV_NONE; ?></td></tr>
