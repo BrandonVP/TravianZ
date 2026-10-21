@@ -38,7 +38,7 @@ if ($bindicate == 11) {
 }
 if ($bindicate == 12) {
     // local redesign: raid balance
-    echo '<p><span class="none">Cranny levels above 10 need a level 20 Warehouse and a level 20 Granary in this village.</span></p>';
+    echo '<p><span class="none">Cranny levels above 10 need a level 20 Warehouse (or Great Warehouse) and a level 20 Granary (or Great Granary) in this village.</span></p>';
     return;
 }
 

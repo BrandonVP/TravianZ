@@ -231,14 +231,17 @@ class Building {
 
 	/**
 	 * Local redesign (raid balance): Cranny levels above 10 need a level 20
-	 * Warehouse and Granary in the village.
+	 * Warehouse (or Great Warehouse) and Granary (or Great Granary) in the village.
 	 */
 	public function crannyLocked($gid, $fieldId) {
 	    if ((int) $gid !== 23) {
 	        return false;
 	    }
 	    $next = (int) ($this->vil->resarray['f' . $fieldId] ?? 0) + 1 + $this->queuedOnField($fieldId);
-	    return $next > 10 && ($this->getTypeLevel(10) < 20 || $this->getTypeLevel(11) < 20);
+	    // a Great Warehouse / Great Granary (38 / 39) at level 20 counts too
+	    $warehouse = max($this->getTypeLevel(10), $this->getTypeLevel(38));
+	    $granary = max($this->getTypeLevel(11), $this->getTypeLevel(39));
+	    return $next > 10 && ($warehouse < 20 || $granary < 20);
 	}
 
 	public function canProcess($gid, $fieldId) {
