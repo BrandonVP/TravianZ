@@ -263,26 +263,22 @@ trait AutomationBuildQueue {
             $buildcrop = $buildarray[$level]['crop'];
             $ww = count($database->getBuildingByType($master['wid'], 40));
 
-            if($tribe == 1){
-                if($master['field'] < 19){
-                    $bdata = $database->getDorf1Building($master['wid']);
-                    $bdataTotal = count($bdata);
-                    $bbdata = count($database->getDorf2Building($master['wid']));
-                }else{
-                    $bdata = $database->getDorf2Building($master['wid']);
-                    $bdataTotal = count($bdata);
-                    $bbdata = count($database->getDorf1Building($master['wid']));
+            // Local redesign: the order waits for room in ITS OWN lane (fields /
+            // buildings, same limits as a normal order: BASIC_MAX / INNER_MAX,
+            // +PLUS_MAX with Plus or in a World Wonder village) and then joins the
+            // end of that lane like a normal order.
+            $isField = ((int) $master['field'] <= 18);
+            $laneMax = ($isField ? BASIC_MAX : INNER_MAX)
+                + (($database->getUserField($owner, 'plus', 0) > time() || $ww > 0) ? PLUS_MAX : 0);
+            $laneJobs = 0;
+            $laneEnd = time();
+            foreach ((array) $database->getJobs($master['wid']) as $tzJob) {
+                if ((int) $tzJob['master'] != 0 || (((int) $tzJob['field'] <= 18) !== $isField)) {
+                    continue;
                 }
-            }else{
-                $bdata = array_merge($database->getDorf1Building($master['wid']), $database->getDorf2Building($master['wid']));
-                $bdataTotal = $bbdata = count($bdata);          
+                $laneJobs++;
+                $laneEnd = max($laneEnd, (int) $tzJob['timestamp']);
             }
-
-            if($database->getUserField($owner, 'plus', 0) > time() || $ww > 0){
-                if($bbdata < 2) $inbuild = 2;                
-                else $inbuild = 1;
-            }
-            else $inbuild = 1;
 
             // Village gold (local redesign): the job's village pays TZ_GOLD_PRICE_MASTER
             // when the job starts (guarded UPDATE, last in the condition)
@@ -290,16 +286,11 @@ trait AutomationBuildQueue {
             $tzMasterVillage = VillageGold::villageMode();
             $usergold = $tzMasterVillage ? 1 : $database->getUserField($owner, 'gold', 0);
 
-            if($bdataTotal < $inbuild && $buildwood <= $villwood && $buildclay <= $villclay && $buildiron <= $villiron && $buildcrop <= $villcrop && $usergold > 0
+            if($laneJobs < $laneMax && $buildwood <= $villwood && $buildclay <= $villclay && $buildiron <= $villiron && $buildcrop <= $villcrop && $usergold > 0
                 && (!$tzMasterVillage || $database->takeVillageGold($master['wid'], TZ_GOLD_PRICE_MASTER))){
-                $time = $master['timestamp'] + time();
-
-                if(!empty($bdata)){
-                    foreach($bdata as $masterLoop) $time += ($masterLoop['timestamp'] - time());
-                }
-
-                if($bdataTotal == 0) $database->updateBuildingWithMaster($master['id'], $time, 0);                  
-                else $database->updateBuildingWithMaster($master['id'], $time, 1);             
+                // timestamp holds the build time while the order waits
+                $time = $laneEnd + (int) $master['timestamp'];
+                $database->updateBuildingWithMaster($master['id'], $time, $laneJobs > 0 ? 1 : 0);
 
                 if (!$tzMasterVillage) $database->updateUserField($owner, 'gold', --$usergold, 1);
                 $database->modifyResource($master['wid'], $buildwood, $buildclay, $buildiron, $buildcrop, 0);
