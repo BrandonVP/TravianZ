@@ -284,7 +284,10 @@ if (!empty($dataarray[287])) {
 <?php } ?>
 </div>
 <div class="carry">
-<?php echo ($dataarray[23]+$dataarray[24]+$dataarray[25]+$dataarray[26])."/".$dataarray[27]; ?>
+<?php
+// raided gold uses carry space too (TZ_GOLD_MERCHANT_SPACE per gold)
+$tzGoldCarry = $tzRaidGold * (defined('TZ_GOLD_MERCHANT_SPACE') ? TZ_GOLD_MERCHANT_SPACE : 100);
+echo ($dataarray[23]+$dataarray[24]+$dataarray[25]+$dataarray[26]+$tzGoldCarry)."/".$dataarray[27]; ?>
 </div>
 </td>
 </tr>
