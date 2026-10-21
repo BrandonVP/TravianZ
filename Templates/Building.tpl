@@ -95,7 +95,15 @@ if (!function_exists('safeHTML')) {
                 <?php if ($master == 0) { ?>
                     <?php if (!$queued) { ?>
                         <div class="tz-job-bar"><span style="width:<?php echo round($pct, 1); ?>%" data-tz-start="<?php echo $start; ?>" data-tz-end="<?php echo $timestamp; ?>" data-tz-now="<?php echo $tzNow; ?>"></span></div>
-                        <div class="tz-job-sub"><?php echo ucfirst(DONE_AT).' '.date('H:i', $timestamp); ?></div>
+                        <div class="tz-job-sub tz-job-done">
+                            <span><?php echo ucfirst(DONE_AT).' '.date('H:i', $timestamp); ?></span>
+                            <?php if ($building->canFinishJob($jobs)) {
+                                $tzFinTxt = $building->finishJobConfirmText($buildingName, $level); ?>
+                            <a class="tz-btn tz-btn-sm tz-job-finish" href="?finishJob=<?php echo $jobId; ?>&amp;c=<?php echo safeHTML($session->checker); ?>"
+                               onclick="return confirm('<?php echo safeHTML(addslashes($tzFinTxt)); ?>');"
+                               title="<?php echo safeHTML($tzFinTxt); ?>">Finish now &middot; <?php echo safeHTML($building->finishPriceLabel()); ?></a>
+                            <?php } ?>
+                        </div>
                     <?php } else { ?>
                         <div class="tz-job-sub">Starts <?php echo date('H:i', $start); ?> &middot; <?php echo DONE_AT.' '.date('H:i', $timestamp); ?></div>
                     <?php } ?>
@@ -107,12 +115,6 @@ if (!function_exists('safeHTML')) {
             <td class="tz-job-time">
                 <?php if ($master == 0 && !$queued) { ?>
                     <span id="timer<?php echo ++$session->timer; ?>"><?php echo $generator->getTimeFormat($remainingTime); ?></span>
-                    <?php if ($building->canFinishJob($jobs)) {
-                        $tzFinTxt = $building->finishJobConfirmText($buildingName, $level); ?>
-                    <a class="tz-btn tz-btn-sm tz-job-finish" href="?finishJob=<?php echo $jobId; ?>&amp;c=<?php echo safeHTML($session->checker); ?>"
-                       onclick="return confirm('<?php echo safeHTML(addslashes($tzFinTxt)); ?>');"
-                       title="<?php echo safeHTML($tzFinTxt); ?>">Finish now &middot; <?php echo safeHTML($building->finishPriceLabel()); ?></a>
-                    <?php } ?>
                 <?php } elseif ($master == 0) { ?>
                     <span class="tz-job-wait">Queued</span>
                     <span id="timer<?php echo ++$session->timer; ?>" class="tz-job-hidden"><?php echo $generator->getTimeFormat($remainingTime); ?></span>
