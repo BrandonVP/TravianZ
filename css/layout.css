@@ -1549,6 +1549,12 @@ div.tz-card-links td.link a { font-weight: 600; }
 .tz-link-help { margin: 0 0 8px; font-size: 12px; color: #6b5a45; }
 .tz-link-error { margin: 0 0 8px; padding: 8px 10px; border: 1px solid #c98a6a; border-radius: 8px; background: #f6dccd; color: #7a2a12; font-weight: 700; }
 
+/* reports list: full width of the centre card; actions as one button row */
+div#content.reports table#overview.row_table_data { width: 100%; }
+div#content.reports table#overview td.dat { width: 170px; white-space: nowrap; }
+div#content.reports table#overview th.buttons { text-align: left; }
+div#content.reports table#overview th.buttons .tz-btn { margin: 2px 4px 2px 0; }
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

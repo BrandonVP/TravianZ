@@ -84,15 +84,8 @@ if(isset($_GET['newdid'])) {
  * Message). Trimite POST catre acelasi Message::procNotice() care trateaza
  * deja del_x/archive_x/start_x mai sus in acest fisier (linia 31).
  */
-if ($message->nunread > 0) {
-    echo '<div id="textmenu" class="rpt-readall">';
-    echo '<form method="post" action="berichte.php" style="display:inline;">';
-    echo '<button type="submit" name="readall" value="1" class="rpt-readall-btn">';
-    echo htmlspecialchars(READ_ALL_REPORTS, ENT_QUOTES, 'UTF-8');
-    echo '</button>';
-    echo '</form>';
-    echo '</div>';
-}
+// local redesign: the button now sits with Delete / Delete all / Archive at
+// the bottom of the list (Templates/Notice/all.tpl)
 ?>
 <?php
 /**

@@ -120,6 +120,9 @@ if (!empty($_GET['t']) && (int)$_GET['t'] === 3 && !empty($_GET['f'])) {
         <button type="submit" name="delall" value="1" class="tz-btn tz-btn-sm tz-delall"
                 onclick="return confirm('Delete all <?php echo count($message->noticearray); ?> reports in this list? This cannot be undone.');">Delete all</button>
     <?php } ?>
+    <?php if ($message->nunread > 0) { // "Read all" moved here from the top of berichte.php ?>
+        <button type="submit" name="readall" value="1" class="tz-btn tz-btn-sm tz-readall"><?php echo htmlspecialchars(READ_ALL_REPORTS, ENT_QUOTES, 'UTF-8'); ?></button>
+    <?php } ?>
 
     <?php if ($session->plus) { ?>
 
