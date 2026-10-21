@@ -204,6 +204,27 @@ class Message
         if (isset($post['readall'])) {
             $this->readAllNotices();
         }
+        if (isset($post['delall'])) {
+            $this->removeAllNotices();
+        }
+    }
+
+    /**
+     * Local redesign: "Delete all" on the reports list. Removes every report of
+     * the tab being viewed - $this->noticearray is already filtered by
+     * noticeType() for that tab (the form posts back to the same t/f query);
+     * the default tab never includes archived reports.
+     */
+    private function removeAllNotices()
+    {
+        global $database, $session;
+        $ids = array_map(function ($n) { return (int) $n['id']; }, (array) $this->noticearray);
+        if ($ids) {
+            $database->removeNotice($ids, (int) $session->uid);
+        }
+        $back = isset($_GET['t']) ? '?t=' . (int) $_GET['t'] : '';
+        header("Location: berichte.php" . $back);
+        exit;
     }
 
     public function quoteMessage($id)
@@ -394,7 +415,7 @@ class Message
     private function removeNotice($post)
     {
         global $database, $session;
-        $removeIDs = $this->collectSelectedIds($post);
+        $removeIDs = $this->collectSelectedIds($post, 20);
         $database->removeNotice($removeIDs, (int) $session->uid);
         header("Location: berichte.php");
         exit;
@@ -403,7 +424,7 @@ class Message
     private function archiveNotice($post)
     {
         global $database, $session;
-        $archiveIDs = $this->collectSelectedIds($post);
+        $archiveIDs = $this->collectSelectedIds($post, 20);
         $database->archiveNotice($archiveIDs, (int) $session->uid);
         header("Location: berichte.php");
         exit;
@@ -412,7 +433,7 @@ class Message
     private function unarchiveNotice($post)
     {
         global $database, $session;
-        $unarchIDs = $this->collectSelectedIds($post);
+        $unarchIDs = $this->collectSelectedIds($post, 20);
         $database->unarchiveNotice($unarchIDs, (int) $session->uid);
         header("Location: berichte.php");
         exit;

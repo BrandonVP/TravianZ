@@ -63,6 +63,7 @@ $MyGold = mysqli_query(
 $golds = mysqli_fetch_array($MyGold);
 
 // ======================== PAGINATION ========================
+$perPage = 20; // local redesign: 20 reports a page (was 10; Message.php accepts 20 selections)
 $s = isset($_GET['s']) ? (int)$_GET['s'] : 0;
 $t = isset($_GET['t']) ? (int)$_GET['t'] : 0;
 $o = isset($_GET['o']) ? (int)$_GET['o'] : 0;
@@ -79,7 +80,7 @@ if (!empty($_GET['t']) && (int)$_GET['t'] === 3 && !empty($_GET['f'])) {
 
 ?>
 
-<form method="post" action="berichte.php" name="msg">
+<form method="post" action="berichte.php<?php echo $queryBase !== '' ? '?' . rtrim(str_replace('&amp;', '&', $queryBase), '&') : ''; ?>" name="msg">
 
 <table cellpadding="1" cellspacing="1" id="overview" class="row_table_data">
 
@@ -115,6 +116,11 @@ if (!empty($_GET['t']) && (int)$_GET['t'] === 3 && !empty($_GET['f'])) {
     <input name="del" type="image" id="btn_delete" class="dynamic_img"
            src="img/x.gif" value="delete" alt="<?php echo DELETE; ?>" />
 
+    <?php if (count($message->noticearray) > 0) { // local redesign ?>
+        <button type="submit" name="delall" value="1" class="tz-btn tz-btn-sm tz-delall"
+                onclick="return confirm('Delete all <?php echo count($message->noticearray); ?> reports in this list? This cannot be undone.');">Delete all</button>
+    <?php } ?>
+
     <?php if ($session->plus) { ?>
 
         <?php if (isset($_GET['t']) && $_GET['t'] == 5) { ?>
@@ -135,16 +141,16 @@ if (!empty($_GET['t']) && (int)$_GET['t'] === 3 && !empty($_GET['f'])) {
 <?php
 $total = count($message->noticearray);
 
-if (!isset($_GET['s']) && $total <= 10) {
+if (!isset($_GET['s']) && $total <= $perPage) {
     echo "&laquo;&raquo;";
 }
-elseif (!isset($_GET['s']) && $total > 10) {
-    echo "&laquo;<a href=\"?".$queryBase."s=10&amp;o=".$o."\">&raquo;</a>";
+elseif (!isset($_GET['s']) && $total > $perPage) {
+    echo "&laquo;<a href=\"?".$queryBase."s=".$perPage."&amp;o=".$o."\">&raquo;</a>";
 }
 elseif (isset($_GET['s']) && $total > $s) {
 
-    $prev = $s - 10;
-    $next = $s + 10;
+    $prev = $s - $perPage;
+    $next = $s + $perPage;
 
     if ($total > $next && $prev >= 0 && $s != 0) {
         echo "<a href=\"?".$queryBase."s=".$prev."&o=".$o."\">&laquo;</a>";
@@ -153,7 +159,7 @@ elseif (isset($_GET['s']) && $total > $s) {
     elseif ($total > $next) {
         echo "&laquo;<a href=\"?".$queryBase."s=".$next."&o=".$o."\">&raquo;</a>";
     }
-    elseif ($total > 10) {
+    elseif ($total > $perPage) {
         echo "<a href=\"?".$queryBase."s=".$prev."&o=".$o."\">&laquo;</a>&raquo;";
     }
 }
@@ -170,7 +176,7 @@ elseif (isset($_GET['s']) && $total > $s) {
 $name = 1;
 $count = 0;
 
-for ($i = (1 + $s); $i <= (10 + $s); $i++) {
+for ($i = (1 + $s); $i <= ($perPage + $s); $i++) {
 
     if ($total >= $i) {
 
