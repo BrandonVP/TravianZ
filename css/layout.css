@@ -1372,6 +1372,13 @@ table.tz-contract tfoot td { text-align: left; font-size: 13px; background: #fbf
 .tz-express-note { font-size: 12px; color: #a5571c; }
 .tz-to-note { font-size: 12px; color: #6b5a45; }
 
+/* hero services (Hero's Mansion) */
+form.tz-hero-svc { display: inline-block; margin: 4px 0 4px 6px; vertical-align: middle; }
+form.tz-hero-svc .tz-btn-sm { padding: 2px 10px; font-size: 12px; }
+.tz-hero-msg { font-weight: 700; color: #5a4128; }
+.tz-hero-reroll { margin: 8px 0; }
+.tz-hero-hint { margin-left: 8px; font-size: 11px; color: #6b5a45; }
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

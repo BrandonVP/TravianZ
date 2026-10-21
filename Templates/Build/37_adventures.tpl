@@ -38,6 +38,19 @@ if (isset($_POST['t4action'], $_POST['advid']) && $_POST['t4action'] === 'starta
     }
 }
 
+// local redesign: hero services paid with village gold (GameEngine/HeroServices.php)
+include_once __DIR__ . '/../../GameEngine/HeroServices.php';
+$tzHeroMsg = '';
+if (isset($_POST['tzhero']) && HeroServices::allowed($village, $session, $_POST['c'] ?? '')) {
+    $tzOk = false;
+    switch ($_POST['tzhero']) {
+        case 'revive': $tzOk = HeroServices::finishRevive($database, $session->uid, $village); break;
+        case 'heal':   $tzOk = HeroServices::heal($database, $session->uid, $village); break;
+        case 'reroll': $tzOk = HeroServices::reroll($database, $session->uid, $village); break;
+    }
+    $tzHeroMsg = $tzOk ? 'Done.' : 'That did not work - not enough gold in this village, or nothing to do.';
+}
+
 // Top up the list opportunistically (respects max/refresh limits internally).
 $t4Adventures->generateOffers($session->uid);
 
@@ -250,3 +263,9 @@ table.t4adv td.t4empty { color: #a5a19a; text-align: center; }
     <?php } ?>
     </tbody>
 </table>
+<?php if ($tzHeroMsg !== '') echo '<p class="tz-hero-msg">' . htmlspecialchars($tzHeroMsg) . '</p>'; ?>
+<?php if (VillageGold::pays($village)) {
+    echo '<div class="tz-hero-reroll">'
+       . HeroServices::button('reroll', 'Find new adventures', HeroServices::rerollPrice(), 'Replace the available adventures with new ones for ' . HeroServices::rerollPrice() . ' gold?')
+       . '<span class="tz-hero-hint">Replaces the adventures on offer (not one already under way).</span></div>';
+} ?>

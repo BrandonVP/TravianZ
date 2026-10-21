@@ -129,6 +129,20 @@ $renderReviveRow = function ($hero_datarow, $name, $wood, $clay, $iron, $crop, $
 	return $html;
 };
 
+// local redesign: hero services paid with village gold (GameEngine/HeroServices.php)
+include_once __DIR__ . '/../../GameEngine/HeroServices.php';
+$tzHeroMsg = '';
+if (isset($_POST['tzhero']) && HeroServices::allowed($village, $session, $_POST['c'] ?? '')) {
+    $tzOk = false;
+    switch ($_POST['tzhero']) {
+        case 'revive': $tzOk = HeroServices::finishRevive($database, $session->uid, $village); break;
+        case 'heal':   $tzOk = HeroServices::heal($database, $session->uid, $village); break;
+        case 'reroll': $tzOk = HeroServices::reroll($database, $session->uid, $village); break;
+    }
+    $tzHeroMsg = $tzOk ? 'Done.' : 'That did not work - not enough gold in this village, or nothing to do.';
+}
+if ($tzHeroMsg !== '') echo '<p class="tz-hero-msg">' . htmlspecialchars($tzHeroMsg) . '</p>';
+
 // check if there is a hero in revive already
 $reviving = $training = false;
 
@@ -165,6 +179,10 @@ foreach ($heroes as $hero_datarow) {
             <tr>
             <?php echo "<tr class='next'><th>".HERO_READY." <span id=timer".++$session->timer.">".$timeleft."</span></th></tr>"; ?>
             </tr>
+            <?php if (VillageGold::pays($village) && (int) $hero_datarow['wref'] === (int) $village->wid && $hero_datarow['trainingtime'] > time()) {
+                $tzRp = HeroServices::revivePrice($hero_datarow['level']); ?>
+            <tr><th><?php echo HeroServices::button('revive', 'Finish revive now', $tzRp, 'Finish the revive now for ' . $tzRp . ' gold?'); ?></th></tr>
+            <?php } ?>
         </thead>
 
             <tr>

@@ -402,7 +402,30 @@ $renderAddLink = function ($action) use ($hero_info, $id, $heroStatColumns) {
         <p><?php echo YOU_CAN; ?> <a href="build.php?id=<?php echo $id; ?>&add=reset"><?php echo RESET; ?></a><?php echo YOUR_POINT_UNTIL; ?> <b>3</b><?php echo OR_LOWER; ?> </p> 
     <?php } ?> 
      
-<p><?php echo YOUR_HERO_HAS; ?> <b><?php echo floor($hero_info['health']); ?></b>% <?php echo OF_HIT_POINTS; ?>.<br/>  
+<?php
+// local redesign: hero services paid with village gold (GameEngine/HeroServices.php)
+include_once __DIR__ . '/../../GameEngine/HeroServices.php';
+$tzHeroMsg = '';
+if (isset($_POST['tzhero']) && HeroServices::allowed($village, $session, $_POST['c'] ?? '')) {
+    $tzOk = false;
+    switch ($_POST['tzhero']) {
+        case 'revive': $tzOk = HeroServices::finishRevive($database, $session->uid, $village); break;
+        case 'heal':   $tzOk = HeroServices::heal($database, $session->uid, $village); break;
+        case 'reroll': $tzOk = HeroServices::reroll($database, $session->uid, $village); break;
+    }
+    $tzHeroMsg = $tzOk ? 'Done.' : 'That did not work - not enough gold in this village, or nothing to do.';
+}
+if ($tzHeroMsg !== '') {
+    echo '<p class="tz-hero-msg">' . htmlspecialchars($tzHeroMsg) . '</p>';
+    $tzH = mysqli_fetch_assoc(mysqli_query($database->dblink, "SELECT health FROM " . TB_PREFIX . "hero WHERE uid = " . (int) $session->uid . " ORDER BY heroid DESC LIMIT 1"));
+    if ($tzH) $hero_info['health'] = $tzH['health'];
+}
+?>
+<p><?php echo YOUR_HERO_HAS; ?> <b><?php echo floor($hero_info['health']); ?></b>% <?php echo OF_HIT_POINTS; ?>.
+<?php if (VillageGold::pays($village) && (float) $hero_info['health'] < 100 && (int) ($hero_info['dead'] ?? 0) === 0) {
+    $tzHp = HeroServices::healPrice($hero_info['health']);
+    echo HeroServices::button('heal', 'Heal now', $tzHp, 'Heal your hero to 100% for ' . $tzHp . ' gold?');
+} ?><br/>
     <?php echo YOUR_HERO_HAS; ?> <?php echo CONQUERED; ?> <b><?php echo $database->VillageOasisCount($village->wid); ?></b> <a href="build.php?id=<?php echo $id; ?>&land"><?php echo OASES; ?></a>.</p>
 
 <?php
