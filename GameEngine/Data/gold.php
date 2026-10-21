@@ -76,11 +76,12 @@ if (!defined('TZ_ROUTE_RENEW_BEFORE'))  define('TZ_ROUTE_RENEW_BEFORE', 3600);
 // Resource contracts (Marketplace tab): buy resources from the NPC with village
 // gold. Daily allowance per village = Marketplace level x TZ_CONTRACT_GOLD_PER_LEVEL.
 if (!defined('TZ_CONTRACT_RES_PER_GOLD'))   define('TZ_CONTRACT_RES_PER_GOLD', 40);
-if (!defined('TZ_CONTRACT_GOLD_PER_LEVEL')) define('TZ_CONTRACT_GOLD_PER_LEVEL', 100);
+if (!defined('TZ_CONTRACT_GOLD_PER_LEVEL')) define('TZ_CONTRACT_GOLD_PER_LEVEL', 200); // 4,000 gold a day at Marketplace 20
 
 // Trade Office: express caravans between your own villages (speed x2 at level 1
-// up to x5 at level 20, paid per merchant) and a cheaper NPC trade per level.
+// up to x5 at level 20, paid per merchant). TZ_NPC_DISCOUNT_PER_LEVEL can make NPC
+// trades cheaper per Trade Office level; 0 = off.
 if (!defined('TZ_EXPRESS_SPEED_L1'))            define('TZ_EXPRESS_SPEED_L1', 2);
 if (!defined('TZ_EXPRESS_SPEED_L20'))           define('TZ_EXPRESS_SPEED_L20', 5);
 if (!defined('TZ_EXPRESS_GOLD_PER_MERCHANT'))   define('TZ_EXPRESS_GOLD_PER_MERCHANT', 5);
-if (!defined('TZ_NPC_DISCOUNT_PER_LEVEL'))      define('TZ_NPC_DISCOUNT_PER_LEVEL', 5);   // 250 -> 150 at level 20
+if (!defined('TZ_NPC_DISCOUNT_PER_LEVEL'))      define('TZ_NPC_DISCOUNT_PER_LEVEL', 0);   // NPC trade stays expensive (contracts are the alternative)

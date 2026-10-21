@@ -55,11 +55,13 @@ $current = $level > 0 ? (int)$bid28[$level]['attri'] : 100;
             <td><b>&times;<?php echo round(VillageGold::expressSpeed($level), 1);?></b>
                 <?php if ($level < 20):?><span class="none">(level <?php echo $tzNext;?>: &times;<?php echo round(VillageGold::expressSpeed($tzNext), 1);?>)</span><?php endif;?></td>
         </tr>
+        <?php if (TZ_NPC_DISCOUNT_PER_LEVEL > 0):?>
         <tr>
             <th>NPC trade price:</th>
             <td><b><?php echo max(1, TZ_GOLD_PRICE_NPC - $level * TZ_NPC_DISCOUNT_PER_LEVEL);?></b> gold
                 <?php if ($level < 20):?><span class="none">(level <?php echo $tzNext;?>: <?php echo max(1, TZ_GOLD_PRICE_NPC - $tzNext * TZ_NPC_DISCOUNT_PER_LEVEL);?>)</span><?php endif;?></td>
         </tr>
+        <?php endif;?>
         <?php endif;?>
     </table>
     <?php if (class_exists('VillageGold') && !empty($village->goldActive)):?>
