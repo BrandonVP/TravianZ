@@ -48,6 +48,7 @@ if($session->plus){
 	<link href="css/layout.css?v=<?php echo @filemtime(__DIR__ . '/css/layout.css'); ?>" rel="stylesheet" type="text/css" />
 	<link href="css/bigmap.css?v=<?php echo @filemtime(__DIR__ . '/css/bigmap.css'); ?>" rel="stylesheet" type="text/css" />
 	<script src="tzbuttons.js?v=<?php echo @filemtime(__DIR__ . '/tzbuttons.js'); ?>" type="text/javascript"></script>
+	<script type="text/javascript">if (window.self !== window.top) document.documentElement.className += ' tz-in-frame';</script>
 	<script type="text/javascript">window.addEvent('domready', start);</script>
 </head>
 <body class="tz-bigmap" onload="start()"><?php

@@ -17,7 +17,18 @@ body.tz-bigmap {
     min-width: 0;
 }
 
+/* the frame fills exactly the overlay's 1000 x 575 iframe (and the popup window) */
+html.tz-in-frame,
+html.tz-in-frame body.tz-bigmap {
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+}
+
 body.tz-bigmap div#mbig {
+    box-sizing: border-box;
+    width: 1000px;
+    height: 575px;
     position: relative;
     margin: 0 auto;
     border: 2px solid var(--tz-gold);
