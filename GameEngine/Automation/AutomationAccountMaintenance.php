@@ -112,9 +112,9 @@ trait AutomationAccountMaintenance {
             if($numusers['Total'] > 0){
                 $varray = count($database->getProfileVillages($user['id']));
                 if($varray > 1){
-                    $usergold = $database->getUserField($user['invited'],"gold",0);
-                    $gold = $usergold+50;
-                    $database->updateUserField($user['invited'],"gold",$gold,1);
+                    // local redesign: the invite reward is gold in the inviter's capital
+                    include_once __DIR__ . '/../VillageGold.php';
+                    VillageGold::grant($database, (int) $user['invited'], TZ_GOLD_INVITE_REWARD, 'Invite reward');
                     $database->updateUserField($user['id'],"invited",0,1);
                 }
             }

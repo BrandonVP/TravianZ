@@ -330,7 +330,9 @@ if (isset($qact)){
 			if ($claimed) {
 				$database->updateUserField($_SESSION['username'],'quest_time',''.($now+$skipp_time).'',0);
 				//Give Reward: 1 day of Plus + 15 gold (atomic increments)
-				mysqli_query($database->dblink,"UPDATE ".TB_PREFIX."users SET gold = gold + 15, plus = IF(plus > $now, plus + 86400, $now + 86400) WHERE `username` = '".$user_sanitized."'");
+				mysqli_query($database->dblink,"UPDATE ".TB_PREFIX."users SET plus = IF(plus > $now, plus + 86400, $now + 86400) WHERE `username` = '".$user_sanitized."'");
+				include_once("GameEngine/VillageGold.php");
+				VillageGold::grant($database, (int) $session->uid, TZ_GOLD_QUEST_SMALL, 'Quest reward');
 			}
 			$_SESSION['qst']= 91;
 			$_SESSION['qst_time'] = time()+$skipp_time;
@@ -388,7 +390,9 @@ if (isset($qact)){
 			if ($claimed) {
 				$database->updateUserField($_SESSION['username'],'quest_time',''.$now.'',0);
 				//Give Reward: 2 days of Plus + 20 gold (atomic increments)
-				mysqli_query($database->dblink,"UPDATE ".TB_PREFIX."users SET gold = gold + 20, plus = IF(plus > $now, plus + 172800, $now + 172800) WHERE `username` = '".$user_sanitized."'");
+				mysqli_query($database->dblink,"UPDATE ".TB_PREFIX."users SET plus = IF(plus > $now, plus + 172800, $now + 172800) WHERE `username` = '".$user_sanitized."'");
+				include_once("GameEngine/VillageGold.php");
+				VillageGold::grant($database, (int) $session->uid, TZ_GOLD_QUEST_BIG, 'Quest reward');
 			}
 			$_SESSION['qst_time'] = time();
 			$_SESSION['qst']= 97;

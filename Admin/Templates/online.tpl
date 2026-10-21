@@ -1,4 +1,4 @@
-<?php
+<?php include_once __DIR__ . '/../../GameEngine/VillageGold.php';
 #################################################################################
 ##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
 ## --------------------------------------------------------------------------- ##
@@ -92,7 +92,7 @@ $accessColors = [
         <span class="uo-stat">👥 <?php echo number_format($totalpop);?></span>
         <span class="uo-stat">🏘 <?php echo count($varray);?></span>
         <span class="uo-stat" style="color:<?php echo $color;?> !important">⚔ <?php echo $tribeName[$tribe];?></span>
-        <span class="uo-gold"><img src="../img/admin/gold.gif" style="vertical-align:-2px"> <?php echo $u['gold'];?></span>
+        <span class="uo-gold"><img src="../img/admin/gold.gif" style="vertical-align:-2px"> <?php echo VillageGold::playerGold($GLOBALS['database'], (int) $u['id']);?></span>
       </div>
     </div>
     <?php }?>

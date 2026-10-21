@@ -21,7 +21,7 @@
 include("Templates/Plus/pmenu.tpl");
 
 $uid = (int)$session->uid;
-$gold = defined('PLUS_PACKAGE_C_GOLD') ? PLUS_PACKAGE_C_GOLD : 360;
+$gold = defined('PLUS_PACKAGE_C_GOLD') ? PLUS_PACKAGE_C_GOLD : 9000;
 $price = defined('PLUS_PACKAGE_C_PRICE') ? str_replace(',', '.', PLUS_PACKAGE_C_PRICE) : '9.99';
 $currency = defined('PAYPAL_CURRENCY') ? PAYPAL_CURRENCY : 'EUR';
 $paypal = defined('PAYPAL_EMAIL') ? PAYPAL_EMAIL : 'novgorodschi@icloud.com';

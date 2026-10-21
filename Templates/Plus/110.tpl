@@ -21,7 +21,7 @@
 include("Templates/Plus/pmenu.tpl");
 
 $pkg = [
-    'gold' => defined('PLUS_PACKAGE_A_GOLD') ? PLUS_PACKAGE_A_GOLD : 60,
+    'gold' => defined('PLUS_PACKAGE_A_GOLD') ? PLUS_PACKAGE_A_GOLD : 1500,
     'price' => defined('PLUS_PACKAGE_A_PRICE') ? PLUS_PACKAGE_A_PRICE : '1,99',
 ];
 $price = str_replace(',', '.', $pkg['price']);

@@ -279,8 +279,10 @@ class QuestConfig
             }
 
             $gold = (int) $cfg['gold'];
-            if ($gold > 0 && $uid > 0 && method_exists($database, 'modifyGold')) {
-                $database->modifyGold($uid, $gold, 1);
+            if ($gold > 0 && $uid > 0) {
+                // local redesign: quest gold goes to the capital
+                include_once __DIR__ . '/VillageGold.php';
+                VillageGold::grant($database, $uid, $gold, 'Quest reward', 'Quest ' . (int) $qid);
             }
 
             $plusDays = (float) $cfg['plus_days'];
@@ -398,7 +400,7 @@ class QuestConfig
                 4 => ['wood'=>30,'clay'=>60,'iron'=>30,'crop'=>20,'gold'=>0,'plus_days'=>0],
                 5 => ['wood'=>40,'clay'=>30,'iron'=>20,'crop'=>30,'gold'=>0,'plus_days'=>0],
                 6 => ['wood'=>50,'clay'=>60,'iron'=>30,'crop'=>30,'gold'=>0,'plus_days'=>0],
-                7 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>20,'plus_days'=>0],
+                7 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>500,'plus_days'=>0],
                 8 => ['wood'=>75,'clay'=>80,'iron'=>30,'crop'=>50,'gold'=>0,'plus_days'=>0],
                 9 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>-200,'gold'=>0,'plus_days'=>0],
                 10 => ['wood'=>75,'clay'=>90,'iron'=>30,'crop'=>50,'gold'=>0,'plus_days'=>0],
@@ -416,7 +418,7 @@ class QuestConfig
                 22 => ['wood'=>200,'clay'=>200,'iron'=>700,'crop'=>450,'gold'=>0,'plus_days'=>0],
                 23 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>0,'plus_days'=>0],
                 24 => ['wood'=>300,'clay'=>320,'iron'=>360,'crop'=>570,'gold'=>0,'plus_days'=>0],
-                28 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>15,'plus_days'=>0],
+                28 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>375,'plus_days'=>0],
                 29 => ['wood'=>240,'clay'=>280,'iron'=>180,'crop'=>100,'gold'=>0,'plus_days'=>0],
                 30 => ['wood'=>600,'clay'=>750,'iron'=>600,'crop'=>300,'gold'=>0,'plus_days'=>0],
                 31 => ['wood'=>900,'clay'=>850,'iron'=>600,'crop'=>300,'gold'=>0,'plus_days'=>0],
@@ -426,13 +428,13 @@ class QuestConfig
                 35 => ['wood'=>1050,'clay'=>800,'iron'=>900,'crop'=>750,'gold'=>0,'plus_days'=>0],
                 36 => ['wood'=>1600,'clay'=>2000,'iron'=>1800,'crop'=>1300,'gold'=>0,'plus_days'=>0],
                 37 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>0,'plus_days'=>0],
-                91 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>15,'plus_days'=>1],
+                91 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>375,'plus_days'=>1],
                 92 => ['wood'=>217,'clay'=>247,'iron'=>177,'crop'=>207,'gold'=>0,'plus_days'=>0],
                 93 => ['wood'=>217,'clay'=>247,'iron'=>177,'crop'=>207,'gold'=>0,'plus_days'=>0],
                 94 => ['wood'=>217,'clay'=>247,'iron'=>177,'crop'=>207,'gold'=>0,'plus_days'=>0],
                 95 => ['wood'=>217,'clay'=>247,'iron'=>177,'crop'=>207,'gold'=>0,'plus_days'=>0],
                 96 => ['wood'=>217,'clay'=>247,'iron'=>177,'crop'=>207,'gold'=>0,'plus_days'=>0],
-                97 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>20,'plus_days'=>2],
+                97 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>500,'plus_days'=>2],
             ],
             'standard' => [
                 2 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>0,'plus_days'=>0],
@@ -440,7 +442,7 @@ class QuestConfig
                 4 => ['wood'=>30,'clay'=>60,'iron'=>30,'crop'=>20,'gold'=>0,'plus_days'=>0],
                 5 => ['wood'=>40,'clay'=>30,'iron'=>20,'crop'=>30,'gold'=>0,'plus_days'=>0],
                 6 => ['wood'=>50,'clay'=>60,'iron'=>30,'crop'=>30,'gold'=>0,'plus_days'=>0],
-                7 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>20,'plus_days'=>0],
+                7 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>500,'plus_days'=>0],
                 8 => ['wood'=>60,'clay'=>30,'iron'=>40,'crop'=>90,'gold'=>0,'plus_days'=>0],
                 9 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>-200,'gold'=>0,'plus_days'=>0],
                 10 => ['wood'=>100,'clay'=>80,'iron'=>40,'crop'=>40,'gold'=>0,'plus_days'=>0],
@@ -460,17 +462,17 @@ class QuestConfig
                 24 => ['wood'=>80,'clay'=>90,'iron'=>60,'crop'=>40,'gold'=>0,'plus_days'=>0],
                 25 => ['wood'=>70,'clay'=>100,'iron'=>90,'crop'=>100,'gold'=>0,'plus_days'=>0],
                 26 => ['wood'=>200,'clay'=>200,'iron'=>700,'crop'=>250,'gold'=>0,'plus_days'=>0],
-                27 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>15,'plus_days'=>0],
+                27 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>375,'plus_days'=>0],
                 28 => ['wood'=>80,'clay'=>70,'iron'=>60,'crop'=>40,'gold'=>0,'plus_days'=>0],
                 29 => ['wood'=>100,'clay'=>60,'iron'=>90,'crop'=>40,'gold'=>0,'plus_days'=>0],
                 30 => ['wood'=>100,'clay'=>140,'iron'=>90,'crop'=>50,'gold'=>0,'plus_days'=>0],
-                91 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>15,'plus_days'=>1],
+                91 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>375,'plus_days'=>1],
                 92 => ['wood'=>217,'clay'=>247,'iron'=>177,'crop'=>207,'gold'=>0,'plus_days'=>0],
                 93 => ['wood'=>217,'clay'=>247,'iron'=>177,'crop'=>207,'gold'=>0,'plus_days'=>0],
                 94 => ['wood'=>217,'clay'=>247,'iron'=>177,'crop'=>207,'gold'=>0,'plus_days'=>0],
                 95 => ['wood'=>217,'clay'=>247,'iron'=>177,'crop'=>207,'gold'=>0,'plus_days'=>0],
                 96 => ['wood'=>217,'clay'=>247,'iron'=>177,'crop'=>207,'gold'=>0,'plus_days'=>0],
-                97 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>20,'plus_days'=>2],
+                97 => ['wood'=>0,'clay'=>0,'iron'=>0,'crop'=>0,'gold'=>500,'plus_days'=>2],
             ],
         ];
     }

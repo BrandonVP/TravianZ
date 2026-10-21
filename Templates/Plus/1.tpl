@@ -22,11 +22,11 @@
 include("Templates/Plus/pmenu.tpl");
 
 $packages = [
-    ['id' => 110,  'key' => 'A', 'img' => 'Travian_paket_a.jpg', 'gold' => defined('PLUS_PACKAGE_A_GOLD') ? PLUS_PACKAGE_A_GOLD : 60,   'price' => defined('PLUS_PACKAGE_A_PRICE') ? PLUS_PACKAGE_A_PRICE : '1,99'],
-    ['id' => 111,  'key' => 'B', 'img' => 'Travian_paket_b.jpg', 'gold' => defined('PLUS_PACKAGE_B_GOLD') ? PLUS_PACKAGE_B_GOLD : 120,  'price' => defined('PLUS_PACKAGE_B_PRICE') ? PLUS_PACKAGE_B_PRICE : '4,99'],
-    ['id' => 112,  'key' => 'C', 'img' => 'Travian_paket_c.jpg', 'gold' => defined('PLUS_PACKAGE_C_GOLD') ? PLUS_PACKAGE_C_GOLD : 360,  'price' => defined('PLUS_PACKAGE_C_PRICE') ? PLUS_PACKAGE_C_PRICE : '9,99'],
-    ['id' => 113,  'key' => 'D', 'img' => 'Travian_paket_d.jpg', 'gold' => defined('PLUS_PACKAGE_D_GOLD') ? PLUS_PACKAGE_D_GOLD : 1000, 'price' => defined('PLUS_PACKAGE_D_PRICE') ? PLUS_PACKAGE_D_PRICE : '19,99'],
-    ['id' => 3110, 'key' => 'E', 'img' => 'Travian_paket_e.jpg', 'gold' => defined('PLUS_PACKAGE_E_GOLD') ? PLUS_PACKAGE_E_GOLD : 2000, 'price' => defined('PLUS_PACKAGE_E_PRICE') ? PLUS_PACKAGE_E_PRICE : '49,99'],
+    ['id' => 110,  'key' => 'A', 'img' => 'Travian_paket_a.jpg', 'gold' => defined('PLUS_PACKAGE_A_GOLD') ? PLUS_PACKAGE_A_GOLD : 1500,   'price' => defined('PLUS_PACKAGE_A_PRICE') ? PLUS_PACKAGE_A_PRICE : '1,99'],
+    ['id' => 111,  'key' => 'B', 'img' => 'Travian_paket_b.jpg', 'gold' => defined('PLUS_PACKAGE_B_GOLD') ? PLUS_PACKAGE_B_GOLD : 3000,  'price' => defined('PLUS_PACKAGE_B_PRICE') ? PLUS_PACKAGE_B_PRICE : '4,99'],
+    ['id' => 112,  'key' => 'C', 'img' => 'Travian_paket_c.jpg', 'gold' => defined('PLUS_PACKAGE_C_GOLD') ? PLUS_PACKAGE_C_GOLD : 9000,  'price' => defined('PLUS_PACKAGE_C_PRICE') ? PLUS_PACKAGE_C_PRICE : '9,99'],
+    ['id' => 113,  'key' => 'D', 'img' => 'Travian_paket_d.jpg', 'gold' => defined('PLUS_PACKAGE_D_GOLD') ? PLUS_PACKAGE_D_GOLD : 25000, 'price' => defined('PLUS_PACKAGE_D_PRICE') ? PLUS_PACKAGE_D_PRICE : '19,99'],
+    ['id' => 3110, 'key' => 'E', 'img' => 'Travian_paket_e.jpg', 'gold' => defined('PLUS_PACKAGE_E_GOLD') ? PLUS_PACKAGE_E_GOLD : 50000, 'price' => defined('PLUS_PACKAGE_E_PRICE') ? PLUS_PACKAGE_E_PRICE : '49,99'],
 ];
 
 $currency = defined('PAYPAL_CURRENCY') ? PAYPAL_CURRENCY : 'EUR';

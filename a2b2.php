@@ -28,11 +28,11 @@ $uid = (int)$session->uid;
 $amount = (int)($_SESSION['amount'] ?? 0);
 
 $packages = [
-    199  => 60,
-    499  => 120,
-    999  => 360,
-    1999 => 1000,
-    4999 => 2000
+    199  => 1500,
+    499  => 3000,
+    999  => 9000,
+    1999 => 25000,
+    4999 => 50000
 ];
 
 if (isset($_GET['newdid'])) {
@@ -51,15 +51,10 @@ $goldAdded = 0;
 if (isset($packages[$amount]) && $amount > 0) {
     $goldAdded = $packages[$amount];
 
-    $result = mysqli_query($database->dblink, "SELECT gold FROM " . TB_PREFIX . "users WHERE id = $uid LIMIT 1");
-    $user = mysqli_fetch_assoc($result);
-    $oldBalance = (int)$user['gold'];
-
-    mysqli_query($database->dblink, "UPDATE " . TB_PREFIX . "users SET gold = gold + $goldAdded WHERE id = $uid");
-
-    $result = mysqli_query($database->dblink, "SELECT gold FROM " . TB_PREFIX . "users WHERE id = $uid LIMIT 1");
-    $user = mysqli_fetch_assoc($result);
-    $newBalance = (int)$user['gold'];
+    // local redesign: package gold goes to the capital
+    $oldBalance = VillageGold::playerGold($database, $uid);
+    VillageGold::grant($database, $uid, $goldAdded, 'Gold package', 'Package of ' . $goldAdded . ' gold');
+    $newBalance = VillageGold::playerGold($database, $uid);
 
     $transactionProcessed = true;
     $_SESSION['amount'] = 0;
@@ -126,6 +121,8 @@ if (isset($packages[$amount]) && $amount > 0) {
                 // --- ISTORIC NORMAL CU FILTRU ---
                 $result = mysqli_query($database->dblink, "SELECT gold FROM ".TB_PREFIX."users WHERE id = $uid LIMIT 1");
                 $golds = mysqli_fetch_assoc($result);
+// local redesign: the balance is the capital's gold
+$golds['gold'] = VillageGold::playerGold($database, $uid);
 
                 $stats = mysqli_fetch_assoc(mysqli_query($database->dblink, "
                     SELECT 
@@ -184,14 +181,13 @@ if (isset($packages[$amount]) && $amount > 0) {
 
                 <table class="plusFunctions" cellpadding="1" cellspacing="1">
                 <thead>
-                <tr><th colspan="6" height="20">Gold history (<?php echo $totalRows; ?>)</th></tr>
+                <tr><th colspan="5" height="20">Gold history (<?php echo $totalRows; ?>)</th></tr>
                 <tr>
                     <td align="center">Date & Time</td>
                     <td align="center">Village</td>
                     <td align="center">Action</td>
                     <td align="center">Details</td>
                     <td align="center"><img src="img/x.gif" class="gold" alt="Gold" /></td>
-                    <td align="center">Balance</td>
                 </tr>
                 </thead>
                 <tbody>
@@ -234,12 +230,11 @@ if (isset($packages[$amount]) && $amount > 0) {
                         echo '<td class="desc"><div style="text-align:center"><b>'.$action.'</b></div></td>';
                         echo '<td class="desc"><div style="text-align:center"><span style="color:#666;font-size:11px">'.$details.'</span></div></td>';
                         echo '<td class="desc"><div style="text-align:center"><font color="'.$color.'"><b>'.$sign.$gold.'</b></font></div></td>';
-                        echo '<td class="act"><div style="text-align:center">'.$balance.'</div></td>';
                         echo '</tr>';
                         $balance -= $gold;
                     }
                 } else {
-                    echo '<tr><td colspan="6" class="desc"><div style="text-align:center;padding:8px;">No transactions yet.</div></td></tr>';
+                    echo '<tr><td colspan="5" class="desc"><div style="text-align:center;padding:8px;">No transactions yet.</div></td></tr>';
                 }
                 ?>
                 </tbody>

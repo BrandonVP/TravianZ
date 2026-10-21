@@ -83,7 +83,7 @@ if($_SESSION['access'] < 9) die(ACCESS_DENIED_ADMIN);
                 <tr>
                     <td class="b"><?php echo CONF_PLUS_PACKAGEGOLDA ?> <em class="tooltip">?<span class="classic"><?php echo CONF_PLUS_PACKAGEGOLDA_TOOLTIP ?></span></em></td>
                     <td>
-                        <input class="fm" name="plus-a-gold" value="<?php echo (defined('PLUS_PACKAGE_A_GOLD') ? PLUS_PACKAGE_A_GOLD : 60); ?>" style="width: 70%;">
+                        <input class="fm" name="plus-a-gold" value="<?php echo (defined('PLUS_PACKAGE_A_GOLD') ? PLUS_PACKAGE_A_GOLD : 1500); ?>" style="width: 70%;">
                     </td>
                 </tr>
                 <tr>
@@ -95,7 +95,7 @@ if($_SESSION['access'] < 9) die(ACCESS_DENIED_ADMIN);
                 <tr>
                     <td class="b"><?php echo CONF_PLUS_PACKAGEGOLDB ?> <em class="tooltip">?<span class="classic"><?php echo CONF_PLUS_PACKAGEGOLDB_TOOLTIP ?></span></em></td>
                     <td>
-                        <input class="fm" name="plus-b-gold" value="<?php echo (defined('PLUS_PACKAGE_B_GOLD') ? PLUS_PACKAGE_B_GOLD : 120); ?>" style="width: 70%;">
+                        <input class="fm" name="plus-b-gold" value="<?php echo (defined('PLUS_PACKAGE_B_GOLD') ? PLUS_PACKAGE_B_GOLD : 3000); ?>" style="width: 70%;">
                     </td>
                 </tr>
                 <tr>
@@ -107,7 +107,7 @@ if($_SESSION['access'] < 9) die(ACCESS_DENIED_ADMIN);
                 <tr>
                     <td class="b"><?php echo CONF_PLUS_PACKAGEGOLDC ?> <em class="tooltip">?<span class="classic"><?php echo CONF_PLUS_PACKAGEGOLDC_TOOLTIP ?></span></em></td>
                     <td>
-                        <input class="fm" name="plus-c-gold" value="<?php echo (defined('PLUS_PACKAGE_C_GOLD') ? PLUS_PACKAGE_C_GOLD : 360); ?>" style="width: 70%;">
+                        <input class="fm" name="plus-c-gold" value="<?php echo (defined('PLUS_PACKAGE_C_GOLD') ? PLUS_PACKAGE_C_GOLD : 9000); ?>" style="width: 70%;">
                     </td>
                 </tr>
                 <tr>
@@ -119,7 +119,7 @@ if($_SESSION['access'] < 9) die(ACCESS_DENIED_ADMIN);
                 <tr>
                     <td class="b"><?php echo CONF_PLUS_PACKAGEGOLDD ?> <em class="tooltip">?<span class="classic"><?php echo CONF_PLUS_PACKAGEGOLDD_TOOLTIP ?></span></em></td>
                     <td>
-                        <input class="fm" name="plus-d-gold" value="<?php echo (defined('PLUS_PACKAGE_D_GOLD') ? PLUS_PACKAGE_D_GOLD : 1000); ?>" style="width: 70%;">
+                        <input class="fm" name="plus-d-gold" value="<?php echo (defined('PLUS_PACKAGE_D_GOLD') ? PLUS_PACKAGE_D_GOLD : 25000); ?>" style="width: 70%;">
                     </td>
                 </tr>
                 <tr>
@@ -131,7 +131,7 @@ if($_SESSION['access'] < 9) die(ACCESS_DENIED_ADMIN);
                 <tr>
                     <td class="b"><?php echo CONF_PLUS_PACKAGEGOLDE ?> <em class="tooltip">?<span class="classic"><?php echo CONF_PLUS_PACKAGEGOLDE_TOOLTIP ?></span></em></td>
                     <td>
-                        <input class="fm" name="plus-e-gold" value="<?php echo (defined('PLUS_PACKAGE_E_GOLD') ? PLUS_PACKAGE_E_GOLD : 2000); ?>" style="width: 70%;">
+                        <input class="fm" name="plus-e-gold" value="<?php echo (defined('PLUS_PACKAGE_E_GOLD') ? PLUS_PACKAGE_E_GOLD : 50000); ?>" style="width: 70%;">
                     </td>
                 </tr>
                 <tr>

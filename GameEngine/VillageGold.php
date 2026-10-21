@@ -84,9 +84,50 @@ class VillageGold
     }
 
     /**
-     * Automation safety net: Plus gold (users.gold) granted by any old code path
-     * moves into the player's capital at TZ_GOLD_PLUS_RATE, never cut to the cap.
-     * Players without a capital keep it until they have one.
+     * Give a player gold: into the capital (never cut to the cap, nobody loses a
+     * reward), or held in users.gold until they have a capital (moved 1:1 by
+     * sweepPlusGold). Logged in the account statement.
+     */
+    public static function grant($db, $uid, $amount, $action = 'Gold received', $details = '')
+    {
+        $uid = (int) $uid;
+        $amount = (int) $amount;
+        if ($uid <= 0 || $amount <= 0) {
+            return false;
+        }
+        $l = $db->dblink;
+        $p = TB_PREFIX;
+        $r = mysqli_query($l, "SELECT wref FROM {$p}vdata WHERE owner = $uid AND capital = 1 LIMIT 1");
+        $row = $r ? mysqli_fetch_row($r) : null;
+        if ($row) {
+            mysqli_query($l, "UPDATE {$p}vdata SET gold = gold + $amount WHERE wref = " . (int) $row[0]);
+            $wid = (int) $row[0];
+        } else {
+            mysqli_query($l, "UPDATE {$p}users SET gold = gold + $amount WHERE id = $uid");
+            $wid = 0;
+        }
+        $a = mysqli_real_escape_string($l, substr($action, 0, 100));
+        $d = mysqli_real_escape_string($l, substr($details, 0, 200));
+        mysqli_query($l, "INSERT INTO {$p}gold_fin_log (uid, wid, action, gold, time, details) VALUES ($uid, $wid, '$a', $amount, " . time() . ", '$d')");
+        return true;
+    }
+
+    /** A player's gold: their capital's, plus anything still held for them. */
+    public static function playerGold($db, $uid)
+    {
+        $l = $db->dblink;
+        $p = TB_PREFIX;
+        $uid = (int) $uid;
+        $r = mysqli_query($l, "SELECT COALESCE((SELECT FLOOR(gold) FROM {$p}vdata WHERE owner = $uid AND capital = 1 LIMIT 1), 0)
+                                    + COALESCE((SELECT gold FROM {$p}users WHERE id = $uid), 0)");
+        $row = $r ? mysqli_fetch_row($r) : null;
+        return $row ? (int) $row[0] : 0;
+    }
+
+    /**
+     * Automation: gold held in users.gold (starting gold, or anything granted
+     * before the player had a capital) moves into the capital, 1:1, never cut
+     * to the cap. Players without a capital keep it until they have one.
      */
     public static function sweepPlusGold($db)
     {
@@ -112,7 +153,7 @@ class VillageGold
             $gold = $plus * (int) TZ_GOLD_PLUS_RATE;
             mysqli_query($l, "UPDATE {$p}vdata SET gold = gold + $gold WHERE wref = " . (int) $row['wref']);
             mysqli_query($l, "INSERT INTO {$p}gold_fin_log (uid, wid, action, gold, time, details)
-                VALUES (" . (int) $row['id'] . ", " . (int) $row['wref'] . ", 'Plus gold to capital', $gold, $now, '$plus Plus gold x " . (int) TZ_GOLD_PLUS_RATE . "')");
+                VALUES (" . (int) $row['id'] . ", " . (int) $row['wref'] . ", 'Gold moved to capital', $gold, $now, 'Held gold')");
             if (method_exists($db, 'clearUserCache')) {
                 $db->clearUserCache((int) $row['id']);
             }

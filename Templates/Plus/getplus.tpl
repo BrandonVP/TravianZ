@@ -20,6 +20,12 @@
 
 include("Templates/Plus/pmenu.tpl");
 
+// local redesign: Plus features are bought with capital gold in the Main Building
+if (class_exists('VillageGold') && VillageGold::villageMode()) {
+    echo '<p>Plus features are bought in your capital\'s <a href="build.php?gid=15#plus">Main Building</a>.</p>';
+    return;
+}
+
 $uid = (int)$session->uid;
 $plusTime = 604800; // 7 zile
 

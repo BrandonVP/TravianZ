@@ -58,7 +58,12 @@ if (!defined('TZ_GOLD_PRICE_ALLY_TRIPLE')) define('TZ_GOLD_PRICE_ALLY_TRIPLE', 7
 // capital's village gold (1 silver price = 1 gold).
 if (!defined('TZ_SILVER_ENABLED')) define('TZ_SILVER_ENABLED', false);
 
-// Plus gold still granted by old code paths (registration bonus, quests, invite
-// rewards, payment packages) is moved into the player's capital by Automation
-// at the conversion rate: 1 Plus gold = this much village gold.
-if (!defined('TZ_GOLD_PLUS_RATE')) define('TZ_GOLD_PLUS_RATE', 25);
+// There is only one gold. users.gold is just a holding balance for a player
+// without a capital yet (e.g. starting gold, granted before the first village
+// exists); Automation moves it 1:1 into the capital (VillageGold::sweepPlusGold).
+if (!defined('TZ_GOLD_PLUS_RATE')) define('TZ_GOLD_PLUS_RATE', 1);
+
+// Rewards (old Plus amounts x25 so they keep their value)
+if (!defined('TZ_GOLD_QUEST_SMALL'))   define('TZ_GOLD_QUEST_SMALL', 375);    // was 15
+if (!defined('TZ_GOLD_QUEST_BIG'))     define('TZ_GOLD_QUEST_BIG', 500);      // was 20
+if (!defined('TZ_GOLD_INVITE_REWARD')) define('TZ_GOLD_INVITE_REWARD', 1250); // was 50

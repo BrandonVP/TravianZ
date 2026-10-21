@@ -1,4 +1,4 @@
-<?php
+<?php include_once __DIR__ . '/../../GameEngine/VillageGold.php';
 #################################################################################
 ##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
 ## --------------------------------------------------------------------------- ##
@@ -159,7 +159,7 @@ function shortEmail($e){if(!$e)return '-';if(strlen($e)>22)return substr($e,0,19
               <span class="tribe-name"><?php echo $t[0];?></span>
             </div>
           </td>
-          <td class="gold"><?php echo (int)$r['gold'];?></td>
+          <td class="gold"><?php echo VillageGold::playerGold($GLOBALS['database'], (int) $r['id']);?></td>
           <td class="last"><?php echo $last;?></td>
         </tr>
         <?php }?>

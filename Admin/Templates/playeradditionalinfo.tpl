@@ -1,4 +1,4 @@
-<style>
+<?php include_once __DIR__ . '/../../GameEngine/VillageGold.php'; ?><style>
 #member{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);margin-top:10px;font-family:system-ui}
 #member thead th{background:linear-gradient(135deg,#66CCFF,#66CCCC) !important;color:#fff;padding:6px 10px;font-weight:600;text-align:left;font-size:13px;position:relative}
 #member thead th .edit-icon{float:right;display:inline-flex;opacity:.9;transition:.15s}
@@ -60,7 +60,7 @@
 		</tr>
 		<tr>
 			<td><?php echo ADMIN_GOLD; ?></td>
-			<td><span class="gold-val"><img src="../img/admin/gold.gif"> <?php echo $user['gold']; ?></span></td>
+			<td><span class="gold-val"><img src="../img/admin/gold.gif"> <?php echo VillageGold::playerGold($GLOBALS['database'], (int) $user['id']); ?></span></td>
 		</tr>
 		<tr>
 			<td><?php echo ADM_SITTER_1_2; ?></td>

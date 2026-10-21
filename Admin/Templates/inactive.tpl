@@ -1,4 +1,4 @@
-<?php
+<?php include_once __DIR__ . '/../../GameEngine/VillageGold.php';
 
 #################################################################################
 ##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
@@ -102,7 +102,7 @@ $tribeName = [1=>'Roman',2=>'Teuton',3=>'Gaul'];
           </div>
         </div>
         <div class="stats">
-          <span class="badge gold">💰 <?php echo $u['gold']; ?></span>
+          <span class="badge gold">💰 <?php echo VillageGold::playerGold($GLOBALS['database'], (int) $u['id']); ?></span>
           <span><a href="?p=player&uid=<?php echo $uid; ?>&action=delete" onclick="return confirm('Delete?')" style="color:#c00;text-decoration:none"><?php echo ADM_DELETE_L; ?></a></span>
         </div>
       </div>

@@ -1,4 +1,4 @@
-<?php
+<?php include_once __DIR__ . '/../../GameEngine/VillageGold.php';
 #################################################################################
 ##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
 ## --------------------------------------------------------------------------- ##
@@ -72,7 +72,7 @@ select.dropdown { width:100%; }
 <div class="editUser-wrap">
     <div class="editUser-head">
         <h2><?php echo ADM_EDIT_PLAYER; ?><a href="admin.php?p=player&uid=<?php echo $user['id']; ?>"><?php echo htmlspecialchars($user['username']); ?></a></h2>
-        <div class="meta">ID: <?php echo $id; ?> | Villages: <?php echo count($varray); ?> | Gold: <?php echo $user['gold']; ?> <img src="../img/x.gif" class="gold" style="vertical-align:-2px;"></div>
+        <div class="meta">ID: <?php echo $id; ?> | Villages: <?php echo count($varray); ?> | Gold: <?php echo VillageGold::playerGold($GLOBALS['database'], (int) $id); ?> <img src="../img/x.gif" class="gold" style="vertical-align:-2px;"></div>
     </div>
 
     <div class="editUser-grid">

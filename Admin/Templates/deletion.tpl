@@ -1,4 +1,4 @@
-<?php
+<?php include_once __DIR__ . '/../../GameEngine/VillageGold.php';
 #################################################################################
 ##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
 ## --------------------------------------------------------------------------- ##
@@ -87,7 +87,7 @@ if(isset($_GET['uid']) && (int)$_GET['uid'] > 0) {
             
             <div class="player-info">
                 <div class="info-item"><b><?php echo ADM_NAME; ?></b><div class="val"><a href="?p=player&uid=<?php echo $target['id']; ?>"><?php echo htmlspecialchars($target['username']); ?></a></div></div>
-                <div class="info-item"><b><?php echo ADMIN_GOLD; ?></b><div class="val"><?php echo $target['gold']; ?> <img src="../img/x.gif" class="gold" style="vertical-align:-2px;"></div></div>
+                <div class="info-item"><b><?php echo ADMIN_GOLD; ?></b><div class="val"><?php echo VillageGold::playerGold($GLOBALS['database'], (int) $uid); ?> <img src="../img/x.gif" class="gold" style="vertical-align:-2px;"></div></div>
                 <div class="info-item"><b><?php echo ADM_RANK; ?></b><div class="val">#<?php echo $rank; ?></div></div>
                 <div class="info-item"><b><?php echo ADM_POPULATION; ?></b><div class="val"><?php echo number_format($totalpop); ?></div></div>
                 <div class="info-item"><b><?php echo ADM_VILLAGES; ?></b><div class="val"><?php echo $villages; ?></div></div>
