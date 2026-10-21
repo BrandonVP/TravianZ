@@ -207,10 +207,19 @@ class Profile {
         // name : without HTML, maximum 30 characters (as in the game)
         $name = mb_substr(strip_tags($name_raw), 0, 30);
 
-        // url: accepts only http/https, max 120 characters
+        // url: http/https, or (local redesign) a page of this game such as
+        // "build.php?gid=17" / "karte.php" - those used to be dropped silently.
+        // A trailing "*" opens the link in a new tab (links.tpl). Max 120 chars.
         $url = '';
-        if ($url_raw !== '' && preg_match('#^https?://#i', $url_raw)) {
+        if ($url_raw !== '' && (preg_match('#^https?://[^\s<>"\']+$#i', $url_raw)
+                || preg_match('#^[a-z0-9_\-]+\.php(\?[^\s<>"\']*)?\*?$#i', $url_raw))) {
             $url = mb_substr($url_raw, 0, 120);
+        } elseif ($url_raw !== '' || $name_raw !== '') {
+            $_SESSION['tz_link_error'] = 'A link was not saved: the target must be a page of this game (for example build.php?gid=17) or a web address starting with http:// or https://, and the link needs a name.';
+        }
+
+        if ($url !== '' && $name === '') {
+            $_SESSION['tz_link_error'] = 'A link was not saved: it needs a name as well as a target.';
         }
 
         // SQL: escape for SQL (keeping the current TravianZ style used in TravianZ)

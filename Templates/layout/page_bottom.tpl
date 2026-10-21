@@ -16,8 +16,13 @@ if (!empty($layoutRightTop)) {
 }
 include(__DIR__ . "/../news.tpl");
 if(!NEW_FUNCTIONS_DISPLAY_LINKS) {
-	echo "<br><br><br><br>";
+	// local redesign: the player's direct links as a card (only when there are any)
+	ob_start();
 	include(__DIR__ . "/../links.tpl");
+	$tzLinksHtml = trim(ob_get_clean());
+	if ($tzLinksHtml !== '') {
+		echo '<div class="tz-cards tz-links-wrap"><div class="tz-card tz-card-links">' . $tzLinksHtml . '</div></div>';
+	}
 }
 ?>
 </div>

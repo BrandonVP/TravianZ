@@ -240,6 +240,16 @@ if(isset($_POST['lang']))
 ========================= -->
 <form action="spieler.php?s=2" method="POST">
 <input type="hidden" name="ft" value="p2">
+<?php
+// local redesign: say why a direct link was not saved (GameEngine/Profile.php)
+if (!empty($_SESSION['tz_link_error'])) {
+    echo '<p class="tz-link-error">' . htmlspecialchars($_SESSION['tz_link_error'], ENT_QUOTES, 'UTF-8') . '</p>';
+    unset($_SESSION['tz_link_error']);
+}
+?>
+<p class="tz-link-help">Direct links appear in the side column for quick access (Plus).
+    Target: a game page such as <b>build.php?gid=17</b> (Marketplace), <b>build.php?gid=16&amp;t=99</b> (Rally Point Gold Club)
+    or <b>karte.php</b>, or a web address starting with http://. End the target with <b>*</b> to open it in a new tab.</p>
 
 <table cellpadding="1" cellspacing="1" id="links">
     <thead>

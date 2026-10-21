@@ -73,9 +73,9 @@ if ($query && mysqli_num_rows($query) > 0) {
     <thead>
 
         <tr>
-            <td colspan="3">
-                <a href="spieler.php?s=2"><?php echo TZ_LINKS; ?></a>
-            </td>
+            <th colspan="3">
+                <a href="spieler.php?s=2" title="Edit links"><?php echo rtrim(TZ_LINKS, ': '); ?></a>
+            </th>
         </tr>
 
     </thead>
