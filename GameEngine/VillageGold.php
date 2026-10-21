@@ -125,6 +125,25 @@ class VillageGold
         return self::cap($db->getResourceLevel($wref));
     }
 
+    /**
+     * Gold raiders with $carry capacity can take from a village: what lies
+     * outside the Treasury, limited to TZ_GOLD_RAID_SHARE of the capacity.
+     */
+    public static function raidable($db, $wref, $carry)
+    {
+        if (!TZ_GOLD_ENABLED || $carry <= 0) {
+            return 0;
+        }
+        $row = $db->getVillageFields($wref, 'gold', false);
+        if (!is_array($row) || !isset($row['gold'])) {
+            return 0;
+        }
+        $outside = floor((float) $row['gold']) - self::treasuryHolds(self::treasuryLevel($db->getResourceLevel($wref, false)));
+        $space = defined('TZ_GOLD_MERCHANT_SPACE') ? TZ_GOLD_MERCHANT_SPACE : 100;
+        $byCarry = floor($carry * TZ_GOLD_RAID_SHARE / $space);
+        return (int) max(0, min($outside, $byCarry));
+    }
+
     /** Highest Main Building (gid 15) and Marketplace (gid 17) level in a village. */
     public static function buildingLevels($resArray)
     {

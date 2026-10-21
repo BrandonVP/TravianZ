@@ -452,6 +452,7 @@ CREATE TABLE IF NOT EXISTS `%PREFIX%attacks` (
  `b6` tinyint(1) NULL, 
  `b7` tinyint(1) NULL, 
  `b8` tinyint(1) NULL, 
+ `gold` int(11) NOT NULL DEFAULT 0,
  PRIMARY KEY (`id`),
   KEY `vref` (`vref`),
   KEY `attack_type` (`attack_type`)

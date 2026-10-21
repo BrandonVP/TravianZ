@@ -20,6 +20,12 @@
 
 $dataarray = array_map('tz_expand_report', explode(",", $message->readingNotice['data']));
 
+// Village gold (local redesign): raided gold is a tagged value at the end
+$tzRaidGold = 0;
+foreach ($dataarray as $tzV) {
+    if (is_string($tzV) && strncmp($tzV, 'tzgold:', 7) === 0) $tzRaidGold = (int) substr($tzV, 7);
+}
+
 // ======================== BASIC SETTINGS ========================
 $hasHero = (isset($dataarray[270]) && $dataarray[270] > 0);
 $colspan = $hasHero ? 11 : 10;
@@ -273,6 +279,9 @@ if (!empty($dataarray[287])) {
 <img class="r2" src="img/x.gif" /><?php echo $dataarray[24]; ?> |
 <img class="r3" src="img/x.gif" /><?php echo $dataarray[25]; ?> |
 <img class="r4" src="img/x.gif" /><?php echo $dataarray[26]; ?>
+<?php if ($tzRaidGold > 0) { ?> |
+<svg class="tz-coin-sm" viewBox="0 0 24 24" aria-label="Gold" role="img"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg><?php echo $tzRaidGold; ?>
+<?php } ?>
 </div>
 <div class="carry">
 <?php echo ($dataarray[23]+$dataarray[24]+$dataarray[25]+$dataarray[26])."/".$dataarray[27]; ?>

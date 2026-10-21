@@ -212,7 +212,7 @@ trait AutomationTroopMovements {
         $q = "
             SELECT
                 `to`, `from`, moveid, ref, starttime, endtime, wood, clay, iron, crop,
-                t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11
+                t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, ".TB_PREFIX."attacks.gold AS tz_gold
             FROM
                 ".TB_PREFIX."movement,
                 ".TB_PREFIX."attacks
@@ -256,6 +256,12 @@ trait AutomationTroopMovements {
             	//If there's at least 1 resource, add it to the village
             	if($data['wood'] + $data['clay'] + $data['iron'] + $data['crop'] > 0){
             		$database->modifyResource($data['to'], $data['wood'], $data['clay'], $data['iron'], $data['crop'], 1);
+            	}
+
+            	// Village gold (local redesign): raided gold arrives with the troops
+            	if (!empty($data['tz_gold'])) {
+            		include_once __DIR__ . '/../VillageGold.php';
+            		$database->addVillageGold($data['to'], (int) $data['tz_gold'], VillageGold::capFor($database, $data['to']));
             	}
             	
             	//Update starvation data

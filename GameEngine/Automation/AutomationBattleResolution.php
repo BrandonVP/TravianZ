@@ -2550,7 +2550,13 @@ trait AutomationBattleResolution {
                         if($chiefing_village != 1){
                         	$database->addMovement(4, $DefenderWref, $AttackerWref, $data['ref'], $AttackArrivalTime, $endtime, 1, $steal[0], $steal[1], $steal[2], $steal[3]);
                             if($type !== 1){
-                            	if ($isoasis == 0) $database->modifyResource($DefenderWref, $steal[0], $steal[1], $steal[2], $steal[3], 0);                   
+                            	if ($isoasis == 0) $database->modifyResource($DefenderWref, $steal[0], $steal[1], $steal[2], $steal[3], 0);
+                                // Village gold (local redesign): the raided gold leaves now and
+                                // travels home on the attack row (paid out in returnunitsComplete)
+                                if ($isoasis == 0 && !empty($data['tz_gold'])
+                                    && $database->takeVillageGold($DefenderWref, (int) $data['tz_gold'])) {
+                                    $database->query("UPDATE " . TB_PREFIX . "attacks SET gold = " . (int) $data['tz_gold'] . " WHERE id = " . (int) $data['ref']);
+                                }
                                 else
                                 {
                                 	//if it's an oasis but it's conquered by someone, resources must be modified in the owner's village
@@ -3072,7 +3078,18 @@ trait AutomationBattleResolution {
                     // T4 hero port (Phase 5): thief sacks raise the carry
                     // bounty when the attacker's living hero joined the strike.
                     $heroBounty = (int) round($battlepart['bounty'] * HeroBattleBonus::raidMultiplier($from['owner'], $data['t11']));
-                    $steal = $this->applyBounty([$avwood, $avclay, $aviron, $avcrop], $heroBounty);
+
+                    // Village gold (local redesign): surviving raiders take gold kept
+                    // outside the Treasury first (resources were just brought up to
+                    // date above, gold with them); it is removed in finalizeReturnOrDeath()
+                    $data['tz_gold'] = 0;
+                    if ($isoasis == 0 && empty($scout)
+                        && $totalsend_att - ($totaldead_att + (isset($totaltraped_att) ? $totaltraped_att : 0)) > 0) {
+                        include_once __DIR__ . '/../VillageGold.php';
+                        $data['tz_gold'] = VillageGold::raidable($database, $data['to'], $heroBounty);
+                    }
+                    $tzGoldCarry = $data['tz_gold'] * (defined('TZ_GOLD_MERCHANT_SPACE') ? TZ_GOLD_MERCHANT_SPACE : 100);
+                    $steal = $this->applyBounty([$avwood, $avclay, $aviron, $avcrop], max(0, $heroBounty - $tzGoldCarry));
 
                     //chiefing village — extracted to handleConquest() [#155]
                     if (!isset($village_destroyed)) $village_destroyed = 0;
@@ -3109,6 +3126,9 @@ trait AutomationBattleResolution {
                     );
                     $data2     = $report['data2'];
                     $data_fail = $report['data_fail'];
+                    if (!empty($data['tz_gold'])) {
+                        $data2 .= ',tzgold:' . (int) $data['tz_gold'];
+                    }
 
                     // notify the defender of the incoming battle/scout — extracted to sendBattleNotifications() [#155]
                     $this->sendBattleNotifications($scout, $battlepart, $from, $to, $targetally, $data2, $AttackArrivalTime, $unitsdead_att, $unitssend_att, $defspy, $info_troop, $totalsend_alldef, $totalsend_att, $totaldead_att, $totaltraped_att, $totaldead_alldef);

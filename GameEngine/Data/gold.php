@@ -42,3 +42,8 @@ if (!defined('TZ_GOLD_PRICE_ROUTE'))      define('TZ_GOLD_PRICE_ROUTE', 50);    
 if (!defined('TZ_GOLD_TREASURY_SHARE'))     define('TZ_GOLD_TREASURY_SHARE', 0.1);
 // catapult damage against a Treasury is divided by this (one of the toughest buildings)
 if (!defined('TZ_GOLD_TREASURY_TOUGHNESS')) define('TZ_GOLD_TREASURY_TOUGHNESS', 4);
+
+// Raids: survivors of an attack/raid on a village carry off gold kept outside
+// the Treasury. Each gold takes TZ_GOLD_MERCHANT_SPACE of carry capacity, and
+// gold may fill at most this share of the raiders' capacity (rest = resources).
+if (!defined('TZ_GOLD_RAID_SHARE')) define('TZ_GOLD_RAID_SHARE', 0.25);
