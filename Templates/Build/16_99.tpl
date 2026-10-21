@@ -74,7 +74,11 @@ $user = $database->getUserArray($session->uid, 1);
         <?= SEND_TROOPS_AWAY_MAX ?>
         <input class="text" type="text" name="maxevasion" value="<?= $user['maxevasion'] ?>" maxlength="3" style="width:50px;">
         <?= TIMES ?>
+        <?php if (class_exists('VillageGold') && VillageGold::villageMode()): // local redesign: village gold ?>
+        <span class="none">(<?= COSTS ?>: <svg class="tz-coin-sm" viewBox="0 0 24 24" aria-label="Gold" role="img"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg><b><?= (int) TZ_GOLD_PRICE_EVASION ?></b> <?= PER_EVASION ?>, paid from the gold of the village whose troops evade; no gold there, no evasion)</span>
+        <?php else: ?>
         <span class="none">(<?= COSTS ?>: <img src="<?= GP_LOCATE ?>img/a/gold_g.gif" alt="<?php echo GOLD; ?>" title="<?= GOLD ?>"><b>2</b> <?= PER_EVASION ?>)</span>
+        <?php endif; ?>
         <div class="clear"></div>
         <p><button value="ok" name="s1" id="btn_ok" class="trav_buttons" tabindex="8">OK</button></p>
     </form>

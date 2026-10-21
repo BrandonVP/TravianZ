@@ -500,7 +500,9 @@ trait AutomationBattleResolution {
 
     /**
      * Handle hero evasion: if the defender has evasion active and can afford it,
-     * send all defender units back to base and charge 2 gold + 1 evasion charge.
+     * send all defender units back to base and charge 1 evasion charge plus gold
+     * (local redesign: TZ_GOLD_PRICE_EVASION from the evading village's gold;
+     * the old account gold, 2 per evasion, only when village gold is off).
      * Pure behaviour-preserving extraction (refactor for issue #155).
      *
      * @param array $data         Current movement row (needs 'to').
@@ -526,7 +528,8 @@ trait AutomationBattleResolution {
     ): void {
         global $database;
 
-        if (!($evasion == 1 && $maxevasion > 0 && $gold > 1 && !$cannotsend && $attackType > 2)) {
+        $tzVillageGold = class_exists('VillageGold') && VillageGold::villageMode();
+        if (!($evasion == 1 && $maxevasion > 0 && ($tzVillageGold || $gold > 1) && !$cannotsend && $attackType > 2)) {
             return;
         }
 
@@ -550,13 +553,25 @@ trait AutomationBattleResolution {
         $totaltroops += $data['u11'];
 
         if ($totaltroops > 0) {
+            if ($tzVillageGold) {
+                // the troops only leave if the village can pay (nothing happens otherwise)
+                if (!$database->takeVillageGold($data['to'], TZ_GOLD_PRICE_EVASION)) {
+                    return;
+                }
+                $database->addGoldFinLog($data['to'], $DefenderID, 'Evasion', -TZ_GOLD_PRICE_EVASION, 'Gold Club evasion');
+            }
+
             $evasionUnitModifications_units[]   = 'hero';
             $evasionUnitModifications_amounts[] = $DefenderUnit['hero'];
             $evasionUnitModifications_modes[]   = 0;
 
             $attackid = $database->addAttack($data['to'], $data['u1'], $data['u2'], $data['u3'], $data['u4'], $data['u5'], $data['u6'], $data['u7'], $data['u8'], $data['u9'], $data['u10'], $data['u11'], 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
             $database->addMovement(4, 0, $data['to'], $attackid, microtime(true), microtime(true) + (180 / EVASION_SPEED));
-            $database->updateUserField($DefenderID, ["gold", "maxevasion"], [$gold - 2, $maxevasion - 1], 1);
+            if ($tzVillageGold) {
+                $database->updateUserField($DefenderID, "maxevasion", $maxevasion - 1, 1);
+            } else {
+                $database->updateUserField($DefenderID, ["gold", "maxevasion"], [$gold - 2, $maxevasion - 1], 1);
+            }
         }
 
         $database->modifyUnit($data['to'], $evasionUnitModifications_units, $evasionUnitModifications_amounts, $evasionUnitModifications_modes);

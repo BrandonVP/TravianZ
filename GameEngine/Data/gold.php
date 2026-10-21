@@ -110,3 +110,6 @@ if (!defined('TZ_WARGAMES_COOLDOWN'))        define('TZ_WARGAMES_COOLDOWN', 7 * 
 // Resource contracts live in the Trade Office: unlocked at this level; the daily
 // allowance is Trade Office level x TZ_CONTRACT_GOLD_PER_LEVEL (level 20: 4,000)
 if (!defined('TZ_CONTRACT_MIN_LEVEL')) define('TZ_CONTRACT_MIN_LEVEL', 10);
+
+// Gold Club evasion (Rally Point): paid by the village whose troops evade
+if (!defined('TZ_GOLD_PRICE_EVASION')) define('TZ_GOLD_PRICE_EVASION', 50);
