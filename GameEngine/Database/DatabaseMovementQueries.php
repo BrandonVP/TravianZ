@@ -342,7 +342,8 @@ trait DatabaseMovementQueries {
                         ', '.(int) $b8[$index].')';
         }
 
-		$q = "INSERT INTO " . TB_PREFIX . "attacks VALUES ".implode(', ', $values);
+		// named columns (local redesign): attacks.gold was added for raided village gold
+		$q = "INSERT INTO " . TB_PREFIX . "attacks (id, vref, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, attack_type, ctar1, ctar2, spy, b1, b2, b3, b4, b5, b6, b7, b8) VALUES ".implode(', ', $values);
 		mysqli_query($this->dblink,$q);
 
 		return (count($vid) == 1 ? mysqli_insert_id($this->dblink) : true);
