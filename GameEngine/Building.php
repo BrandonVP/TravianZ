@@ -748,6 +748,10 @@ class Building {
             // refund doar pentru non-master
             if ((int) $jobs['master'] === 0) {
 
+                if (!empty($uprequire['gold'])) {
+                    $this->db->addVillageGold($this->vil->wid, $uprequire['gold'], VillageGold::capOf($this->vil));
+                }
+
                 $this->db->modifyResource(
                     $this->vil->wid,
                     $uprequire['wood'],
@@ -814,6 +818,12 @@ class Building {
             $level['f'.$fieldId] +
             1 +
             $loopsame;
+
+        // local redesign: gold on top of the resources (Treasury), taken first
+        if (!empty($uprequire['gold']) && !$this->db->takeVillageGold($this->vil->wid, $uprequire['gold'])) {
+            header('Location: dorf2.php');
+            exit;
+        }
 
         if (
             $this->db->addBuilding(
@@ -918,6 +928,12 @@ class Building {
             $level['f'.$buildField] +
             1 +
             count($queuedBuildings);
+
+        // local redesign: gold on top of the resources (Treasury), taken first
+        if (!empty($uprequire['gold']) && !$this->db->takeVillageGold($this->vil->wid, $uprequire['gold'])) {
+            header('Location: dorf2.php');
+            exit;
+        }
 
         if (
             $this->db->addBuilding(
@@ -1189,12 +1205,14 @@ class Building {
         return 2;
     }
 
-    // not enough resources
+    // not enough resources (local redesign: or gold, for the Treasury)
+    $tzGold = VillageGold::buildGold($gid, $nextLevel);
     if (
         $wood > $this->vil->awood ||
         $clay > $this->vil->aclay ||
         $iron > $this->vil->airon ||
-        $crop > $this->vil->acrop
+        $crop > $this->vil->acrop ||
+        ($tzGold > 0 && $tzGold > floor((float) $this->vil->agold))
     ) {
         return 3;
     }
@@ -1950,7 +1968,8 @@ class Building {
             'crop' => 0,
             'pop'  => 0,
             'time' => 0,
-            'cp'   => 0
+            'cp'   => 0,
+            'gold' => 0
         );
 
         return $this->resourceReqCache[$cacheKey] = $empty;
@@ -1971,7 +1990,9 @@ class Building {
             $this->vil->wid,
             $this->vil->resarray
         ),
-        'cp'   => $required['cp']
+        'cp'   => $required['cp'],
+        // local redesign: gold on top of the resources (Treasury)
+        'gold' => VillageGold::buildGold($gid, $level)
     );
 
     return $this->resourceReqCache[$cacheKey] = $result;

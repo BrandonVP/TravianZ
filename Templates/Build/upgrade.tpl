@@ -59,6 +59,7 @@ $total_required = (int)($uprequire['wood'] + $uprequire['clay'] + $uprequire['ir
     <img class="r2" src="img/x.gif" title="<?php echo CLAY;?>"/><span class="little_res"><?php echo $uprequire['clay'];?></span> |
     <img class="r3" src="img/x.gif" title="<?php echo IRON;?>"/><span class="little_res"><?php echo $uprequire['iron'];?></span> |
     <img class="r4" src="img/x.gif" title="<?php echo CROP;?>"/><span class="little_res"><?php echo $uprequire['crop'];?></span> |
+    <?php if (!empty($uprequire['gold'])):?><svg class="tz-coin-sm" viewBox="0 0 24 24" aria-label="Gold" role="img"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg><span class="little_res"><?php echo $uprequire['gold'];?></span> |<?php endif;?>
     <img class="r5" src="img/x.gif" title="<?php echo CROP_COM;?>"/><?php echo $uprequire['pop'];?> |
     <img class="clock" src="img/x.gif" title="<?php echo DURATION;?>"/><?php echo $generator->getTimeFormat($uprequire['time']);?>
     <?php if (VillageGold::npcCan($village, $session) && $building->getTypeLevel(17) >= 1 && $village->atotal >= $total_required):?>
@@ -83,7 +84,10 @@ switch ($bindicate) {
         echo '<span class="none">'.UPGRADE_GRANARY.'.</span>';
         break;
     case 7:
-        if ($village->allcrop - $village->pop - $technology->getUpkeep($village->unitall, 0) > 0) {
+        if (!empty($uprequire['gold']) && $uprequire['gold'] > floor((float) $village->agold)) {
+            // local redesign: the Treasury also needs gold
+            echo '<span class="none">Not enough gold in this village (' . (int) $uprequire['gold'] . ' needed).</span>';
+        } elseif ($village->allcrop - $village->pop - $technology->getUpkeep($village->unitall, 0) > 0) {
             $neededtime = $building->calculateAvaliable($id, $bid, 1 + $tzQueued);
             echo '<span class="none">'.ENOUGH_RESOURCES.' '.$neededtime[0].' at '.$neededtime[1].'</span>';
         } else {

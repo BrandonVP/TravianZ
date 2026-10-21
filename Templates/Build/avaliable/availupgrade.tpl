@@ -34,6 +34,7 @@ $canNpc = (VillageGold::npcCan($village, $session) && $building->getTypeLevel(17
     <img class="r2" src="img/x.gif" alt="<?php echo CLAY; ?>" title="<?php echo CLAY; ?>" /><?= (int)$uprequire['clay']?> |
     <img class="r3" src="img/x.gif" alt="<?php echo IRON; ?>" title="<?php echo IRON; ?>" /><?= (int)$uprequire['iron']?> |
     <img class="r4" src="img/x.gif" alt="<?php echo CROP; ?>" title="<?php echo CROP; ?>" /><?= (int)$uprequire['crop']?> |
+    <?php if (!empty($uprequire['gold'])):?><svg class="tz-coin-sm" viewBox="0 0 24 24" aria-label="Gold" role="img"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg><?= (int)$uprequire['gold']?> |<?php endif;?>
     <img class="r5" src="img/x.gif" alt="<?php echo CROP_COM; ?>" title="<?php echo CROP_COM; ?>" /><?= (int)$uprequire['pop']?> |
     <img class="clock" src="img/x.gif" alt="<?php echo DURATION; ?>" title="<?php echo DURATION; ?>" /><?= htmlspecialchars($generator->getTimeFormat($uprequire['time']), ENT_QUOTES, 'UTF-8')?>
     <?php if ($canNpc):?>

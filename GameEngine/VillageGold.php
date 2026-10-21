@@ -167,6 +167,13 @@ class VillageGold
         return (is_array($row) && isset($row['gold'])) ? (int) floor((float) $row['gold']) : 0;
     }
 
+    /** Gold a building level costs on top of its resources (only the Treasury, gid 27). */
+    public static function buildGold($gid, $level)
+    {
+        if ((int) $gid !== 27 || !self::villageMode()) return 0;
+        return (int) $level * (int) TZ_TREASURY_GOLD_PER_LEVEL;
+    }
+
     /** Trade Office (gid 28) level of the village being viewed. */
     public static function tradeOfficeLevel()
     {

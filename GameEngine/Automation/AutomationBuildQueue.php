@@ -287,7 +287,7 @@ trait AutomationBuildQueue {
             $usergold = $tzMasterVillage ? 1 : $database->getUserField($owner, 'gold', 0);
 
             if($laneJobs < $laneMax && $buildwood <= $villwood && $buildclay <= $villclay && $buildiron <= $villiron && $buildcrop <= $villcrop && $usergold > 0
-                && (!$tzMasterVillage || $database->takeVillageGold($master['wid'], TZ_GOLD_PRICE_MASTER))){
+                && (!$tzMasterVillage || $database->takeVillageGold($master['wid'], TZ_GOLD_PRICE_MASTER + VillageGold::buildGold($type, $level)))){
                 // timestamp holds the build time while the order waits
                 $time = $laneEnd + (int) $master['timestamp'];
                 $database->updateBuildingWithMaster($master['id'], $time, $laneJobs > 0 ? 1 : 0);

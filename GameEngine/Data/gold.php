@@ -91,3 +91,7 @@ if (!defined('TZ_HERO_REVIVE_GOLD_BASE'))      define('TZ_HERO_REVIVE_GOLD_BASE'
 if (!defined('TZ_HERO_REVIVE_GOLD_PER_LEVEL')) define('TZ_HERO_REVIVE_GOLD_PER_LEVEL', 10);
 if (!defined('TZ_HERO_HEAL_GOLD_PER_HP'))      define('TZ_HERO_HEAL_GOLD_PER_HP', 6);   // 600 gold from 0 % to 100 %
 if (!defined('TZ_HERO_REROLL_GOLD'))           define('TZ_HERO_REROLL_GOLD', 50);
+
+// Building with gold: the Treasury also costs gold (on top of its resources),
+// TZ_TREASURY_GOLD_PER_LEVEL x the level being built (level 20: 500)
+if (!defined('TZ_TREASURY_GOLD_PER_LEVEL')) define('TZ_TREASURY_GOLD_PER_LEVEL', 25);
