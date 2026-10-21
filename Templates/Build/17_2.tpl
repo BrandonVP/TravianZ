@@ -26,6 +26,7 @@ $res = [
     2 => ['class' => 'r2', 'name' => CLAY],
     3 => ['class' => 'r3', 'name' => IRON],
     4 => ['class' => 'r4', 'name' => CROP],
+    5 => ['class' => 'tzgold', 'name' => 'Gold'], // local redesign: village gold
 ];
 
 $merchantAvail = (int)$market->merchantAvail();
@@ -107,7 +108,11 @@ $totalMerchants = (int)$market->merchant;
             $offerId = (int)$offer['id'];
             $gtype = (int)$offer['gtype'];
             $wtype = (int)$offer['wtype'];
-            $ratio = $offer['gamt'] > 0 ? round($offer['wamt'] / $offer['gamt'], 1) : 0;
+            // local redesign: gold counts as TZ_GOLD_MERCHANT_SPACE resources in the ratio
+            $tzGS = defined('TZ_GOLD_MERCHANT_SPACE') ? TZ_GOLD_MERCHANT_SPACE : 100;
+            $tzGV = $offer['gamt'] * ($gtype === 5 ? $tzGS : 1);
+            $tzWV = $offer['wamt'] * ($wtype === 5 ? $tzGS : 1);
+            $ratio = $tzGV > 0 ? round($tzWV / $tzGV, 1) : 0;
             $ratioClass = $ratio <= 1 ? 'red' : ($ratio < 2 ? 'orange' : 'green');
             $delLink = $session->access != BANNED ? "build.php?id=".(int)$id."&t=2&a=5&del=".$offerId : "banned.php";
         ?>

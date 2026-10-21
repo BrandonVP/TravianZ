@@ -88,7 +88,12 @@ class Market
             $type = $database->getMarketField($village->wid, $get['del'], 'gtype');
             $amt  = $database->getMarketField($village->wid, $get['del'], 'gamt');
 
-            $database->getResourcesBack($village->wid, $type, $amt);
+            if ((int) $type === 5) {
+                // local redesign: held gold goes back (not cut to the cap)
+                $database->query("UPDATE " . TB_PREFIX . "vdata SET gold = gold + " . (int) $amt . " WHERE wref = " . (int) $village->wid);
+            } else {
+                $database->getResourcesBack($village->wid, $type, $amt);
+            }
             $database->addMarket($village->wid, $get['del'], 0, 0, 0, 0, 0, 0, 1);
 
             header('Location: build.php?id=' . $get['id'] . '&t=2');
@@ -490,15 +495,21 @@ class Market
             exit;
         }
 
+        // local redesign: gold (type 5) counts as TZ_GOLD_MERCHANT_SPACE resources
+        // for the ratio limits below (same as its merchant space)
+        $tzGoldSpace = defined('TZ_GOLD_MERCHANT_SPACE') ? TZ_GOLD_MERCHANT_SPACE : 100;
+        $tzV1 = $post['m1'] * ($post['rid1'] == 5 ? $tzGoldSpace : 1);
+        $tzV2 = $post['m2'] * ($post['rid2'] == 5 ? $tzGoldSpace : 1);
+
         // Max 2:1 trade ratio
-        if ($post['m1'] > (2 * $post['m2'])) {
+        if ($tzV1 > (2 * $tzV2)) {
 
             header('Location: build.php?id=' . $post['id'] . '&t=2&e2');
             exit;
         }
 
         // Min 1:2 trade ratio
-        if ($post['m2'] > (2 * $post['m1'])) {
+        if ($tzV2 > (2 * $tzV1)) {
 
             header('Location: build.php?id=' . $post['id'] . '&t=2&e2');
             exit;
@@ -507,9 +518,9 @@ class Market
         // Invalid resource ids
         if (
             $post['rid1'] < 1 ||
-            $post['rid1'] > 4 ||
+            $post['rid1'] > (!empty($village->goldActive) ? 5 : 4) ||
             $post['rid2'] < 1 ||
-            $post['rid2'] > 4
+            $post['rid2'] > (!empty($village->goldActive) ? 5 : 4)
         ) {
 
             header('Location: build.php?id=' . $post['id'] . '&t=2&e2');
@@ -521,6 +532,7 @@ class Market
         $clay = ($post['rid1'] == 2) ? $post['m1'] : 0;
         $iron = ($post['rid1'] == 3) ? $post['m1'] : 0;
         $crop = ($post['rid1'] == 4) ? $post['m1'] : 0;
+        $tzGoldOffered = ($post['rid1'] == 5) ? (int) $post['m1'] : 0;
 
         // Preload village data
         $database->getVillage($village->wid);
@@ -546,10 +558,11 @@ class Market
             $availableWood >= $wood &&
             $availableClay >= $clay &&
             $availableIron >= $iron &&
-            $availableCrop >= $crop
+            $availableCrop >= $crop &&
+            $tzGoldOffered <= floor((float) $village->agold)
         ) {
 
-            $totalRes = $wood + $clay + $iron + $crop;
+            $totalRes = $wood + $clay + $iron + $crop + $tzGoldOffered * $tzGoldSpace;
 
             $reqMerc = 1;
 
@@ -576,7 +589,15 @@ class Market
 
             if ($this->merchantAvail() > 0 && $reqMerc <= $this->merchantAvail()) {
 
+                // offered gold is held while the offer is up (given back on cancel)
+                if ($tzGoldOffered > 0 && !$database->takeVillageGold($village->wid, $tzGoldOffered)) {
+                    $database->releaseMerchantLock($village->wid);
+                    header('Location: build.php?id=' . $post['id'] . '&t=2&e1');
+                    exit;
+                }
+
                 if (
+                    $tzGoldOffered > 0 ||
                     $database->modifyResource(
                         $village->wid,
                         $wood,
@@ -640,22 +661,17 @@ class Market
 
         $infoarray = $database->getMarketInfo($get['g']);
 
-        $reqMerc = 1;
-
-        if ($infoarray['wamt'] > $this->maxcarry) {
-
-            $reqMerc = round($infoarray['wamt'] / $this->maxcarry);
-
-            if ($infoarray['wamt'] > ($this->maxcarry * $reqMerc)) {
-                $reqMerc += 1;
-            }
-        }
+        // local redesign: gold (type 5) takes TZ_GOLD_MERCHANT_SPACE per gold
+        $tzGoldSpace = defined('TZ_GOLD_MERCHANT_SPACE') ? TZ_GOLD_MERCHANT_SPACE : 100;
+        $tzWantLoad = $infoarray['wamt'] * ((int) $infoarray['wtype'] === 5 ? $tzGoldSpace : 1);
+        $reqMerc = max(1, (int) ceil($tzWantLoad / $this->maxcarry));
 
         $villageResources = [
             $village->awood,
             $village->aclay,
             $village->airon,
-            $village->acrop
+            $village->acrop,
+            floor((float) $village->agold)
         ];
 
         // Not enough resources
@@ -719,9 +735,17 @@ class Market
             exit;
         }
 
-        // Prepare resources
-        $myresource = [1 => 0, 0, 0, 0];
-        $hisresource = [1 => 0, 0, 0, 0];
+        // wanted gold leaves the buyer's village first (guarded)
+        if ((int) $infoarray['wtype'] === 5 && !$database->takeVillageGold($village->wid, (int) $infoarray['wamt'])) {
+            $this->forget();
+            $database->releaseMerchantLock($village->wid);
+            header('Location: build.php?id=' . $get['id'] . '&t=1&e1');
+            exit;
+        }
+
+        // Prepare resources (index 5 = gold)
+        $myresource = [1 => 0, 0, 0, 0, 0];
+        $hisresource = [1 => 0, 0, 0, 0, 0];
 
         $myresource[$infoarray['wtype']] = $infoarray['wamt'];
 
@@ -731,7 +755,8 @@ class Market
             $myresource[3],
             $myresource[4],
             $reqMerc,
-            0
+            0,
+            $myresource[5] > 0 ? $myresource[5] : null
         );
 
         $hisresource[$infoarray['gtype']] = $infoarray['gamt'];
@@ -742,7 +767,8 @@ class Market
             $hisresource[3],
             $hisresource[4],
             $infoarray['merchant'],
-            0
+            0,
+            $hisresource[5] > 0 ? $hisresource[5] : null
         );
 
         $hiscoor = $database->getCoor($infoarray['vref']);
@@ -778,7 +804,7 @@ class Market
             [$mytime + $timestamp, $histime + $timestamp]
         );
 
-        $resource = [1 => 0, 0, 0, 0];
+        $resource = [1 => 0, 0, 0, 0, 0];
         $resource[$infoarray['wtype']] = $infoarray['wamt'];
 
         $database->modifyResource(

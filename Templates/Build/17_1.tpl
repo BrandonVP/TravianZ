@@ -31,6 +31,7 @@ $resIcon = [
     2 => ['class' => 'r2', 'name' => CLAY],
     3 => ['class' => 'r3', 'name' => IRON],
     4 => ['class' => 'r4', 'name' => CROP],
+    5 => ['class' => 'tzgold', 'name' => 'Gold'], // local redesign: village gold
 ];
 ?>
 <div id="build" class="gid17">
@@ -46,7 +47,7 @@ $resIcon = [
     <table id="search_select" class="buy_select" cellpadding="1" cellspacing="1">
         <thead><tr><td colspan="4"><?php echo I_AN_SEARCHING;?></td></tr></thead>
         <tbody><tr>
-            <?php for ($i = 1; $i <= 4; $i++):?>
+            <?php for ($i = 1; $i <= 5; $i++):?>
             <td <?php if ($s === $i) echo 'class="hl"';?>>
                 <a href="build.php?id=<?php echo (int)$id;?>&t=1&s=<?php echo $i;?><?php if($v) echo '&v='.urlencode($v);?><?php if($b) echo '&b='.$b;?>">
                     <img class="<?php echo $resIcon[$i]['class'];?>" src="img/x.gif" alt="<?php echo $resIcon[$i]['name'];?>" title="<?php echo $resIcon[$i]['name'];?>" />
@@ -66,7 +67,7 @@ $resIcon = [
     <table id="bid_select" class="buy_select" cellpadding="1" cellspacing="1">
         <thead><tr><td colspan="4"><?php echo I_AN_OFFERING;?></td></tr></thead>
         <tbody><tr>
-            <?php for ($i = 1; $i <= 4; $i++):?>
+            <?php for ($i = 1; $i <= 5; $i++):?>
             <td <?php if ($b === $i) echo 'class="hl"';?>>
                 <a href="build.php?id=<?php echo (int)$id;?>&t=1&b=<?php echo $i;?><?php if($v) echo '&v='.urlencode($v);?><?php if($s) echo '&s='.$s;?>">
                     <img class="<?php echo $resIcon[$i]['class'];?>" src="img/x.gif" alt="<?php echo $resIcon[$i]['name'];?>" title="<?php echo $resIcon[$i]['name'];?>" />
@@ -108,7 +109,7 @@ $resIcon = [
                 if (!isset($offers[$i])) continue;
                 $offer = $offers[$i];
 
-                $reqMerc = max(1, (int)ceil($offer['wamt'] / $market->maxcarry));
+                $reqMerc = max(1, (int)ceil($offer['wamt'] * ((int)$offer['wtype'] === 5 ? (defined('TZ_GOLD_MERCHANT_SPACE') ? TZ_GOLD_MERCHANT_SPACE : 100) : 1) / $market->maxcarry));
                 $vref = (int)$offer['vref'];
                 $owner = (int)$database->getVillageField($vref, "owner");
                 $username = htmlspecialchars($database->getUserField($owner, "username", 0));
@@ -120,6 +121,7 @@ $resIcon = [
                     case 2: $hasRes = $village->aclay > $offer['wamt']; break;
                     case 3: $hasRes = $village->airon > $offer['wamt']; break;
                     case 4: $hasRes = $village->acrop > $offer['wamt']; break;
+                    case 5: $hasRes = floor((float)$village->agold) >= $offer['wamt']; break;
                 }
                 ?>
                 <tr>
