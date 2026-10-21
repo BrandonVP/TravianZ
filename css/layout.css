@@ -1490,6 +1490,56 @@ div.popup3.quest table.altquest tbody tr.c td { color: #8a7a62; }
 .tz-noally .tz-btn { display: inline-block; margin: 4px 0 6px; }
 .tz-noally-hint { color: #6b5a45; font-size: 12px; }
 
+/* vacation tab (Templates/Profile/vacation.tpl): theme colours over the pack's grey/white */
+div#content .vacationBox {
+    background: var(--tz-cream);
+    border: 1px solid var(--tz-line);
+    border-radius: 10px;
+    padding: 16px 20px;
+}
+div#content .vacationBox h2 {
+    margin: 0 0 12px;
+    text-align: center;
+    font-family: "Cinzel", Georgia, "Times New Roman", serif;
+    color: var(--tz-ink);
+}
+div#content .vacationDesc,
+div#content .vacationActivate {
+    background: var(--tz-panel);
+    border: 1px solid var(--tz-line);
+    border-radius: 8px;
+    color: var(--tz-ink);
+}
+div#content .vacationColumn h3,
+div#content .vacationColumn h4 {
+    margin: 0 0 8px;
+    color: var(--tz-ink);
+    font-family: "Cinzel", Georgia, "Times New Roman", serif;
+    font-size: 15px;
+}
+div#content .vacList li { color: var(--tz-ink); }
+div#content .vacList li.vac-ok { color: #2e7d32; }
+div#content .vacList li.vac-no { color: #a3361c; font-weight: 700; }
+div#content .vacList li.vac-ok::marker { content: "\2713  "; }
+div#content .vacList li.vac-no::marker { content: "\2717  "; }
+div#content .vacationActivate input[type=number] {
+    border: 1px solid var(--tz-line);
+    border-radius: 4px;
+    padding: 2px 4px;
+    background: #fff;
+}
+div#content .vac-error,
+div#content .vac-blocked {
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border: 1px solid #c98a6a;
+    border-radius: 8px;
+    background: #f6dccd;
+    color: #7a2a12;
+    font-weight: 700;
+    text-align: center;
+}
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

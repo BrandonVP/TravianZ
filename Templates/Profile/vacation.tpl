@@ -58,13 +58,12 @@ function vac_ok($key, $errors)
 
 <div class="vacationBox">
 
-    <center><h2><?php echo VACATION_MODE; ?></h2></center>
-    <br>
+    <h2><?php echo VACATION_MODE; ?></h2>
 
     <?php
     // ERROR DISPLAY (unchanged logic, safer output)
     if (isset($_SESSION['vac_error'])) {
-        echo "<div class='error' style='background:#900;color:#fff;padding:10px;margin-bottom:10px;'>"
+        echo "<div class='error vac-error'>"
             . nl2br(htmlspecialchars($_SESSION['vac_error'], ENT_QUOTES, 'UTF-8')) .
         "</div>";
 
@@ -97,31 +96,31 @@ function vac_ok($key, $errors)
             <h3><?php echo TZ_REQUIREMENTS; ?></h3>
             <ul class="vacList">
 
-                <li style="color:<?= vac_ok('TROOPS_MOVING',$errors) ? 'green':'red' ?>">
+                <li class="<?= vac_ok('TROOPS_MOVING',$errors) ? 'vac-ok' : 'vac-no' ?>">
                     <?php echo TZ_THERE_ARE_NO_OUTGOING_TROOPS; ?>
                 </li>
 
-                <li style="color:<?= vac_ok('INCOMING_TROOPS',$errors) ? 'green':'red' ?>">
+                <li class="<?= vac_ok('INCOMING_TROOPS',$errors) ? 'vac-ok' : 'vac-no' ?>">
                     <?php echo TZ_THERE_ARE_NO_INCOMING_TROOPS; ?>
                 </li>
 
-                <li style="color:<?= vac_ok('REINFORCEMENTS',$errors) ? 'green':'red' ?>">
+                <li class="<?= vac_ok('REINFORCEMENTS',$errors) ? 'vac-ok' : 'vac-no' ?>">
                     <?php echo TZ_NO_REINFORCING_TROOPS_SENT_RECEIVE; ?>
                 </li>
 
-                <li style="color:<?= vac_ok('WW',$errors) ? 'green':'red' ?>">
+                <li class="<?= vac_ok('WW',$errors) ? 'vac-ok' : 'vac-no' ?>">
                     <?php echo TZ_NO_OWNERSHIP_OF_A_WONDER_OF_THE_WO; ?>
                 </li>
 
-                <li style="color:<?= vac_ok('ARTEFACTS',$errors) ? 'green':'red' ?>">
+                <li class="<?= vac_ok('ARTEFACTS',$errors) ? 'vac-ok' : 'vac-no' ?>">
                     <?php echo TZ_NO_OWNERSHIP_OF_AN_ARTIFACT_VILLAG; ?>
                 </li>
 
-                <li style="color:<?= vac_ok('PROTECTION',$errors) ? 'green':'red' ?>">
+                <li class="<?= vac_ok('PROTECTION',$errors) ? 'vac-ok' : 'vac-no' ?>">
                     <?php echo TZ_NO_BEGINNER_PROT2; ?>
                 </li>
 
-                <li style="color:<?= (vac_ok('PRISONERS_IN',$errors) && vac_ok('PRISONERS_OUT',$errors)) ? 'green':'red' ?>">
+                <li class="<?= (vac_ok('PRISONERS_IN',$errors) && vac_ok('PRISONERS_OUT',$errors)) ? 'vac-ok' : 'vac-no' ?>">
                     <?php if ($tribe == 3) { ?>
                         No units in your traps
                     <?php } else { ?>
@@ -129,15 +128,15 @@ function vac_ok($key, $errors)
                     <?php } ?>
                 </li>
 
-                <li style="color:<?= vac_ok('MARKET',$errors) ? 'green':'red' ?>">
+                <li class="<?= vac_ok('MARKET',$errors) ? 'vac-ok' : 'vac-no' ?>">
                     <?php echo TZ_NO_MARKETPLACE_ACTIVITY; ?>
                 </li>
 
-                <li style="color:<?= vac_ok('ACCOUNT_DELETION',$errors) ? 'green':'red' ?>">
+                <li class="<?= vac_ok('ACCOUNT_DELETION',$errors) ? 'vac-ok' : 'vac-no' ?>">
                     <?php echo TZ_ACCOUNT_IS_NOT_SCHEDULED_FOR_DELET; ?>
                 </li>
 				<?php if ($isAdmin || $isMH): ?>
-				<li style="color:<?= vac_ok('NO_VACATION_ACCESS', $errors) ? 'green' : 'red' ?>">
+				<li class="<?= vac_ok('NO_VACATION_ACCESS', $errors) ? 'vac-ok' : 'vac-no' ?>">
 				<?php echo TZ_ACCOUNT_IS_ADMIN_OR_MH; ?>
 				</li>
 				<?php endif; ?>
@@ -163,7 +162,7 @@ function vac_ok($key, $errors)
     <?php if ($canActivate) { ?>
         <input type="image" name="s1" id="btn_save" class="dynamic_img" src="img/x.gif" alt="<?php echo SAVE; ?>">
     <?php } else { ?>
-        <div style="padding:10px;background:#300;color:#fff;font-weight:bold;text-align:center;border-radius:5px;">
+        <div class="vac-blocked">
             <?php echo TZ_VACATION_MODE_CANNOT_BE_ACTIVATED; ?>
         </div>
     <?php } ?>
