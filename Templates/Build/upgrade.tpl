@@ -36,6 +36,11 @@ if ($bindicate == 11) {
     echo '<p><span class="none">'.BUILDING_BEING_DEMOLISHED.'</span></p>';
     return;
 }
+if ($bindicate == 12) {
+    // local redesign: raid balance
+    echo '<p><span class="none">Cranny levels above 10 need a level 20 Warehouse and a level 20 Granary in this village.</span></p>';
+    return;
+}
 
 $loopsame = ($building->isCurrent($id) || $building->isLoop($id))? 1 : 0;
 $doublebuild = ($building->isCurrent($id) && $building->isLoop($id))? 1 : 0;

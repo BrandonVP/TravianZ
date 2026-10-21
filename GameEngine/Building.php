@@ -229,6 +229,18 @@ class Building {
 	/** Sloturi rezervate in satul Minunii (vezi si Templates/dorf2.tpl). */
 	const NATAR_RESERVED_SLOTS = array(25, 26, 29, 30, 33);
 
+	/**
+	 * Local redesign (raid balance): Cranny levels above 10 need a level 20
+	 * Warehouse and Granary in the village.
+	 */
+	public function crannyLocked($gid, $fieldId) {
+	    if ((int) $gid !== 23) {
+	        return false;
+	    }
+	    $next = (int) ($this->vil->resarray['f' . $fieldId] ?? 0) + 1 + $this->queuedOnField($fieldId);
+	    return $next > 10 && ($this->getTypeLevel(10) < 20 || $this->getTypeLevel(11) < 20);
+	}
+
 	public function canProcess($gid, $fieldId) {
 
     // WW restriction early exit
@@ -280,6 +292,11 @@ class Building {
     ) {
         header('Location: '.$_SERVER['SCRIPT_NAME']);
         exit;
+    }
+
+    // local redesign: Cranny above level 10 (also blocks the Master Builder)
+    if ($this->crannyLocked($gid, $fieldId)) {
+        $this->redirect($fieldId);
     }
 
     if (!isset($_GET['master'])) {
@@ -452,6 +469,11 @@ class Building {
     $sameField = $this->queuedOnField($fieldId);
     if ($sameField > 0 && $this->isMax($gid, $fieldId, $sameField)) {
         return 10;
+    }
+
+    // Local redesign: Cranny above level 10 needs Warehouse 20 + Granary 20
+    if ($this->crannyLocked($gid, $fieldId)) {
+        return 12;
     }
 
     // FIX B4 (B-D1): '>=' in loc de '>' - la allocated == maxConcurrent coada e
@@ -764,7 +786,7 @@ class Building {
         $bindicate = $this->canBuild($fieldId, $fieldType);
 
         // early exit
-        if (in_array($bindicate, array(1, 2, 3, 10, 11))) {
+        if (in_array($bindicate, array(1, 2, 3, 10, 11, 12))) {
 
             header('Location: dorf2.php');
             exit;
