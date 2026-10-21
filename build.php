@@ -357,6 +357,13 @@ if(isset($_GET['mode']) && $_GET['mode'] == 'troops' && isset($_GET['cancel']) &
 <?php include("Templates/layout/page_top.tpl"); ?>
 <div id="content"  class="build">
 <?php
+// local redesign: back to the field / village overview
+$tzBackId = (int) ($_GET['id'] ?? 0);
+if ($tzBackId >= 1 && $tzBackId <= 18) {
+    echo '<a class="tz-back" href="dorf1.php">&larr; ' . (defined('TZ_FIELDS_LABEL') ? TZ_FIELDS_LABEL : 'Fields') . '</a>';
+} else {
+    echo '<a class="tz-back" href="dorf2.php">&larr; ' . (defined('TZ_VILLAGE_LABEL') ? TZ_VILLAGE_LABEL : 'Village') . '</a>';
+}
 if(isset($_GET['id']) || isset($_GET['gid']) || $route == 1 || isset($_POST['routeid']) || isset($_GET['buildingFinish'])) {
     
     if(isset($_GET['s']) && !ctype_digit($_GET['s'])) $_GET['s'] = null;
