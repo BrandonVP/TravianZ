@@ -41,6 +41,10 @@ $t4Tabs = [
             <a href="<?php echo $tab['url']; ?>" style="margin-right:14px;"><?php echo $tab['label']; ?></a>
         <?php } ?>
     <?php } ?>
-    <span style="float:right;"><b><?php echo HERO_SILVER; ?>:</b> <?php echo number_format($t4Silver); ?></span>
+    <?php if (class_exists('VillageGold') && VillageGold::auctionUsesGold()) { $t4NavCap = VillageGold::capitalOf($database, $session->uid); ?>
+<span style="float:right;"><b>Capital gold:</b> <?php echo number_format($t4NavCap ? floor($t4NavCap['gold']) : 0); ?></span>
+<?php } else { ?>
+<span style="float:right;"><b><?php echo HERO_SILVER; ?>:</b> <?php echo number_format($t4Silver); ?></span>
+<?php } ?>
     <div style="clear:both;"></div>
 </div>

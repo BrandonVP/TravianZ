@@ -21,12 +21,15 @@
 
 $t4Auction = new HeroAuction();
 $t4Msg = '';
+// local redesign: with silver off the auction uses the capital's village gold
+$t4UsesGold = class_exists('VillageGold') && VillageGold::auctionUsesGold();
+$t4Coin = $t4UsesGold ? '<svg class="tz-coin-sm" viewBox="0 0 24 24" aria-label="Gold" role="img"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg> ' : '';
 
 if (isset($_POST['t4action'])) {
     // --- SCHIMB AUR <-> ARGINT -------------------------------------------
     // Validarea si atomicitatea sunt in HeroItems::exchange*(); aici doar
     // afisam rezultatul si tinem sesiunea sincronizata cu noul sold de aur.
-    if (($_POST['t4action'] === 'g2s' || $_POST['t4action'] === 's2g') && isset($_POST['amount'])) {
+    if (!$t4UsesGold && ($_POST['t4action'] === 'g2s' || $_POST['t4action'] === 's2g') && isset($_POST['amount'])) {
         $t4Items  = new HeroItems();
         $t4Amount = (int) $_POST['amount'];
 
@@ -60,7 +63,7 @@ if (isset($_POST['t4action'])) {
         } elseif ($t4Result === HeroAuction::BID_OUTBID) {
             $t4Msg = HERO_AUC_BID_OUTBID;
         } elseif ($t4Result === HeroAuction::BID_NO_SILVER) {
-            $t4Msg = HERO_AUC_BID_NOSILVER;
+            $t4Msg = $t4UsesGold ? 'Not enough gold in your capital for this bid (your full maximum bid is held until you are outbid).' : HERO_AUC_BID_NOSILVER;
         } else {
             $t4Msg = HERO_AUC_BID_FAIL;
         }
@@ -351,6 +354,13 @@ function t4AucCoin($tone, $title)
 $t4LblGold   = defined('GOLD') ? GOLD : 'Gold';
 $t4LblSilver = defined('HERO_SILVER') ? HERO_SILVER : 'Silver';
 ?>
+<?php if ($t4UsesGold) {
+    $t4Cap = VillageGold::capitalOf($database, $session->uid);
+?>
+<p class="tz-auc-gold"><?php echo $t4Coin; ?>Bids are paid with your capital's gold<?php if ($t4Cap) { ?>
+    (<b><?php echo htmlspecialchars($t4Cap['name']); ?></b> has <b><?php echo number_format(floor($t4Cap['gold'])); ?></b>)<?php } ?>.
+    Your maximum bid is held until you are outbid; you only pay the final price. Sales pay out to your capital, minus a <?php echo HeroAuction::AUCTION_FEE_PCT; ?>% fee.</p>
+<?php } else { ?>
 <table id="distribution" class="t4auc-ex" cellpadding="1" cellspacing="1">
     <thead>
         <tr><th colspan="2"><?php echo defined('HERO_EXCHANGE') ? HERO_EXCHANGE : 'Exchange office'; ?></th></tr>
@@ -446,6 +456,7 @@ $t4LblSilver = defined('HERO_SILVER') ? HERO_SILVER : 'Silver';
         </tr>
     </tbody>
 </table>
+<?php } ?>
 
 <?php
 /**
@@ -512,7 +523,7 @@ $t4LblPrice = defined('HERO_AUC_PRICE_SHORT') ? HERO_AUC_PRICE_SHORT : HERO_AUC_
                 <?php } ?>
             </td>
             <td class="t4auc-col-qty"><?php echo (int) $t4A['quantity']; ?></td>
-            <td class="t4auc-col-price"><?php echo number_format((int) $t4A['silver_current']); ?></td>
+            <td class="t4auc-col-price"><?php echo $t4Coin . number_format((int) $t4A['silver_current']); ?></td>
             <td class="t4auc-col-time">
                 <span id="timer<?php echo ++$session->timer; ?>"><?php echo $generator->getTimeFormat(max(0, $t4A['time_end'] - $t4Now)); ?></span>
             </td>
@@ -551,11 +562,11 @@ $t4LblPrice = defined('HERO_AUC_PRICE_SHORT') ? HERO_AUC_PRICE_SHORT : HERO_AUC_
             </td>
             <td class="t4auc-val">
                 <span class="t4auc-lbl"><?php echo $t4LblPrice; ?></span>
-                <span class="t4auc-value"><?php echo number_format((int) $t4A['silver_current']); ?></span>
+                <span class="t4auc-value"><?php echo $t4Coin . number_format((int) $t4A['silver_current']); ?></span>
             </td>
             <td class="t4auc-val">
                 <span class="t4auc-lbl"><?php echo HERO_AUC_YOUR_MAX; ?></span>
-                <span class="t4auc-value"><?php echo number_format((int) $t4A['bid_max']); ?></span>
+                <span class="t4auc-value"><?php echo $t4Coin . number_format((int) $t4A['bid_max']); ?></span>
             </td>
             <td class="t4auc-time"><span id="timer<?php echo ++$session->timer; ?>"><?php echo $generator->getTimeFormat(max(0, $t4A['time_end'] - $t4Now)); ?></span></td>
         </tr>
@@ -580,7 +591,7 @@ $t4LblPrice = defined('HERO_AUC_PRICE_SHORT') ? HERO_AUC_PRICE_SHORT : HERO_AUC_
             </td>
             <td class="t4auc-val">
                 <span class="t4auc-lbl"><?php echo $t4LblPrice; ?></span>
-                <span class="t4auc-value"><?php echo number_format((int) $t4A['silver_current']); ?></span>
+                <span class="t4auc-value"><?php echo $t4Coin . number_format((int) $t4A['silver_current']); ?></span>
             </td>
             <td class="t4auc-time"><span id="timer<?php echo ++$session->timer; ?>"><?php echo $generator->getTimeFormat(max(0, $t4A['time_end'] - $t4Now)); ?></span></td>
         </tr>

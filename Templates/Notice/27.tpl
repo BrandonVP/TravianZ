@@ -66,7 +66,7 @@ $itemLabel = $qty . '&times; ' . ($itemId > 0 ? heroItemName($itemId) : '?');
     <table class="auctionResult" cellpadding="1" cellspacing="1" style="width:100%;margin-top:8px;">
         <tr>
             <td><?php echo tz_hero_auc('HERO_AUC_PRICE', 'Final price'); ?></td>
-            <td style="text-align:right;"><?php echo number_format($price); ?> <?php echo tz_hero_auc('HERO_SILVER', 'silver'); ?></td>
+            <td style="text-align:right;"><?php echo number_format($price); ?> <?php echo (class_exists('VillageGold') && VillageGold::auctionUsesGold()) ? 'gold' : tz_hero_auc('HERO_SILVER', 'silver'); ?></td>
         </tr>
         <?php if ($refund > 0) { ?>
         <tr>
@@ -82,7 +82,7 @@ $itemLabel = $qty . '&times; ' . ($itemId > 0 ? heroItemName($itemId) : '?');
     <table class="auctionResult" cellpadding="1" cellspacing="1" style="width:100%;margin-top:8px;">
         <tr>
             <td><?php echo tz_hero_auc('HERO_AUC_PRICE', 'Final price'); ?></td>
-            <td style="text-align:right;"><?php echo number_format($price); ?> <?php echo tz_hero_auc('HERO_SILVER', 'silver'); ?></td>
+            <td style="text-align:right;"><?php echo number_format($price); ?> <?php echo (class_exists('VillageGold') && VillageGold::auctionUsesGold()) ? 'gold' : tz_hero_auc('HERO_SILVER', 'silver'); ?></td>
         </tr>
         <tr>
             <td><?php echo tz_hero_auc('HERO_AUC_FEE', 'Auction fee'); ?></td>

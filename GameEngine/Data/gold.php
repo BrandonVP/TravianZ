@@ -52,3 +52,8 @@ if (!defined('TZ_GOLD_RAID_SHARE')) define('TZ_GOLD_RAID_SHARE', 0.25);
 if (!defined('TZ_GOLD_PRICE_MASTER'))      define('TZ_GOLD_PRICE_MASTER', 25);       // Master Builder, per job, was 1
 if (!defined('TZ_GOLD_PRICE_DEMOLISH'))    define('TZ_GOLD_PRICE_DEMOLISH', 250);    // instant complete demolition, was 10
 if (!defined('TZ_GOLD_PRICE_ALLY_TRIPLE')) define('TZ_GOLD_PRICE_ALLY_TRIPLE', 75);  // triple an alliance donation, was 3
+
+// Hero silver is switched off (kept in the code for later): adventures give no
+// silver, the exchange office is hidden, and the auction house uses the
+// capital's village gold (1 silver price = 1 gold).
+if (!defined('TZ_SILVER_ENABLED')) define('TZ_SILVER_ENABLED', false);

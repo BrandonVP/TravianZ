@@ -275,7 +275,8 @@ class Village {
 			$this->goldRate = VillageGold::rate($this->db, $this->wid, $this->resarray);
 			$ngold = VillageGold::accrue($this->db, $this->wid, $this->infoarray, $this->resarray, $timepast);
 			$this->goldCap = VillageGold::cap($this->resarray);
-			$this->agold = min(max((float) $this->infoarray['gold'] + $ngold, 0), $this->goldCap);
+			// above the cap (refunds, lost Treasury) gold is kept but does not grow
+			$this->agold = max(0, min((float) $this->infoarray['gold'] + $ngold, max($this->goldCap, (float) $this->infoarray['gold'])));
 		}
 
 		// lightweight sync ONLY (no DB reload)

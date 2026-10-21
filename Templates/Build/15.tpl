@@ -65,10 +65,12 @@ $nextTime      = round($bid15[$nextLevel]['attri']);
         include 'Templates/Build/15_1.tpl';
     }
     include 'upgrade.tpl';
-
-    // Village gold (local redesign): Plus features are bought here, at the capital
-    if (class_exists('VillageGold') && VillageGold::pays($village)) {
-        include 'Templates/Build/15_plus.tpl';
-    }
     ?>
 </div>
+<?php
+// Village gold (local redesign): Plus features are bought here, at the capital.
+// Outside div#build (fixed 502px) so the card spans the whole middle card.
+if (class_exists('VillageGold') && VillageGold::pays($village)) {
+    include 'Templates/Build/15_plus.tpl';
+}
+?>

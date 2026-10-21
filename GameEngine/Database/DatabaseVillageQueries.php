@@ -1270,7 +1270,9 @@ trait DatabaseVillageQueries {
 	    $amount = (float) $amount;
 	    $cap = (float) $cap;
 	    return mysqli_query($this->dblink,
-	        "UPDATE " . TB_PREFIX . "vdata SET gold = LEAST(GREATEST(gold + $amount, 0), $cap) WHERE wref = $vid");
+	        // never lowers gold that is already above the cap (auction refunds,
+	        // a lost Treasury): above the cap it simply stops growing
+	        "UPDATE " . TB_PREFIX . "vdata SET gold = GREATEST(LEAST(gold, GREATEST(gold + $amount, 0)), LEAST(GREATEST(gold + $amount, 0), $cap)) WHERE wref = $vid");
 	}
 
 	/**

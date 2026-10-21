@@ -72,11 +72,38 @@ class HeroAuction
     {
         global $database;
         $this->db = $database->dblink;
+        include_once __DIR__ . '/VillageGold.php';
 
         global $heroItemCatalog;
         if (!isset($heroItemCatalog)) {
             include_once __DIR__ . '/Data/hero_items.php';
         }
+    }
+
+    /* =========================================================================
+     *  CURRENCY (local redesign): capital village gold while silver is off
+     * ===================================================================== */
+
+    /** Escrow/pay: capital gold (VillageGold) or hero silver. */
+    private function take($uid, $amount)
+    {
+        global $database;
+        if (class_exists('VillageGold') && VillageGold::auctionUsesGold()) {
+            return VillageGold::takeFromCapital($database, $uid, $amount);
+        }
+        $heroItems = new HeroItems();
+        return $heroItems->spendSilver($uid, $amount);
+    }
+
+    /** Refund/payout: capital gold (never cut to the cap) or hero silver. */
+    private function give($uid, $amount)
+    {
+        global $database;
+        if (class_exists('VillageGold') && VillageGold::auctionUsesGold()) {
+            return VillageGold::giveToCapital($database, $uid, $amount);
+        }
+        $heroItems = new HeroItems();
+        return $heroItems->addSilver($uid, $amount);
     }
 
     /* =========================================================================
@@ -284,7 +311,7 @@ class HeroAuction
         $heroItems = new HeroItems();
 
         // 1. escrow (conditional - fails on insufficient silver).
-        if (!$heroItems->spendSilver($uid, $escrow)) {
+        if (!$this->take($uid, $escrow)) {
             return self::BID_NO_SILVER;
         }
 
@@ -321,7 +348,7 @@ class HeroAuction
             // Race lost: a rival displaced us between snapshot and update, so
             // their winning path already refunded our OLD escrow - the delta
             // is all we still hold. Return it.
-            $heroItems->addSilver($uid, $escrow);
+            $this->give($uid, $escrow);
             return self::BID_OUTBID;
         }
 
@@ -340,7 +367,7 @@ class HeroAuction
         if ($won) {
             // 3a. refund the displaced bidder's full escrow.
             if ($prev && (int) $prev['bidder'] > 0 && (int) $prev['bidder'] !== $uid && (int) $prev['bid_max'] > 0) {
-                $heroItems->addSilver((int) $prev['bidder'], (int) $prev['bid_max']);
+                $this->give((int) $prev['bidder'], (int) $prev['bid_max']);
             }
             return self::BID_OK;
         }
@@ -356,7 +383,7 @@ class HeroAuction
         $stmt->execute();
         $stmt->close();
 
-        $heroItems->addSilver($uid, $escrow);
+        $this->give($uid, $escrow);
         return self::BID_OUTBID;
     }
 
@@ -414,13 +441,13 @@ class HeroAuction
                 // Winner escrowed bid_max; they only pay the hammer price.
                 $refund = (int) $a['bid_max'] - $price;
                 if ($refund > 0) {
-                    $heroItems->addSilver($bidder, $refund);
+                    $this->give($bidder, $refund);
                 }
 
                 // Player seller gets the price minus the fee; NPC proceeds sink.
                 if ($seller > 0) {
                     $fee = (int) floor($price * self::AUCTION_FEE_PCT / 100);
-                    $heroItems->addSilver($seller, $price - $fee);
+                    $this->give($seller, $price - $fee);
                     $database->addNotice($seller, 0, 0, NTYPE_AUCTION_REPORT,
                         'Auction sold',
                         'role=seller&itemid=' . (int) $a['itemid'] . '&qty=' . (int) $a['quantity']
@@ -493,7 +520,7 @@ class HeroAuction
 
         $heroItems = new HeroItems();
         if ((int) $a['bidder'] > 0 && (int) $a['bid_max'] > 0) {
-            $heroItems->addSilver((int) $a['bidder'], (int) $a['bid_max']);
+            $this->give((int) $a['bidder'], (int) $a['bid_max']);
         }
         if ((int) $a['seller'] > 0) {
             $heroItems->addItem((int) $a['seller'], (int) $a['itemid'], (int) $a['quantity'], (int) $a['stat_value']);

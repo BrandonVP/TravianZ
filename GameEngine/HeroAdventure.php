@@ -391,6 +391,9 @@ class HeroAdventure
             /* ---- Roll rewards ---- */
             $exp    = mt_rand($cfg['exp'][0], $cfg['exp'][1]);
             $silver = mt_rand($cfg['silver'][0], $cfg['silver'][1]);
+            // local redesign: hero silver is switched off (GameEngine/Data/gold.php)
+            include_once __DIR__ . '/Data/gold.php';
+            if (!TZ_SILVER_ENABLED) $silver = 0;
             $hpLoss = mt_rand($cfg['hp_loss'][0], $cfg['hp_loss'][1]);
             $wood   = mt_rand($cfg['resources'][0], $cfg['resources'][1]);
             $clay   = mt_rand($cfg['resources'][0], $cfg['resources'][1]);

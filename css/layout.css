@@ -1119,7 +1119,8 @@ table#send_select tr.tz-gold-hint td {
 
 /* Main Building: Plus features (capital gold, auto-buy) */
 .tz-mbplus {
-    margin: 18px 0 8px;
+    clear: both;
+    margin: 18px 25px 8px;
     padding: 12px 14px;
     border: 1px solid #d9c49a;
     border-radius: 10px;
@@ -1191,6 +1192,16 @@ table.tz-mbplus-table tr.tz-on td.tz-f { font-weight: bold; }
     table.tz-mbplus-table th:nth-child(2),
     table.tz-mbplus-table td:nth-child(2) { display: none; }
     table.tz-mbplus-table th, table.tz-mbplus-table td { padding: 5px 4px; }
+}
+
+/* auction house: gold note (silver off) */
+.tz-auc-gold {
+    margin: 6px 0 12px;
+    padding: 8px 12px;
+    border: 1px solid #d9c49a;
+    border-radius: 8px;
+    background: #fbf3df;
+    line-height: 1.5;
 }
 
 /* ===================== smaller screens ===================== */

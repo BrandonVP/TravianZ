@@ -694,6 +694,7 @@ $tzCssVer = @filemtime('css/hero_header.css');
     <?php echo $tzHeroClickable ? '</a>' : '</span>'; ?>
 
     <!-- ============ DREAPTA JOS: argint -> 37_auction.tpl ============ -->
+    <?php if (!defined('TZ_SILVER_ENABLED') || TZ_SILVER_ENABLED) { /* local redesign: silver off */ ?>
     <?php echo tzHeroSlotOpen($tzLinkAuc, 'tzHeroSlot tzHeroSilver', $tzHeroClickable); ?>
         <!-- Teanc de monede desenat, in acelasi stil ca iconita de casa.
              Inlocuieste img/hero/silver.png din graphic pack. -->
@@ -708,6 +709,7 @@ $tzCssVer = @filemtime('css/hero_header.css');
             <b><?php echo $tzTxtSilver; ?>: <?php echo number_format($tzHeroSilver); ?></b>
         </span>
     <?php echo $tzHeroClickable ? '</a>' : '</span>'; ?>
+    <?php } ?>
 
     <?php } ?>
 

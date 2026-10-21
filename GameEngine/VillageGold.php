@@ -56,6 +56,33 @@ class VillageGold
         return TZ_GOLD_ENABLED && defined('TZ_GOLD_PAYS_VILLAGE') && TZ_GOLD_PAYS_VILLAGE;
     }
 
+    /** The auction house trades in capital gold instead of hero silver. */
+    public static function auctionUsesGold()
+    {
+        return !TZ_SILVER_ENABLED && self::villageMode();
+    }
+
+    /** Take gold from a player's capital (guarded). */
+    public static function takeFromCapital($db, $uid, $amount)
+    {
+        $cap = self::capitalOf($db, $uid);
+        return $cap ? $db->takeVillageGold((int) $cap['wref'], (int) $amount) : false;
+    }
+
+    /**
+     * Give gold to a player's capital (refunds, sales). Not cut to the cap:
+     * gold already owed is never lost; above the cap the village just stops growing.
+     */
+    public static function giveToCapital($db, $uid, $amount)
+    {
+        $cap = self::capitalOf($db, $uid);
+        if (!$cap || $amount <= 0) {
+            return false;
+        }
+        mysqli_query($db->dblink, "UPDATE " . TB_PREFIX . "vdata SET gold = gold + " . (int) $amount . " WHERE wref = " . (int) $cap['wref']);
+        return true;
+    }
+
     /** Whole gold a village has right now in the database. */
     public static function goldOf($db, $wref)
     {

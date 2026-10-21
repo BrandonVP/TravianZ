@@ -100,46 +100,7 @@ if (!function_exists('tzCoinIcon')) {
 
         <span class="tzbar-time"><?php echo safeHTML(rtrim(SERVER_TIME, ': ')); ?> <span id="tp1" class="b"><?php echo date('H:i:s'); ?></span></span>
 
-<?php if (!$isRestrictedUser && isset($session->gold)) {
-        $goldLabel = defined('GOLD') ? GOLD : 'Gold';
-        $goldValue = (int) $session->gold;
-        $tzHdrTitle = PLUS_MENU;
-        // Village gold (local redesign): the pill shows the capital's gold,
-        // which pays for Plus features
-        $tzHdrVil = isset($GLOBALS['village']) ? $GLOBALS['village'] : null;
-        if ($tzHdrVil && class_exists('VillageGold') && VillageGold::pays($tzHdrVil)) {
-            if (!empty($tzHdrVil->capital) && (string) $tzHdrVil->capital !== '0') {
-                $goldValue = (int) floor($tzHdrVil->agold);
-            } else {
-                $tzHdrRes = mysqli_query($GLOBALS['database']->dblink,
-                    "SELECT gold FROM " . TB_PREFIX . "vdata WHERE owner = " . (int) $session->uid . " AND capital = 1 LIMIT 1");
-                $tzHdrRow = $tzHdrRes ? mysqli_fetch_row($tzHdrRes) : null;
-                $goldValue = $tzHdrRow ? (int) floor($tzHdrRow[0]) : 0;
-            }
-            $tzHdrTitle = 'Gold in your capital (pays for Plus features)';
-        }
-        $goldTone  = ($goldValue <= 1) ? 'goldOff' : 'gold';
-?>
-        <a id="goldHeader" class="tzbar-coins" href="plus.php?id=3" title="<?php echo safeHTML($tzHdrTitle); ?>">
-            <?php
-            echo '<span id="goldHeaderRow" class="tzCoinRow tzCoinRow-' . $goldTone . '">'
-               . tzCoinIcon($goldTone, $goldValue . ' ' . $goldLabel)
-               . '<span class="tzCoinValue">' . $goldValue . '</span></span>';
-
-            if (defined('NEW_FUNCTIONS_HERO_T4') && NEW_FUNCTIONS_HERO_T4 && class_exists('HeroItems')) {
-                if (!isset($GLOBALS['t4SilverValue'])) {
-                    $t4SilverItems = new HeroItems();
-                    $GLOBALS['t4SilverValue'] = (int) $t4SilverItems->getSilver($session->uid);
-                }
-                $t4SilverLabel = defined('HERO_SILVER') ? HERO_SILVER : 'Silver';
-                $t4SilverValue = (int) $GLOBALS['t4SilverValue'];
-                echo '<span id="silverHeader" class="tzCoinRow tzCoinRow-silver">'
-                   . tzCoinIcon('silver', $t4SilverValue . ' ' . $t4SilverLabel)
-                   . '<span class="tzCoinValue">' . $t4SilverValue . '</span></span>';
-            }
-            ?>
-        </a>
-<?php } ?>
+<?php /* local redesign: gold and silver pills removed from the top bar */ ?>
 
 
 
