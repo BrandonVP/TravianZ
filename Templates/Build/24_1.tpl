@@ -34,7 +34,7 @@ $inProgress = $inuse > $now;
         $c = $cel[$i];
         $time = $generator->getTimeFormat(round($c['time'] * ($bid24[$building->getTypeLevel(24)]['attri']/100) / SPEED));
         $total = $c['wood']+$c['clay']+$c['iron']+$c['crop'];
-        $showNpc = $session->userinfo['gold']>=3 && $building->getTypeLevel(17)>=1 && $village->atotal >= $total;
+        $showNpc = VillageGold::npcCan($village, $session) && $building->getTypeLevel(17)>=1 && $village->atotal >= $total;
         $canAfford = $c['wood']<=$village->awood && $c['clay']<=$village->aclay && $c['iron']<=$village->airon && $c['crop']<=$village->acrop;
        ?>
         <tr>
@@ -60,7 +60,7 @@ $inProgress = $inuse > $now;
         <?php if ($level >= 10):
             $gcTime = $generator->getTimeFormat(round($gc[$level]/SPEED));
             $gcTotal = 29700+33250+32000+6700;
-            $showNpc2 = $session->userinfo['gold']>=3 && $building->getTypeLevel(17)>=1 && $village->atotal >= $gcTotal;
+            $showNpc2 = VillageGold::npcCan($village, $session) && $building->getTypeLevel(17)>=1 && $village->atotal >= $gcTotal;
             $canAfford2 = 29700<=$village->awood && 33250<=$village->aclay && 32000<=$village->airon && 6700<=$village->acrop;
        ?>
         <tr>

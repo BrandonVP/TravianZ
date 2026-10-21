@@ -35,7 +35,7 @@ $level = (int)$village->resarray['f'.$id];
         $name = $technology->getUnitName($i);
         $time = $generator->getTimeFormat(round($res['time'] * ($bid22[$level]['attri']/100) / SPEED));
         $total_required = (int)($res['wood']+$res['clay']+$res['iron']+$res['crop']);
-        $showNpc = $session->userinfo['gold']>=3 && $building->getTypeLevel(17)>=1 && $village->atotal >= $total_required;
+        $showNpc = VillageGold::npcCan($village, $session) && $building->getTypeLevel(17)>=1 && $village->atotal >= $total_required;
 ?>
         <tr>
             <td class="desc">

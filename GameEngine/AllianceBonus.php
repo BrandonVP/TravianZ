@@ -485,10 +485,14 @@ class AllianceBonus
         }
 
         // aurul pentru triplare
+        // Village gold (local redesign): tripling is paid by the donating village
+        include_once __DIR__ . '/VillageGold.php';
+        $tzAllyVillage = VillageGold::villageMode();
         if ($triple) {
-            $cost = defined('ALLIANCE_BONUS_TRIPLE_GOLD') ? (int) ALLIANCE_BONUS_TRIPLE_GOLD : 3;
+            $cost = $tzAllyVillage ? TZ_GOLD_PRICE_ALLY_TRIPLE
+                : (defined('ALLIANCE_BONUS_TRIPLE_GOLD') ? (int) ALLIANCE_BONUS_TRIPLE_GOLD : 3);
 
-            if ((int) $session->gold < $cost) {
+            if ($tzAllyVillage ? VillageGold::goldOf($database, $wref) < $cost : (int) $session->gold < $cost) {
                 return self::DONATE_NO_GOLD;
             }
         }
@@ -555,7 +559,8 @@ class AllianceBonus
              VALUES (" . $aid . ", " . $uid . ", " . $btype . ", " . $counted . ", " . time() . ")");
 
         if ($triple) {
-            $cost = defined('ALLIANCE_BONUS_TRIPLE_GOLD') ? (int) ALLIANCE_BONUS_TRIPLE_GOLD : 3;
+            $cost = $tzAllyVillage ? TZ_GOLD_PRICE_ALLY_TRIPLE
+                : (defined('ALLIANCE_BONUS_TRIPLE_GOLD') ? (int) ALLIANCE_BONUS_TRIPLE_GOLD : 3);
 
             // PERMISIUNI SITTER: donatia tripla costa aur. Daca sitterul nu are
             // dreptul, donatia simpla (deja inregistrata mai sus) ramane valida,
@@ -563,7 +568,9 @@ class AllianceBonus
             if (!isset($session) || !method_exists($session, 'sitterCan')
                 || $session->sitterCan(SITTER_PERM_GOLD)) {
 
-                if ($database->spendGold($uid, $cost, 'Alliance bonus triple donation')) {
+                if ($tzAllyVillage) {
+                    $database->takeVillageGold($wref, $cost);
+                } elseif ($database->spendGold($uid, $cost, 'Alliance bonus triple donation')) {
                     $session->gold -= $cost;
                 }
             }

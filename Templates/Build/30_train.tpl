@@ -53,7 +53,7 @@ for ($i = $start; $i <= $end; $i++):
     $time = (int) round($unit['time'] * $speedMod / SPEED);
 
     $totalRequired = (int)($unit['wood'] + $unit['clay'] + $unit['iron'] + $unit['crop']);
-    $showNpc = $session->userinfo['gold'] >= 3 && $building->getTypeLevel(17) >= 1 && $village->atotal >= $totalRequired;
+    $showNpc = VillageGold::npcCan($village, $session) && $building->getTypeLevel(17) >= 1 && $village->atotal >= $totalRequired;
 ?>
 <tr>
     <td class="desc">

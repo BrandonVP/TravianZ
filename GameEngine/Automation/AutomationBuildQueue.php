@@ -286,9 +286,14 @@ trait AutomationBuildQueue {
             }
             else $inbuild = 1;
 
-            $usergold = $database->getUserField($owner, 'gold', 0);
+            // Village gold (local redesign): the job's village pays TZ_GOLD_PRICE_MASTER
+            // when the job starts (guarded UPDATE, last in the condition)
+            include_once __DIR__ . '/../VillageGold.php';
+            $tzMasterVillage = VillageGold::villageMode();
+            $usergold = $tzMasterVillage ? 1 : $database->getUserField($owner, 'gold', 0);
 
-            if($bdataTotal < $inbuild && $buildwood <= $villwood && $buildclay <= $villclay && $buildiron <= $villiron && $buildcrop <= $villcrop && $usergold > 0){
+            if($bdataTotal < $inbuild && $buildwood <= $villwood && $buildclay <= $villclay && $buildiron <= $villiron && $buildcrop <= $villcrop && $usergold > 0
+                && (!$tzMasterVillage || $database->takeVillageGold($master['wid'], TZ_GOLD_PRICE_MASTER))){
                 $time = $master['timestamp'] + time();
 
                 if(!empty($bdata)){
@@ -298,7 +303,7 @@ trait AutomationBuildQueue {
                 if($bdataTotal == 0) $database->updateBuildingWithMaster($master['id'], $time, 0);                  
                 else $database->updateBuildingWithMaster($master['id'], $time, 1);             
 
-                $database->updateUserField($owner, 'gold', --$usergold, 1);
+                if (!$tzMasterVillage) $database->updateUserField($owner, 'gold', --$usergold, 1);
                 $database->modifyResource($master['wid'], $buildwood, $buildclay, $buildiron, $buildcrop, 0);
             }
         }

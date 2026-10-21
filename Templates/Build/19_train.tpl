@@ -45,7 +45,7 @@ foreach ($units as $i) {
     $timeFormatted = $generator->getTimeFormat($dur);
 
     $total_required = (int)($unitData['wood'] + $unitData['clay'] + $unitData['iron'] + $unitData['crop']);
-    $showNpc = $session->userinfo['gold'] >= 3 && $building->getTypeLevel(17) >= 1 && $village->atotal >= $total_required;
+    $showNpc = VillageGold::npcCan($village, $session) && $building->getTypeLevel(17) >= 1 && $village->atotal >= $total_required;
 ?>
 <tr>
     <td class="desc">

@@ -72,7 +72,7 @@ $end = $session->tribe * 10 - 2;
 
                     <?php
                     $totalRequired = $next['wood'] + $next['clay'] + $next['iron'] + $next['crop'];
-                    $canNpc = $session->userinfo['gold'] >= 3 && $building->getTypeLevel(17) >= 1 && $village->atotal >= $totalRequired;
+                    $canNpc = VillageGold::npcCan($village, $session) && $building->getTypeLevel(17) >= 1 && $village->atotal >= $totalRequired;
                   ?>
                     <?php if ($canNpc):?>
                         |<a href="build.php?gid=17&t=3&r1=<?= $next['wood']?>&r2=<?= $next['clay']?>&r3=<?= $next['iron']?>&r4=<?= $next['crop']?>" title="<?php echo NPC_TRADE; ?>">

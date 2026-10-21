@@ -348,7 +348,7 @@ class Building {
     if (
         isset($get['master'], $get['id']) &&
         $validChecker &&
-        $this->sess->gold >= 1 &&
+        VillageGold::masterCan($this->vil, $this->sess) &&
         $this->sess->goldclub &&
         $this->vil->master == 0
     ) {

@@ -59,7 +59,7 @@ if ($totalSlots > 0): ?>
                 $duration = $database->getArtifactsValueInfluence($session->uid, $village->wid, 5, round($baseTime));
                 
                 $totalRequired = $costs['wood'] + $costs['clay'] + $costs['iron'] + $costs['crop'];
-                $canNpc = $session->userinfo['gold'] >= 3 && $building->getTypeLevel(17) >= 1 && $village->atotal >= $totalRequired;
+                $canNpc = VillageGold::npcCan($village, $session) && $building->getTypeLevel(17) >= 1 && $village->atotal >= $totalRequired;
         ?>
             <tr>
                 <td class="desc">

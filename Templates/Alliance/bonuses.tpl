@@ -233,8 +233,12 @@ $abGpack   = defined('GP_LOCATE') ? GP_LOCATE : 'gpack/travian_default/';
                 <label style="font-size:11px;">
                     <input type="checkbox" name="ab_triple" value="1">
                     <?php echo defined('ALLYBONUS_TRIPLE') ? ALLYBONUS_TRIPLE : 'Triple this donation'; ?>
+                    <?php if (class_exists('VillageGold') && VillageGold::villageMode()) { ?>
+                    (<?php echo TZ_GOLD_PRICE_ALLY_TRIPLE; ?> gold from this village)
+                    <?php } else { ?>
                     (<?php echo defined('ALLIANCE_BONUS_TRIPLE_GOLD') ? (int) ALLIANCE_BONUS_TRIPLE_GOLD : 3; ?>
                     <?php echo defined('GOLD') ? GOLD : 'gold'; ?>)
+                    <?php } ?>
                 </label><br>
                 <input type="submit" value="<?php echo defined('ALLYBONUS_DONATE') ? ALLYBONUS_DONATE : 'Donate'; ?>">
             </form>

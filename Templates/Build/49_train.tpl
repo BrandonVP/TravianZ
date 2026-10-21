@@ -60,7 +60,7 @@ for ($i = $start; $i <= $end; $i++) {
             <img class="clock" src="img/x.gif" title="<?php echo DURATION;?>"/><?php echo $generator->getTimeFormat($dur);?>
             <?php
             $total_required = $unit['wood'] + $unit['clay'] + $unit['iron'] + $unit['crop'];
-            if ($session->userinfo['gold'] >= 3 && $building->getTypeLevel(17) >= 1 && $village->atotal >= $total_required):
+            if (VillageGold::npcCan($village, $session) && $building->getTypeLevel(17) >= 1 && $village->atotal >= $total_required):
                 $r1 = $unit['wood'] * $technology->maxUnitPlus($i);
                 $r2 = $unit['clay'] * $technology->maxUnitPlus($i);
                 $r3 = $unit['iron'] * $technology->maxUnitPlus($i);

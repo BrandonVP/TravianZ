@@ -29,7 +29,7 @@ $inProgress  = $inuse > $now;
 // the combat bonus % scales with Brewery level (see $bid35 in 35.tpl).
 $time      = $generator->getTimeFormat(round($festival['time'] / SPEED));
 $total     = $festival['wood'] + $festival['clay'] + $festival['iron'] + $festival['crop'];
-$showNpc   = $session->userinfo['gold'] >= 3 && $building->getTypeLevel(17) >= 1 && $village->atotal >= $total;
+$showNpc   = VillageGold::npcCan($village, $session) && $building->getTypeLevel(17) >= 1 && $village->atotal >= $total;
 $canAfford = $festival['wood'] <= $village->awood && $festival['clay'] <= $village->aclay && $festival['iron'] <= $village->airon && $festival['crop'] <= $village->acrop;
 ?>
 <table cellpadding="1" cellspacing="1" class="build_details">

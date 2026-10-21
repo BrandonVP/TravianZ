@@ -49,11 +49,18 @@ if (!empty($_REQUEST['demolish']) && $_REQUEST['c'] == $session->mchecker) {
 
         if($instant){
             // DEMOLARE COMPLETA CU GOLD
-            if($session->gold < 10){
+            // Village gold (local redesign): TZ_GOLD_PRICE_DEMOLISH from this village
+            $tzDemoVillage = VillageGold::pays($village);
+            if($tzDemoVillage ? !VillageGold::canAfford($village, TZ_GOLD_PRICE_DEMOLISH) : $session->gold < 10){
                 header("Location: build.php?gid=15&ty=$type&notenoughgold=1");
                 exit;
             }
             if($currentLvl > 0){
+                // paid first, in one guarded UPDATE
+                if ($tzDemoVillage && !$database->takeVillageGold($village->wid, TZ_GOLD_PRICE_DEMOLISH)) {
+                    header("Location: build.php?gid=15&ty=$type&notenoughgold=1");
+                    exit;
+                }
                 // sterge orice demolare in curs
                 $database->delDemolition($village->wid);
 
@@ -99,8 +106,10 @@ if (!empty($_REQUEST['demolish']) && $_REQUEST['c'] == $session->mchecker) {
                 // FIX 1: modul 0 al lui modifyGold SCADE deja (gold = gold - $amt),
                 // deci valoarea trebuie sa fie POZITIVA. Cu -10 iesea
                 // "gold - (-10)", adica jucatorul PRIMEA 10 aur in loc sa plateasca.
-                $database->modifyGold($session->uid, 10, 0);
-                $session->gold -= 10;
+                if (!$tzDemoVillage) {
+                    $database->modifyGold($session->uid, 10, 0);
+                    $session->gold -= 10;
+                }
 
                 // soldul din sesiune se poate reciti la urmatoarea cerere din
                 // cache-ul de utilizator; il invalidam ca sa nu reapara vechea valoare
@@ -153,7 +162,7 @@ $inProgress =!empty($Demolition)? $Demolition[0] : null;
         </p>
     <?php endif;?>
     <?php if (isset($_GET['notenoughgold'])):?>
-        <p style="color:#ff0000"><?= TZ_YOU_DON_T_HAVE_ENOUGH_GOLD_YOU_NEE?></p>
+        <p style="color:#ff0000"><?= VillageGold::pays($village) ? 'Not enough gold in this village: complete demolition costs ' . TZ_GOLD_PRICE_DEMOLISH . ' gold.' : TZ_YOU_DON_T_HAVE_ENOUGH_GOLD_YOU_NEE?></p>
     <?php endif;?>
     <?php if (isset($_GET['demolished'])):?>
         <p style="color:#008000"><?= TZ_THE_BUILDING_WAS_COMPLETELY_DEMOLI?></p>
@@ -176,8 +185,13 @@ $inProgress =!empty($Demolition)? $Demolition[0] : null;
         </select>
 
         <label style="margin:0 10px;">
+            <?php if (VillageGold::pays($village)): ?>
+            <input type="checkbox" name="instant" value="1" id="instant_demolish" <?= !VillageGold::canAfford($village, TZ_GOLD_PRICE_DEMOLISH) ? 'disabled' : ''?>>
+            Complete demolition (<?= VillageGold::priceTag($village, TZ_GOLD_PRICE_DEMOLISH, 10)?>)
+            <?php else: ?>
             <input type="checkbox" name="instant" value="1" id="instant_demolish" <?= $session->gold < 10 ? 'disabled' : ''?>>
             <?= TZ_COMPLETE_DEMOLITION_10?> <img src="img/x.gif" class="gold" style="vertical-align:middle">)
+            <?php endif; ?>
         </label>
 
         <input id="btn_demolish" name="demolish" class="dynamic_img" value="<?= DEMOLISH?>" type="image" src="img/x.gif" alt="<?= DEMOLISH?>" title="<?= DEMOLISH?>" onclick="return verify_demolition();">

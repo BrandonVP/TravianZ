@@ -46,7 +46,7 @@ for ($i = $start; $i <= $end; $i++):
     // timpul de baza, fara artefacte: acestea apar ca reducere in train_bonus.tpl
     $time = (int) round($unit['time'] * ($bid29[$level]['attri'] / 100) / SPEED);
     $totalRequired = (int)($unit['wood'] + $unit['clay'] + $unit['iron'] + $unit['crop']);
-    $showNpc = $session->userinfo['gold'] >= 3 && $building->getTypeLevel(17) >= 1 && $village->atotal >= $totalRequired;
+    $showNpc = VillageGold::npcCan($village, $session) && $building->getTypeLevel(17) >= 1 && $village->atotal >= $totalRequired;
 ?>
 <tr>
     <td class="desc">

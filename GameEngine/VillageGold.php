@@ -50,6 +50,35 @@ class VillageGold
         return $db->takeVillageGold($village->wid, $price) ? (int) $price : false;
     }
 
+    /** Spending uses village gold (no village object needed, e.g. automation). */
+    public static function villageMode()
+    {
+        return TZ_GOLD_ENABLED && defined('TZ_GOLD_PAYS_VILLAGE') && TZ_GOLD_PAYS_VILLAGE;
+    }
+
+    /** Whole gold a village has right now in the database. */
+    public static function goldOf($db, $wref)
+    {
+        $row = $db->getVillageFields($wref, 'gold', false);
+        return (is_array($row) && isset($row['gold'])) ? (int) floor((float) $row['gold']) : 0;
+    }
+
+    /** NPC trade shortcut next to costs (village gold, else 3 Plus gold). */
+    public static function npcCan($village, $session)
+    {
+        return self::pays($village)
+            ? self::canAfford($village, TZ_GOLD_PRICE_NPC)
+            : (int) $session->userinfo['gold'] >= 3;
+    }
+
+    /** Master Builder (village gold, else 1 Plus gold); paid when the job starts. */
+    public static function masterCan($village, $session)
+    {
+        return self::pays($village)
+            ? self::canAfford($village, TZ_GOLD_PRICE_MASTER)
+            : $session->gold >= 1;
+    }
+
     /** Can this village pay for a trade route (village gold, else 2 Plus gold)? */
     public static function routeCanPay($village, $session)
     {

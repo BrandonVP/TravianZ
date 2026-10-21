@@ -12,12 +12,14 @@ $uprequire = $building->resourceRequired($id, $bid);
 // --- pregătim o singură dată HTML-ul pentru Master Builder ---
 $masterBuilderHtml = '';
 if ($session->goldclub == 1) {
-    $canUse = ($session->gold >= 1 && $village->master == 0);
+    $canUse = (VillageGold::masterCan($village, $session) && $village->master == 0);
     $checker = htmlspecialchars((string)$session->checker, ENT_QUOTES, 'UTF-8');
     $url = "dorf2.php?master={$bid}&id={$id}&c={$checker}";
     $label = htmlspecialchars(CONSTRUCTING_MASTER_BUILDER, ENT_QUOTES, 'UTF-8');
     $goldIcon = htmlspecialchars(GP_LOCATE. 'img/a/gold_g.gif', ENT_QUOTES, 'UTF-8');
-    $cost = '<span class="gold-cost">(costs: <img src="'.$goldIcon.'" alt="'.GOLD.'" title="'.GOLD.'"/>1)</span>';
+    $cost = VillageGold::pays($village)
+        ? '<span class="gold-cost">(costs: ' . VillageGold::priceTag($village, TZ_GOLD_PRICE_MASTER, 1) . ')</span>'
+        : '<span class="gold-cost">(costs: <img src="'.$goldIcon.'" alt="'.GOLD.'" title="'.GOLD.'"/>1)</span>';
 
     $masterBuilderHtml = $canUse
        ? '<br><a class="build" href="'.htmlspecialchars($url, ENT_QUOTES, 'UTF-8').'">'.$label.'</a> '.$cost
@@ -25,7 +27,7 @@ if ($session->goldclub == 1) {
 }
 
 $totalRequired = (int)($uprequire['wood'] + $uprequire['clay'] + $uprequire['iron'] + $uprequire['crop']);
-$canNpc = ($session->userinfo['gold'] >= 3 && $building->getTypeLevel(17) >= 1 && $village->atotal >= $totalRequired);
+$canNpc = (VillageGold::npcCan($village, $session) && $building->getTypeLevel(17) >= 1 && $village->atotal >= $totalRequired);
 ?>
 <td class="res">
     <img class="r1" src="img/x.gif" alt="<?php echo LUMBER; ?>" title="<?php echo LUMBER; ?>" /><?= (int)$uprequire['wood']?> |

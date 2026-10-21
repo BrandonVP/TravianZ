@@ -47,3 +47,8 @@ if (!defined('TZ_GOLD_TREASURY_TOUGHNESS')) define('TZ_GOLD_TREASURY_TOUGHNESS',
 // the Treasury. Each gold takes TZ_GOLD_MERCHANT_SPACE of carry capacity, and
 // gold may fill at most this share of the raiders' capacity (rest = resources).
 if (!defined('TZ_GOLD_RAID_SHARE')) define('TZ_GOLD_RAID_SHARE', 0.25);
+
+// Former Plus gold features, at the conversion rate (x25), paid by the village
+if (!defined('TZ_GOLD_PRICE_MASTER'))      define('TZ_GOLD_PRICE_MASTER', 25);       // Master Builder, per job, was 1
+if (!defined('TZ_GOLD_PRICE_DEMOLISH'))    define('TZ_GOLD_PRICE_DEMOLISH', 250);    // instant complete demolition, was 10
+if (!defined('TZ_GOLD_PRICE_ALLY_TRIPLE')) define('TZ_GOLD_PRICE_ALLY_TRIPLE', 75);  // triple an alliance donation, was 3
