@@ -72,7 +72,7 @@ $tzPricePlus = $tzVG ? TZ_GOLD_PRICE_PLUS : 10;
 $tzPriceProd = $tzVG ? TZ_GOLD_PRICE_PRODUCTION : 5;
 $tzPriceClub = $tzVG ? TZ_GOLD_PRICE_GOLDCLUB : 100;
 $tzPriceFinish = $tzVG ? TZ_GOLD_PRICE_FINISH : 2;
-$tzPriceNpc = $tzVG ? TZ_GOLD_PRICE_NPC : 3;
+$tzPriceNpc = $tzVG ? VillageGold::npcPrice() : 3;
 $tzHereGold = $tzVG ? floor($village->agold) : (int) $golds['gold'];
 $tzCoin = $tzVG
     ? '<svg class="tz-coin-sm" viewBox="0 0 24 24" aria-label="Gold" role="img"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg> '

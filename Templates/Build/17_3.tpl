@@ -24,10 +24,10 @@ global $database, $session, $village, $id;
 // Village gold (local redesign, phase 3): NPC trade is paid from this village
 $tzNpcVillage = VillageGold::pays($village);
 $tzNpcCan = $tzNpcVillage
-    ? VillageGold::canAfford($village, TZ_GOLD_PRICE_NPC)
+    ? VillageGold::canAfford($village, VillageGold::npcPrice())
     : $session->gold > 2;
 $tzNpcCost = $tzNpcVillage
-    ? '<b>' . TZ_GOLD_PRICE_NPC . '</b> gold'
+    ? '<b>' . VillageGold::npcPrice() . '</b> gold'
     : '<img src="img/x.gif" class="gold" alt="' . GOLD . '" title="' . GOLD . '" /><b>3</b>';
 
 // the "completed" message stays reachable after paying

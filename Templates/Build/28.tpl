@@ -47,7 +47,24 @@ $current = $level > 0 ? (int)$bid28[$level]['attri'] : 100;
             <td><b><?php echo (int)$bid28[$next]['attri'];?></b> <?php echo PERCENT;?></td>
             <?php endif;?>
         </tr>
+        <?php if (class_exists('VillageGold') && !empty($village->goldActive)):
+            // local redesign: express caravans and a cheaper NPC trade
+            $tzNext = min(20, $level + 1); ?>
+        <tr>
+            <th>Express caravan speed:</th>
+            <td><b>&times;<?php echo round(VillageGold::expressSpeed($level), 1);?></b>
+                <?php if ($level < 20):?><span class="none">(level <?php echo $tzNext;?>: &times;<?php echo round(VillageGold::expressSpeed($tzNext), 1);?>)</span><?php endif;?></td>
+        </tr>
+        <tr>
+            <th>NPC trade price:</th>
+            <td><b><?php echo max(1, TZ_GOLD_PRICE_NPC - $level * TZ_NPC_DISCOUNT_PER_LEVEL);?></b> gold
+                <?php if ($level < 20):?><span class="none">(level <?php echo $tzNext;?>: <?php echo max(1, TZ_GOLD_PRICE_NPC - $tzNext * TZ_NPC_DISCOUNT_PER_LEVEL);?>)</span><?php endif;?></td>
+        </tr>
+        <?php endif;?>
     </table>
+    <?php if (class_exists('VillageGold') && !empty($village->goldActive)):?>
+    <p class="tz-to-note">Express caravans: on the Marketplace's Send Resources tab, tick "Express caravan" to send to one of your own villages faster, for <?php echo (int) TZ_EXPRESS_GOLD_PER_MERCHANT;?> gold per merchant.</p>
+    <?php endif;?>
 
     <?php include("upgrade.tpl");?>
 </div>

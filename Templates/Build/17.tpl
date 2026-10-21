@@ -87,7 +87,14 @@ $avail = [
     4 => (int)$database->getCropAvailable($village->wid),
     5 => $tzGoldOn ? (int) floor($village->agold) : 0,
 ];
-$hasResources = ($r[1] <= $avail[1] && $r[2] <= $avail[2] && $r[3] <= $avail[3] && $r[4] <= $avail[4] && $r[5] <= $avail[5]);
+// local redesign: express caravan (Trade Office): own villages, single delivery
+$tzToLevel = VillageGold::tradeOfficeLevel();
+$tzExpressSpeed = VillageGold::expressSpeed($tzToLevel);
+$tzExpressAsk = $tzGoldOn && $tzToLevel > 0 && !empty($_POST['express']);
+$tzExpressOk = $tzExpressAsk && $checkexist && (int) ($target['owner'] ?? 0) === (int) $session->uid && $send3 === 1;
+$tzExpressMerc = (int) ceil(max(1, $allres - 0.1) / max(1, $maxcarry));
+$tzExpressCost = $tzExpressOk ? $tzExpressMerc * (int) TZ_EXPRESS_GOLD_PER_MERCHANT : 0;
+$hasResources = ($r[1] <= $avail[1] && $r[2] <= $avail[2] && $r[3] <= $avail[3] && $r[4] <= $avail[4] && $r[5] + $tzExpressCost <= $avail[5]);
 
 $showConfirm = ($ft === 'check' && $canRepeat && $validTarget && $allres > 0 && $allres <= $maxTotalCarry && $hasResources && $validAccess && $userVacation == 0);
 
@@ -117,6 +124,7 @@ if (isset($_GET['z'])) {
         <input type="hidden" name="ft" value="mk1">
         <input type="hidden" name="id" value="<?php echo (int)$id;?>">
         <input type="hidden" name="send3" value="<?php echo $send3;?>">
+        <?php if ($tzExpressOk):?><input type="hidden" name="express" value="1"><?php endif;?>
         <table id="send_select" class="send_res" cellpadding="1" cellspacing="1">
             <?php for ($i = 1; $i <= 4; $i++):
                 $resNames = [1=>LUMBER,2=>CLAY,3=>IRON,4=>CROP];
@@ -149,8 +157,21 @@ if (isset($_GET['z'])) {
             </tr>
             <tr>
                 <th><?php echo DURATION;?>:</th>
-                <td><?php echo $generator->getTimeFormat($target['time']);?></td>
+                <td><?php if ($tzExpressOk):?>
+                    <?php echo $generator->getTimeFormat((int) ceil($target['time'] / $tzExpressSpeed));?>
+                    <span class="tz-express-tag">express &times;<?php echo round($tzExpressSpeed, 1);?></span>
+                <?php else:?>
+                    <?php echo $generator->getTimeFormat($target['time']);?>
+                <?php endif;?></td>
             </tr>
+            <?php if ($tzExpressOk):?>
+            <tr>
+                <th>Express:</th>
+                <td><svg class="tz-coin-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg> <b><?php echo $tzExpressCost;?></b> gold</td>
+            </tr>
+            <?php elseif ($tzExpressAsk):?>
+            <tr><td colspan="2" class="tz-express-note">Express caravans only travel between your own villages, as a single delivery.</td></tr>
+            <?php endif;?>
             <tr>
                 <th><?php echo MERCHANT;?>:</th>
                 <td><?php echo ceil(($allres - 0.1) / $maxcarry);?></td>
@@ -221,6 +242,11 @@ if (isset($_GET['z'])) {
             <p><select name="send3"><option value="1" selected>1x</option><option value="2">2x</option><option value="3">3x</option></select> <?php echo GO;?></p>
         <?php else:?>
             <input type="hidden" name="send3" value="1">
+        <?php endif;?>
+        <?php if ($tzGoldOn && $tzToLevel > 0):?>
+            <p class="tz-express-opt"><label><input type="checkbox" name="express" value="1">
+                Express caravan &times;<?php echo round($tzExpressSpeed, 1);?> speed
+                (<?php echo (int) TZ_EXPRESS_GOLD_PER_MERCHANT;?> gold per merchant, own villages only)</label></p>
         <?php endif;?>
         <p><input type="image" value="ok" name="s1" id="btn_ok" class="dynamic_img" src="img/x.gif" tabindex="8" alt="OK" <?php if(!$merchantAvail) echo 'disabled';?> /></p>
     </form>

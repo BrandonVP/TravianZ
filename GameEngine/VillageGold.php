@@ -167,11 +167,50 @@ class VillageGold
         return (is_array($row) && isset($row['gold'])) ? (int) floor((float) $row['gold']) : 0;
     }
 
+    /** Trade Office (gid 28) level of the village being viewed. */
+    public static function tradeOfficeLevel()
+    {
+        return isset($GLOBALS['building']) && is_object($GLOBALS['building'])
+            ? (int) $GLOBALS['building']->getTypeLevel(28) : 0;
+    }
+
+    /** NPC trade price in this village: TZ_GOLD_PRICE_NPC minus the Trade Office discount. */
+    public static function npcPrice()
+    {
+        return max(1, (int) TZ_GOLD_PRICE_NPC - self::tradeOfficeLevel() * (int) TZ_NPC_DISCOUNT_PER_LEVEL);
+    }
+
+    /** Express caravan speed factor for a Trade Office level (1 = no express). */
+    public static function expressSpeed($level)
+    {
+        $level = (int) $level;
+        if ($level < 1) return 1;
+        return TZ_EXPRESS_SPEED_L1 + (TZ_EXPRESS_SPEED_L20 - TZ_EXPRESS_SPEED_L1) * (min(20, $level) - 1) / 19;
+    }
+
+    /** Resource contracts: [allowance today, used today] in gold for a village. */
+    public static function contractAllowance($db, $wid, $marketLevel)
+    {
+        $l = $db->dblink;
+        $t = TB_PREFIX . 'tz_contracts';
+        mysqli_query($l, "CREATE TABLE IF NOT EXISTS `$t` (`wid` INT NOT NULL, `day` INT NOT NULL, `gold` INT NOT NULL DEFAULT 0, PRIMARY KEY (`wid`, `day`)) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+        $r = mysqli_query($l, "SELECT gold FROM `$t` WHERE wid = " . (int) $wid . " AND day = " . (int) date('Ymd'));
+        $row = $r ? mysqli_fetch_row($r) : null;
+        return [(int) $marketLevel * (int) TZ_CONTRACT_GOLD_PER_LEVEL, $row ? (int) $row[0] : 0];
+    }
+
+    /** Record gold spent on contracts today. */
+    public static function contractUse($db, $wid, $gold)
+    {
+        mysqli_query($db->dblink, "INSERT INTO `" . TB_PREFIX . "tz_contracts` (wid, day, gold) VALUES (" . (int) $wid . ", " . (int) date('Ymd') . ", " . (int) $gold . ")
+            ON DUPLICATE KEY UPDATE gold = gold + " . (int) $gold);
+    }
+
     /** NPC trade shortcut next to costs (village gold, else 3 Plus gold). */
     public static function npcCan($village, $session)
     {
         return self::pays($village)
-            ? self::canAfford($village, TZ_GOLD_PRICE_NPC)
+            ? self::canAfford($village, self::npcPrice())
             : (int) $session->userinfo['gold'] >= 3;
     }
 

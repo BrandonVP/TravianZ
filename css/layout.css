@@ -1357,6 +1357,21 @@ img.tzgold {
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23e3b427' stroke='%239a7512' stroke-width='1.5'/%3E%3Ccircle cx='12' cy='12' r='6.5' fill='none' stroke='%239a7512' stroke-width='1'/%3E%3C/svg%3E") no-repeat center / contain;
 }
 
+/* resource contracts (Marketplace) */
+.tz-contract-intro { font-size: 13px; line-height: 1.5; }
+.tz-contract-ok { color: #2e7d32; font-weight: 700; }
+table.tz-contract { width: 100%; border-collapse: collapse; background: #fff; }
+table.tz-contract th, table.tz-contract td { padding: 5px 8px; border-bottom: 1px solid #eadcbc; text-align: center; }
+table.tz-contract thead th { background: #f1e4c4; font-size: 12px; }
+table.tz-contract .tz-l { text-align: left; }
+table.tz-contract input.text { width: 90px; }
+table.tz-contract tfoot td { text-align: left; font-size: 13px; background: #fbf6ea; }
+/* express caravans */
+.tz-express-opt { font-size: 13px; }
+.tz-express-tag { margin-left: 6px; padding: 0 6px; border-radius: 8px; background: #e9d7a6; font-size: 11px; font-weight: 700; }
+.tz-express-note { font-size: 12px; color: #a5571c; }
+.tz-to-note { font-size: 12px; color: #6b5a45; }
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

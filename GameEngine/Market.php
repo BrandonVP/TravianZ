@@ -67,6 +67,10 @@ class Market
             case 'mk3':
                 $this->tradeResource($post);
                 break;
+
+            case 'mk5':
+                $this->buyContract($post);
+                break;
         }
     }
 
@@ -380,6 +384,18 @@ class Market
             // resurse pozitive.
             $reqMerc = ceil((array_sum($resource) + $gtrans * $goldSpace - 0.1) / $this->maxcarry);
 
+            // local redesign: express caravan (Trade Office) - own villages only,
+            // single delivery, faster by expressSpeed(), paid per merchant
+            $tzToLevel = VillageGold::tradeOfficeLevel();
+            $tzExpress = !empty($post['express']) && $tzToLevel > 0 && !empty($village->goldActive)
+                && (int) $post['send3'] === 1
+                && (int) $database->getVillageField($id, 'owner') === (int) $session->uid;
+            $tzExpressCost = $tzExpress ? (int) ($reqMerc * TZ_EXPRESS_GOLD_PER_MERCHANT) : 0;
+            if ($tzExpress && $gtrans + $tzExpressCost > floor($village->agold)) {
+                $form->addError('error', 'Not enough gold for the express caravan (' . $tzExpressCost . ' gold).');
+                return;
+            }
+
             // Acquire merchant lock to prevent race conditions
             $database->getMerchantLock($village->wid);
 
@@ -404,12 +420,18 @@ class Market
                         $session->tribe,
                         0
                     );
+                    if ($tzExpress) {
+                        $timetaken = (int) ceil($timetaken / VillageGold::expressSpeed($tzToLevel));
+                    }
 
                     $res = array_sum($resource) + $gtrans;
 
                     // gold is taken first, in one guarded UPDATE: if it was
                     // spent in the meantime nothing is sent
-                    if ($res != 0 && $database->takeVillageGold($village->wid, $gtrans)) {
+                    if ($res != 0 && $database->takeVillageGold($village->wid, $gtrans + $tzExpressCost)) {
+                        if ($tzExpressCost > 0) {
+                            $database->addGoldFinLog($village->wid, $session->uid, 'Express caravan', -$tzExpressCost, $reqMerc . ' merchant(s)');
+                        }
 
                         $reference = $database->sendResource(
                             $resource[0],
@@ -934,6 +956,62 @@ class Market
     }
 
     /**
+     * Local redesign: resource contract - buy resources from the NPC with this
+     * village's gold (TZ_CONTRACT_RES_PER_GOLD per gold), within a daily
+     * allowance of Marketplace level x TZ_CONTRACT_GOLD_PER_LEVEL gold.
+     */
+    private function buyContract($post)
+    {
+        global $session, $database, $village, $building;
+
+        $back = 'Location: build.php?id=' . (int) $post['id'] . '&t=5';
+        if (!VillageGold::pays($village)
+            || (isset($session) && method_exists($session, 'sitterCan') && !$session->sitterCan(SITTER_PERM_GOLD))) {
+            header($back . '&e=1');
+            exit;
+        }
+
+        $want = [];
+        foreach ([1 => 'wood', 2 => 'clay', 3 => 'iron', 4 => 'crop'] as $i => $k) {
+            $want[$k] = max(0, (int) ($post['r' . $i] ?? 0));
+        }
+        $total = array_sum($want);
+        if ($total <= 0) {
+            header($back);
+            exit;
+        }
+
+        // must fit in storage now (bought resources are not thrown away)
+        $have = ['wood' => $village->awood, 'clay' => $village->aclay, 'iron' => $village->airon, 'crop' => $village->acrop];
+        foreach ($want as $k => $n) {
+            $cap = ($k === 'crop') ? $village->maxcrop : $village->maxstore;
+            if ($n > max(0, floor($cap - $have[$k]))) {
+                header($back . '&e=2');
+                exit;
+            }
+        }
+
+        $gold = (int) ceil($total / TZ_CONTRACT_RES_PER_GOLD);
+        list($limit, $used) = VillageGold::contractAllowance($database, $village->wid, $building->getTypeLevel(17));
+        if ($used + $gold > $limit) {
+            header($back . '&e=3');
+            exit;
+        }
+        if (!$database->takeVillageGold($village->wid, $gold)) {
+            header($back . '&e=4');
+            exit;
+        }
+
+        $database->modifyResource($village->wid, $want['wood'], $want['clay'], $want['iron'], $want['crop'], 1);
+        VillageGold::contractUse($database, $village->wid, $gold);
+        $database->addGoldFinLog($village->wid, $session->uid, 'Resource contract', -$gold, number_format($total) . ' resources');
+        $this->forget();
+
+        header($back . '&ok=' . $gold);
+        exit;
+    }
+
+    /**
      * NPC merchant trade.
      */
     private function tradeResource($post)
@@ -950,7 +1028,7 @@ class Market
         // Not enough gold (village gold when it pays, else 3 Plus gold)
         $tzNpcVillage = VillageGold::pays($village);
         if ($tzNpcVillage
-            ? !VillageGold::canAfford($village, TZ_GOLD_PRICE_NPC)
+            ? !VillageGold::canAfford($village, VillageGold::npcPrice())
             : $session->userinfo['gold'] < 3) {
 
             header('Location: build.php?id=' . $post['id'] . '&t=3');
@@ -1025,7 +1103,7 @@ class Market
         }
 
         // village gold is taken first, in one guarded UPDATE
-        if ($tzNpcVillage && !$database->takeVillageGold($village->wid, TZ_GOLD_PRICE_NPC)) {
+        if ($tzNpcVillage && !$database->takeVillageGold($village->wid, VillageGold::npcPrice())) {
 
             header('Location: build.php?id=' . $post['id'] . '&t=3');
             exit;
