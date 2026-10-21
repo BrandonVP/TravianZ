@@ -23,7 +23,7 @@ $tzEmpTot = [
     'have' => ['wood' => 0, 'clay' => 0, 'iron' => 0, 'crop' => 0],
     'cap'  => ['wood' => 0, 'clay' => 0, 'iron' => 0, 'crop' => 0],
     'full' => ['wood' => null, 'clay' => null, 'iron' => null, 'crop' => null], // [hours, village]
-    'gold' => 0, 'goldRate' => 0, 'pop' => 0, 'cp' => 0,
+    'gold' => 0, 'goldRate' => 0, 'goldCap' => 0, 'goldFull' => null, 'pop' => 0, 'cp' => 0,
 ];
 $tzEmpArmy = [];
 foreach (['home', 'away', 'reinf', 'all'] as $k) $tzEmpArmy[$k] = array_fill_keys($tzEmpUnits, 0);
@@ -58,6 +58,13 @@ foreach ($tzEmpVillages as $tzEmpV) {
     if ($tzSnap['gold']) {
         $tzEmpTot['gold'] += $tzSnap['gold']['amount'];
         $tzEmpTot['goldRate'] += $tzSnap['gold']['rate'];
+        $tzEmpTot['goldCap'] += $tzSnap['gold']['cap'];
+        if ($tzSnap['gold']['rate'] > 0) {
+            $h = max(0, $tzSnap['gold']['cap'] - $tzSnap['gold']['amount']) / $tzSnap['gold']['rate'];
+            if ($tzEmpTot['goldFull'] === null || $h < $tzEmpTot['goldFull'][0]) {
+                $tzEmpTot['goldFull'] = [$h, $tzSnap['name']];
+            }
+        }
     }
     $tzEmpTot['pop'] += $tzSnap['pop'];
     $tzEmpTot['cp'] += $tzSnap['cp'];
@@ -113,18 +120,21 @@ $tzEmpArmyTotal = array_sum($tzEmpArmy['all']);
     </p>
 
     <div class="tz-emp-totals">
+        <?php $tzGoldPct = $tzEmpTot['goldCap'] > 0 ? min(100, $tzEmpTot['gold'] / $tzEmpTot['goldCap'] * 100) : 0; ?>
         <div class="tz-emp-card tz-emp-gold">
-            <div class="tz-emp-head"><?php echo $tzEmpCoin; ?> Gold <span class="tz-emp-rate">+<?php echo number_format($tzEmpTot['goldRate'], $tzEmpTot['goldRate'] < 10 ? 1 : 0); ?>/h</span></div>
-            <div class="tz-emp-amt"><?php echo number_format(floor($tzEmpTot['gold'])); ?></div>
-            <div class="tz-emp-note">in all villages</div>
+            <div class="tz-emp-head"><?php echo $tzEmpCoin; ?> Gold</div>
+            <div class="tz-emp-rate">+<?php echo number_format($tzEmpTot['goldRate'], $tzEmpTot['goldRate'] < 10 ? 1 : 0); ?>/h</div>
+            <div class="tz-emp-amt"><?php echo number_format(floor($tzEmpTot['gold'])); ?> <span>/ <?php echo number_format($tzEmpTot['goldCap']); ?></span></div>
+            <div class="tz-emp-bar tz-emp-bar-gold"><span style="width:<?php echo round($tzGoldPct, 1); ?>%"></span></div>
+            <div class="tz-emp-note"><?php echo $tzEmpTot['goldFull'] ? 'First full: ' . htmlspecialchars($tzEmpTot['goldFull'][1]) . ' in ' . tzEmpTime($tzEmpTot['goldFull'][0]) : '&nbsp;'; ?></div>
         </div>
         <?php foreach ($tzEmpRes as $r => $label) {
             $pct = $tzEmpTot['cap'][$r] > 0 ? min(100, $tzEmpTot['have'][$r] / $tzEmpTot['cap'][$r] * 100) : 0;
             $full = $tzEmpTot['full'][$r];
         ?>
         <div class="tz-emp-card">
-            <div class="tz-emp-head"><img class="<?php echo $tzEmpIcon[$r]; ?>" src="img/x.gif" alt="" /> <?php echo $label; ?>
-                <span class="tz-emp-rate<?php echo $tzEmpTot['prod'][$r] < 0 ? ' tz-neg' : ''; ?>"><?php echo ($tzEmpTot['prod'][$r] >= 0 ? '+' : '') . number_format($tzEmpTot['prod'][$r]); ?>/h</span></div>
+            <div class="tz-emp-head"><img class="<?php echo $tzEmpIcon[$r]; ?>" src="img/x.gif" alt="" /> <?php echo $label; ?></div>
+            <div class="tz-emp-rate<?php echo $tzEmpTot['prod'][$r] < 0 ? ' tz-neg' : ''; ?>"><?php echo ($tzEmpTot['prod'][$r] >= 0 ? '+' : '') . number_format($tzEmpTot['prod'][$r]); ?>/h</div>
             <div class="tz-emp-amt"><?php echo number_format(floor($tzEmpTot['have'][$r])); ?> <span>/ <?php echo number_format($tzEmpTot['cap'][$r]); ?></span></div>
             <div class="tz-emp-bar"><span style="width:<?php echo round($pct, 1); ?>%"></span></div>
             <div class="tz-emp-note"><?php echo $full ? 'First full: ' . htmlspecialchars($full[1]) . ' in ' . tzEmpTime($full[0]) : '&nbsp;'; ?></div>

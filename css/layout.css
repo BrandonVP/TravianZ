@@ -1279,7 +1279,8 @@ div#content.build a.tz-back:hover {
 }
 .tz-emp-totals .tz-emp-card { padding: 7px 8px; min-width: 0; }
 .tz-emp-totals .tz-emp-head { flex-wrap: wrap; gap: 3px; font-size: 11px; }
-.tz-emp-totals .tz-emp-rate { font-size: 11px; }
+.tz-emp-totals .tz-emp-rate { margin-top: 2px; font-size: 12px; }
+.tz-emp-bar.tz-emp-bar-gold span { background: #d4a72c; }
 .tz-emp-totals .tz-emp-amt { font-size: 16px; }
 @media (max-width: 760px) {
     .tz-emp-totals { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
@@ -1291,7 +1292,7 @@ div#content.build a.tz-back:hover {
     background: #fbf3df;
 }
 .tz-emp-head { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; }
-.tz-emp-rate { margin-left: auto; color: #3f7a2a; font-weight: 700; }
+.tz-emp-rate { color: #3f7a2a; font-weight: 700; }
 .tz-neg, .tz-emp-rate.tz-neg { color: #b3261e; }
 .tz-emp-amt { margin: 3px 0 4px; font-size: 18px; font-weight: 700; }
 .tz-emp-amt span { font-size: 12px; font-weight: normal; color: #6b5a45; }
