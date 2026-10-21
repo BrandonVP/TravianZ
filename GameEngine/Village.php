@@ -231,6 +231,69 @@ class Village {
 	}
 
 	/**
+	 * Local redesign (Empire page): read-only snapshot of another village of
+	 * this account - same production code as the village page (fields, oasis,
+	 * bonus buildings, hero, +25%, upkeep), nothing is written to the database.
+	 * Returns null when the village is not the player's.
+	 */
+	public static function snapshot(int $wid): ?array {
+		$saved = $_SESSION['wid'] ?? null;
+		$_SESSION['wid'] = $wid;
+		try {
+			$v = new Village();
+		} finally {
+			if ($saved === null) unset($_SESSION['wid']);
+			else $_SESSION['wid'] = $saved;
+		}
+		if ((int) $v->wid !== (int) $wid) {
+			return null;
+		}
+		return $v->preview();
+	}
+
+	/**
+	 * Production per hour and the amounts right now, without saving anything
+	 * (the village page / Automation do the real update).
+	 */
+	public function preview(): array {
+		if (empty($this->production)) {
+			$this->calculateProduction();
+		}
+		$elapsed = max(0, time() - (int) $this->infoarray['lastupdate']);
+		$now = [];
+		foreach (['wood', 'clay', 'iron', 'crop'] as $r) {
+			$cap = ($r === 'crop') ? (float) $this->maxcrop : (float) $this->maxstore;
+			$have = (float) $this->{'a' . $r} + $this->production[$r] / 3600 * $elapsed;
+			$now[$r] = max(0, min($have, $cap));
+		}
+		$gold = null;
+		if (VillageGold::active($this->infoarray)) {
+			$rate = VillageGold::rate($this->db, $this->wid, $this->resarray);
+			$cap = VillageGold::cap($this->resarray);
+			$g = $this->goldActive ? (float) $this->agold : (float) $this->infoarray['gold'];
+			$gold = [
+				'amount' => max(0, min($g + $rate['total'] / 3600 * $elapsed, max($cap, $g))),
+				'rate'   => $rate['total'],
+				'cap'    => $cap,
+			];
+		}
+		return [
+			'wid'        => (int) $this->wid,
+			'name'       => $this->vname,
+			'capital'    => (int) $this->capital,
+			'pop'        => (int) $this->pop,
+			'loyalty'    => (float) $this->loyalty,
+			'cp'         => (int) ($this->infoarray['cp'] ?? 0),
+			'production' => $this->production,
+			'amount'     => $now,
+			'maxstore'   => (float) $this->maxstore,
+			'maxcrop'    => (float) $this->maxcrop,
+			'gold'       => $gold,
+			'resarray'   => $this->resarray,
+		];
+	}
+
+	/**
 	 * PRODUCTION CALC
 	 */
 	private function calculateProduction(): void {

@@ -40,6 +40,7 @@ $tzNav = array(
     // short labels for the bar; the full names stay in the tooltips
     array('dorf1.php',       $dorf1Link,          defined('TZ_NAV_FIELDS')  ? TZ_NAV_FIELDS  : 'Fields',  1, 0, TZ_VILLAGE_OVERVIEW),
     array('dorf2.php',       $dorf2Link,          defined('TZ_NAV_VILLAGE') ? TZ_NAV_VILLAGE : 'Village', 2, 0, VILLAGE_CENTER),
+    array('dorf3.php',       $isRestrictedUser ? '#' : 'dorf3.php', 'Empire', 0, 0, 'All your villages at a glance (Plus)'),
     array('karte.php',       'karte.php',         MAP,                 3, 0),
     array('statistiken.php', 'statistiken.php',   STATISTICS,          4, 0),
     array('berichte.php',    $reportsLink,        REPORTS,             5, $tzUnreadReports),

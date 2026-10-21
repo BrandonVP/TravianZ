@@ -44,7 +44,7 @@ if(isset($_GET['newdid'])) {
 
 <html>
 <head>
-	<title><?php echo SERVER_NAME ?> - Cross-Village Totals</title>
+	<title><?php echo SERVER_NAME ?> - Empire</title>
 	<?php include("Templates/layout/assets.tpl"); ?>
 	<script type="text/javascript">
 
@@ -57,22 +57,12 @@ if(isset($_GET['newdid'])) {
 <div id="content"  class="village3">
 
 <?php
+// Local redesign: one Empire page (Plus) replaces the old Overview / Resources /
+// Warehouse / CP / Troops tabs (Templates/dorf3/1-5.tpl, kept for reference)
 if($session->plus){
-  if(isset($_GET['s'])){
-	if($_GET['s'] == 2){
-	  include("Templates/dorf3/2.tpl");
-	}elseif($_GET['s'] == 3){
-	  include("Templates/dorf3/3.tpl");
-	}elseif($_GET['s'] == 4){
-	  include("Templates/dorf3/4.tpl");
-	}elseif($_GET['s'] == 5){
-	  include("Templates/dorf3/5.tpl");
-	}
-  }else{
-	include("Templates/dorf3/1.tpl");
-  }
+  include("Templates/dorf3/empire.tpl");
 }else{
-  include("Templates/dorf3/noplus.tpl");
+  include("Templates/dorf3/empire_noplus.tpl");
 }
 ?>
 </div>
