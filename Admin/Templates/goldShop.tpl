@@ -85,7 +85,7 @@ $msg     = isset($_GET['msg']) ? (string)$_GET['msg'] : '';
             </div>
             <div>
                 <label><?php echo ADMIN_GOLD; ?></label>
-                <input class="num" type="number" name="gold" min="1" value="100" required>
+                <input class="num" type="number" name="gold" min="1" value="1000" required title="Paid into the player's capital as village gold (refused if the capital has no room)">
             </div>
             <div>
                 <label><?php echo ADM_MAX_USES_0; ?></label>

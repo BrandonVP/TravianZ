@@ -144,6 +144,24 @@ class VillageGold
         return (int) max(0, min($outside, $byCarry));
     }
 
+    /**
+     * A player's capital for crediting gold: array('wref', 'name', 'gold', 'cap'),
+     * or null when village gold is off or there is no capital.
+     */
+    public static function capitalOf($db, $uid)
+    {
+        if (!TZ_GOLD_ENABLED || !isset($db->dblink)) {
+            return null;
+        }
+        $r = mysqli_query($db->dblink, "SELECT wref, name, gold FROM " . TB_PREFIX . "vdata WHERE owner = " . (int) $uid . " AND capital = 1 LIMIT 1");
+        $row = $r ? mysqli_fetch_assoc($r) : null;
+        if (!$row || !array_key_exists('gold', $row)) {
+            return null;
+        }
+        $row['cap'] = self::capFor($db, (int) $row['wref']);
+        return $row;
+    }
+
     /** Highest Main Building (gid 15) and Marketplace (gid 17) level in a village. */
     public static function buildingLevels($resArray)
     {

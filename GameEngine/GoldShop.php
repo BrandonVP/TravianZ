@@ -284,6 +284,21 @@ class GoldShop
         $promoId = (int) $promo['id'];
         $gold    = (int) $promo['gold'];
 
+        // Village gold (local redesign): codes pay into the capital. Refuse
+        // BEFORE using the code when the capital has no room for all of it.
+        $capital = null;
+        if (isset($GLOBALS['database'])) {
+            include_once __DIR__ . '/VillageGold.php';
+            $capital = VillageGold::capitalOf($GLOBALS['database'], $uid);
+            if ($capital) {
+                $room = (int) floor($capital['cap'] - (float) $capital['gold']);
+                if ($room < $gold) {
+                    return [false, 'This code is worth ' . $gold . ' gold, but your capital only has room for '
+                        . max(0, $room) . ' more. Spend some gold or build up a Treasury, then try again.', 0];
+                }
+            }
+        }
+
         // Per-user-once check.
         if ((int) $promo['per_user'] === 1) {
             $chk = mysqli_prepare($link,
@@ -319,9 +334,14 @@ class GoldShop
             return [false, 'This code has already been fully redeemed.', 0];
         }
 
-        // Grant the gold. Prefer the Database helper (also writes gold_fin_log).
+        // Grant the gold. Village gold: into the capital (checked for room above).
         $granted = false;
-        if (isset($GLOBALS['database']) && method_exists($GLOBALS['database'], 'modifyGold')) {
+        if ($capital) {
+            $GLOBALS['database']->addVillageGold((int) $capital['wref'], $gold, $capital['cap']);
+            $granted = true;
+        }
+        // Prefer the Database helper (also writes gold_fin_log).
+        if (!$granted && isset($GLOBALS['database']) && method_exists($GLOBALS['database'], 'modifyGold')) {
             $GLOBALS['database']->modifyGold($uid, $gold, 1);
             $granted = true;
         }
@@ -345,6 +365,9 @@ class GoldShop
             mysqli_stmt_close($ins);
         }
 
+        if ($capital) {
+            return [true, 'Success! ' . $gold . ' gold has been added to your capital, ' . $capital['name'] . '.', $gold];
+        }
         return [true, 'Success! ' . $gold . ' gold has been added to your account.', $gold];
     }
 }
