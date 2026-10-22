@@ -1555,6 +1555,23 @@ div#content.reports table#overview td.dat { width: 170px; white-space: nowrap; }
 div#content.reports table#overview th.buttons { text-align: left; }
 div#content.reports table#overview th.buttons .tz-btn { margin: 2px 4px 2px 0; }
 
+/* Residence / Palace festivities (Templates/Build/tz_festivities.tpl) */
+.tz-fest-intro { margin: 10px 0; }
+.tz-fest-ok { font-weight: 700; color: #2e7d32; }
+.tz-fest-err { font-weight: 700; color: #a3361c; }
+h3.tz-fest-group { margin: 16px 0 8px; font-family: "Cinzel", Georgia, serif; font-size: 16px; color: var(--tz-ink); }
+.tz-fest-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.tz-fest-card { background: var(--tz-cream); border: 1px solid var(--tz-line); border-radius: 10px; padding: 12px 14px; }
+.tz-fest-card.is-on { border-color: #6f9a3a; box-shadow: inset 3px 0 0 #6f9a3a; }
+.tz-fest-card h4 { margin: 0 0 6px; font-family: "Cinzel", Georgia, serif; font-size: 15px; color: var(--tz-ink); }
+.tz-fest-card p { margin: 0 0 6px; }
+.tz-fest-story { font-style: italic; color: #6b5a45; }
+.tz-fest-effect { font-weight: 600; }
+.tz-fest-use { font-size: 12px; color: #6b5a45; }
+.tz-fest-cost { margin: 8px 0; }
+.tz-fest-cost img, .tz-fest-cost svg { vertical-align: middle; }
+.tz-fest-state { font-weight: 700; color: #2e7d32; }
+.tz-fest-blocked { font-size: 12px; font-weight: 700; color: #8a6a3a; }
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the

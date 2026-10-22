@@ -19,6 +19,8 @@
 ##                 https://github.com/Shadowss/TravianZ                        ##
 #################################################################################
 
+include_once __DIR__ . '/../Festivities.php'; // local redesign: Residence festivities
+
 trait AutomationVillageUpkeep {
 
 
@@ -111,7 +113,11 @@ trait AutomationVillageUpkeep {
                 }
                 
                 if($value > 0){
-                    $newloyalty = min(100, $loyalty['loyalty'] + $value * (time() - $loyalty['lastupdate2']) / 3600);
+                    // local redesign: festivities - Harvest Feast doubles the rate,
+                    // Travelling Players raise the cap (GameEngine/Festivities.php)
+                    $tzMult = Festivities::regenMultiplier($database, $loyalty['wref']);
+                    $tzCap  = Festivities::loyaltyCap($database, $loyalty['wref']);
+                    $newloyalty = min($tzCap, $loyalty['loyalty'] + $value * $tzMult * (time() - $loyalty['lastupdate2']) / 3600);
                     $q = "UPDATE ".TB_PREFIX."vdata SET loyalty = $newloyalty, lastupdate2=".time()." WHERE wref = '".$loyalty['wref']."'";
                     $database->query($q);
                 }            
@@ -132,6 +138,9 @@ trait AutomationVillageUpkeep {
                 }              
             }
         }
+
+        // local redesign: festivities over time (Monument unveiled, Players' extra loyalty)
+        Festivities::tick($database);
     }
 
     public function getTypeLevel($tid, $vid) {
@@ -235,6 +244,8 @@ trait AutomationVillageUpkeep {
         // Se aplica INAINTE de updateVSumField, fiindca acela reseteaza
         // users.lastupdate; asa ambele folosesc exact aceeasi fereastra de timp.
         $this->applyHeroCulturePoints();
+        // local redesign: Patron of the Arts, same window as updateVSumField (GameEngine/Festivities.php)
+        Festivities::patronBonus($database);
 
         $database->updateVSumField('cp');
     }

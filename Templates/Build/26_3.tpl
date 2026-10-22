@@ -23,7 +23,7 @@ global $database, $village;
 
 $level = (int)$village->resarray['f'.$id];
 $loyalty = floor((float)$database->getVillageField($village->wid, 'loyalty'));
-$loyalty = max(0, min(100, $loyalty)); // siguranță: între 0-100%
+$loyalty = max(0, min(115, $loyalty)); // local redesign: Travelling Players raise the cap // siguranță: între 0-100%
 ?>
 <div id="build" class="gid26">
     <h1><?php echo PALACE; ?> <span class="level"><?php echo LEVEL.' '.$level; ?></span></h1>

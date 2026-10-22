@@ -27,6 +27,7 @@ $menu = [
     '2' => CULTURE_POINTS,
     '3' => LOYALTY,
     '4' => EXPANSION,
+    '5' => 'Festivities', // local redesign (tz_festivities.tpl)
 ];
 ?>
 <div id="textmenu">
