@@ -1323,6 +1323,10 @@ table.tz-emp-army thead th, table.tz-emp-villages thead th { background: #f1e4c4
 table.tz-emp-army tbody th { text-align: left; white-space: nowrap; background: #fbf6ea; }
 table.tz-emp-army tr.tz-emp-all td { font-weight: 700; }
 table.tz-emp-army td.none { color: #c2b394; }
+table.tz-emp-def tbody th.tz-emp-vil { min-width: 120px; }
+table.tz-emp-def thead th.tz-l { text-align: left; }
+table.tz-emp-def td.tz-emp-defv { font-weight: 700; color: #4a3a26; white-space: nowrap; }
+table.tz-emp-def tr.tz-cur th, table.tz-emp-def tr.tz-cur td { background: #fbf3df; }
 table.tz-emp-villages .tz-l { text-align: left; }
 table.tz-emp-villages tr.tz-cur { background: #fbf3df; }
 .tz-emp-vil a { font-weight: 700; }

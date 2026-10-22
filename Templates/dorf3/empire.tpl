@@ -28,6 +28,19 @@ $tzEmpTot = [
 $tzEmpArmy = [];
 foreach (['home', 'away', 'reinf', 'all'] as $k) $tzEmpArmy[$k] = array_fill_keys($tzEmpUnits, 0);
 $tzEmpRows = [];
+// defence per village: own troops at home + troops stationed there by other
+// villages (own or allied), base defence values from unitdata (no smithy
+// upgrades, hero not counted), wall type/level from field 40
+$tzEmpDef = [];
+$tzEmpUnitDef = function ($n) {
+    if (!isset($GLOBALS['u' . $n])) {
+        include __DIR__ . '/../../GameEngine/Data/unitdata.php';
+        foreach (get_defined_vars() as $k => $v) if (preg_match('/^u\d+$/', $k)) $GLOBALS[$k] = $v;
+    }
+    $d = $GLOBALS['u' . $n] ?? null;
+    return $d ? [(int) $d['di'], (int) $d['dc']] : [0, 0];
+};
+$tzEmpWalls = [31 => CITYWALL, 32 => EARTHWALL, 33 => PALISADE, 42 => STONEWALL, 43 => MAKESHIFTWALL, 47 => DEFENSIVEWALL];
 
 if (!function_exists('tzEmpTime')) {
     function tzEmpTime($hours)
@@ -73,6 +86,37 @@ foreach ($tzEmpVillages as $tzEmpV) {
     // settlers) and captured
     $tzHome = $database->getUnit($tzWid) ?: [];
     foreach ($tzEmpUnits as $u) $tzEmpArmy['home'][$u] += (int) ($tzHome[$u] ?? 0);
+
+    $tzD = ['units' => [], 'support' => 0, 'from' => [], 'di' => 0, 'dc' => 0];
+    foreach ($tzEmpUnits as $u) {
+        $n = (int) ($tzHome[$u] ?? 0);
+        $tzD['units'][$u] = $n;
+        if ($u !== 'hero' && $n > 0) {
+            list($di, $dc) = $tzEmpUnitDef((int) substr($u, 1));
+            $tzD['di'] += $n * $di; $tzD['dc'] += $n * $dc;
+        }
+    }
+    foreach ((array) $database->getEnforceVillage($tzWid, 0) as $tzE) {
+        $cnt = 0;
+        for ($n = 1; $n <= 90; $n++) {
+            $c = (int) ($tzE['u' . $n] ?? 0);
+            if ($c <= 0) continue;
+            $cnt += $c;
+            list($di, $dc) = $tzEmpUnitDef($n);
+            $tzD['di'] += $c * $di; $tzD['dc'] += $c * $dc;
+        }
+        $cnt += (int) ($tzE['hero'] ?? 0);
+        if ($cnt > 0) {
+            $tzD['support'] += $cnt;
+            // from = 0: animals caught with cages and released here
+            $src = ((int) $tzE['from'] > 0) ? (string) $database->getVillageField((int) $tzE['from'], 'name') : 'Tamed animals';
+            $tzD['from'][$src] = ($tzD['from'][$src] ?? 0) + $cnt;
+        }
+    }
+    $tzFd = $database->getResourceLevel($tzWid) ?: [];
+    $tzWallType = (int) ($tzFd['f40t'] ?? 0);
+    $tzD['wall'] = isset($tzEmpWalls[$tzWallType]) ? [$tzEmpWalls[$tzWallType], (int) $tzFd['f40']] : null;
+    $tzEmpDef[$tzWid] = $tzD;
     foreach ((array) $database->getEnforceVillage($tzWid, 1) as $tzE) {
         foreach ($tzEmpUnits as $u) $tzEmpArmy['reinf'][$u] += (int) ($tzE[$u] ?? 0);
     }
@@ -167,6 +211,62 @@ $tzEmpArmyTotal = array_sum($tzEmpArmy['all']);
     </table>
     </div>
     <p class="tz-emp-foot">Away = attacking, returning, settling or captured. Reinforcing = stationed in other villages or oases.</p>
+
+    <h2>Defence by village</h2>
+    <div class="tz-emp-scroll">
+    <table class="tz-emp-army tz-emp-def" cellpadding="1" cellspacing="1">
+        <thead>
+            <tr>
+                <th class="tz-l"><?php echo VILLAGE; ?></th>
+                <?php foreach ($tzEmpUnits as $u) {
+                    $tzName = ($u === 'hero') ? (defined('TZ_HERO') ? TZ_HERO : 'Hero') : $technology->getUnitName((int) substr($u, 1)); ?>
+                    <th><img class="unit <?php echo $u === 'hero' ? 'uhero' : $u; ?>" src="img/x.gif" title="<?php echo htmlspecialchars($tzName); ?>" alt="<?php echo htmlspecialchars($tzName); ?>" /></th>
+                <?php } ?>
+                <th title="Troops other villages (yours or allies') and tamed animals stationed here">Support</th>
+                <th>Wall</th>
+                <th title="Defence against infantry">Def inf</th>
+                <th title="Defence against cavalry">Def cav</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $tzDefTot = ['units' => array_fill_keys($tzEmpUnits, 0), 'support' => 0, 'di' => 0, 'dc' => 0];
+            foreach ($tzEmpRows as $row) {
+                $s = $row['snap'];
+                $d = $tzEmpDef[(int) $s['wid']] ?? null;
+                if (!$d) continue;
+                foreach ($tzEmpUnits as $u) $tzDefTot['units'][$u] += $d['units'][$u];
+                $tzDefTot['support'] += $d['support']; $tzDefTot['di'] += $d['di']; $tzDefTot['dc'] += $d['dc'];
+                $tzFromTitle = [];
+                foreach ($d['from'] as $src => $c) $tzFromTitle[] = $src . ': ' . number_format($c);
+            ?>
+            <tr class="<?php echo ((int) $s['wid'] === (int) $village->wid) ? 'tz-cur' : ''; ?>">
+                <th class="tz-emp-vil">
+                    <a href="build.php?newdid=<?php echo (int) $s['wid']; ?>&amp;id=39"><?php echo htmlspecialchars($s['name']); ?></a>
+                    <?php if ($row['attacks'] > 0) { ?><span class="tz-emp-att" title="<?php echo $row['attacks']; ?> incoming attack(s)">&#9876; <?php echo $row['attacks']; ?></span><?php } ?>
+                </th>
+                <?php foreach ($tzEmpUnits as $u) { $n = $d['units'][$u]; ?>
+                    <td class="<?php echo $n == 0 ? 'none' : ''; ?>"><?php echo number_format($n); ?></td>
+                <?php } ?>
+                <td class="<?php echo $d['support'] == 0 ? 'none' : ''; ?>" title="<?php echo htmlspecialchars(implode("\n", $tzFromTitle)); ?>"><?php echo number_format($d['support']); ?></td>
+                <td class="<?php echo $d['wall'] ? '' : 'none'; ?>" title="<?php echo $d['wall'] ? htmlspecialchars($d['wall'][0]) : 'No wall'; ?>"><?php echo $d['wall'] ? $d['wall'][1] : '-'; ?></td>
+                <td class="tz-emp-defv"><?php echo number_format($d['di']); ?></td>
+                <td class="tz-emp-defv"><?php echo number_format($d['dc']); ?></td>
+            </tr>
+            <?php } ?>
+            <tr class="tz-emp-all">
+                <th>Total</th>
+                <?php foreach ($tzEmpUnits as $u) { $n = $tzDefTot['units'][$u]; ?>
+                    <td class="<?php echo $n == 0 ? 'none' : ''; ?>"><?php echo number_format($n); ?></td>
+                <?php } ?>
+                <td class="<?php echo $tzDefTot['support'] == 0 ? 'none' : ''; ?>"><?php echo number_format($tzDefTot['support']); ?></td>
+                <td></td>
+                <td class="tz-emp-defv"><?php echo number_format($tzDefTot['di']); ?></td>
+                <td class="tz-emp-defv"><?php echo number_format($tzDefTot['dc']); ?></td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+    <p class="tz-emp-foot">Troops in each village right now: your own at home plus support stationed there (hover for where it comes from). Defence is the base value of all of them, before smithy upgrades and the wall bonus; the hero is not included.</p>
 
     <h2>Villages</h2>
     <div class="tz-emp-scroll">
