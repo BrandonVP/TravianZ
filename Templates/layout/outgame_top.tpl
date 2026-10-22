@@ -28,6 +28,7 @@ $ogNav = [
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap" rel="stylesheet" type="text/css" />
 	<link href="css/outgame.css?v=<?php echo @filemtime(__DIR__ . '/../../css/outgame.css'); ?>" rel="stylesheet" type="text/css" />
+	<script src="tzbuttons.js?v=<?php echo @filemtime(__DIR__ . '/../../tzbuttons.js'); ?>" type="text/javascript"></script>
 	<?php echo isset($ogHead) ? $ogHead : ''; ?>
 </head>
 <body class="og">

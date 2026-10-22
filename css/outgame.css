@@ -280,6 +280,42 @@ body.og a.og-btn.og-btn-gold:visited { background: var(--og-gold); border-color:
 .og-doc ul.rules li { margin: 6px 0; }
 .og-doc .terms-box { line-height: 1.55; }
 .og-doc .characteristics { padding-left: 20px; }
+/* ---------- classic content (activation, password, logout templates) ---------- */
+
+/* the old sprite headings render as empty images without the pack */
+.og-classic h1 img[class], .og-classic h5 img[class], .og-classic img.roman { display: none; }
+.og-classic h5:empty, .og-classic h1:empty { display: none; }
+.og-classic h6 { font-size: 16px; margin: 10px 0 6px; font-family: "Cinzel", Georgia, serif; }
+.og-classic input.text {
+    box-sizing: border-box;
+    width: min(320px, 100%);
+    padding: 8px 10px;
+    border: 1px solid var(--og-line);
+    border-radius: 8px;
+    background: #fffdf7;
+    font: 15px "Source Sans 3", "Segoe UI", Verdana, Arial, sans-serif;
+}
+.og-classic .important, .og-classic .e { font-weight: 700; }
+.og-classic table th { text-align: left; padding-right: 14px; }
+
+/* image buttons (tzbuttons.js wraps them) and the old text buttons */
+body.og .tz-btn,
+body.og button.trav_buttons {
+    position: relative;
+    display: inline-block;
+    padding: 8px 18px;
+    border: 1px solid #8a6a22;
+    border-radius: 999px;
+    background: var(--og-gold);
+    color: var(--og-wood);
+    font: 700 15px "Source Sans 3", "Segoe UI", Verdana, Arial, sans-serif;
+    cursor: pointer;
+    overflow: hidden;
+}
+body.og .tz-btn:hover,
+body.og button.trav_buttons:hover { background: #cf9d3a; }
+/* the original image input is stretched invisibly over the text button */
+body.og .tz-ibtn > input[type="image"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 /* ---------- server info (Templates/News/newsbox1.tpl) ---------- */
 
 .og-serverinfo h5 { display: none; }

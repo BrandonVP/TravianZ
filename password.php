@@ -41,40 +41,15 @@ if (!isset($_REQUEST['npw'])) {
     exit;
 }
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
-<head>
-    <title><?php echo SERVER_NAME; ?> - Forgotten Password</title>
-    <link rel="shortcut icon" href="favicon.ico"/>
-    <meta name="content-language" content="en" />
-    <meta http-equiv="cache-control" content="max-age=0" />
-    <meta http-equiv="imagetoolbar" content="no" />
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-
-    <script src="mt-core.js?0faab" type="text/javascript"></script>
-    <script src="mt-more.js?0faab" type="text/javascript"></script>
-    <script src="unx.js?f4b7m" type="text/javascript"></script>
-    <script src="new.js?0faab" type="text/javascript"></script>
-
-    <link href="<?php echo GP_LOCATE; ?>lang/en/compact.css?f4b7i" rel="stylesheet" type="text/css" />
-    <link href="<?php echo GP_LOCATE; ?>lang/en/lang.css?f4b7d" rel="stylesheet" type="text/css" />
-    <link href="<?php echo GP_LOCATE; ?>travian.css?f4b7d" rel="stylesheet" type="text/css" />
-    <link href="<?php echo GP_LOCATE; ?>lang/en/lang.css" rel="stylesheet" type="text/css" />
-</head>
-
-<body class="v35 ie ie7" onload="initCounter()">
-
-<div class="wrapper">
-<div id="dynamic_header"></div>
-<div id="header"></div>
-
-<div id="mid">
-
-<?php include("Templates/menu.tpl"); ?>
-
-<div id="content" class="activate">
-
+<?php
+// local redesign: logged-out frame (Templates/layout/outgame_*.tpl, css/outgame.css)
+$ogTitle  = 'Forgotten Password';
+$ogActive = '';
+include("Templates/layout/outgame_top.tpl");
+?>
+<div class="og-grid">
+<section class="og-card og-doc og-classic">
+<h1>Forgotten password</h1>
     <h1><img src="img/x.gif" class="passwort" alt="new password" /></h1>
     <h5><img src="img/x.gif" class="img_u22" alt="forgotten password" /></h5>
 
@@ -170,26 +145,18 @@ if (isset($_POST['email']) && isset($_POST['npw'])) {
                     class="trav_buttons"
                     id="btn_ok"
                     alt="OK">
-                ok
+                Send
             </button>
         </p>
     </form>
 
 <?php } ?>
-
+</section>
+<aside class="og-stack">
+	<section class="og-card og-serverinfo">
+		<h2>Server info</h2>
+		<?php if (NEWSBOX1) { include("Templates/News/newsbox1.tpl"); } ?>
+	</section>
+</aside>
 </div>
-
-<div id="side_info" class="outgame"></div>
-
-<div class="clear"></div>
-</div>
-
-<div class="footer-stopper outgame"></div>
-<div class="clear"></div>
-
-<?php include("Templates/footer.tpl"); ?>
-
-<div id="ce"></div>
-
-</body>
-</html>
+<?php include("Templates/layout/outgame_bottom.tpl"); ?>

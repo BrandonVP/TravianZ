@@ -157,24 +157,10 @@ if (!isset($regQuadrants[$regQuad])) {
 /* When the server rejected the form we jump straight back to the recap step. */
 $regStep = $regErrors ? 3 : 1;
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
-	<head>
-	<title><?php echo SERVER_NAME; ?> - Registration</title>
-		<link rel="shortcut icon" href="favicon.ico"/>
-	<meta name="content-language" content="en" />
-	<meta http-equiv="cache-control" content="max-age=0" />
-	<meta http-equiv="imagetoolbar" content="no" />
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-	<script src="mt-core.js?0faab" type="text/javascript"></script>
-	<script src="mt-more.js?0faab" type="text/javascript"></script>
-	<script src="unx.js?f4b7m" type="text/javascript"></script>
-	<script src="new.js?0faab" type="text/javascript"></script>
-	<link href="<?php echo GP_LOCATE; ?>lang/en/compact.css?f4b7i" rel="stylesheet" type="text/css" />
-	<link href="<?php echo GP_LOCATE; ?>lang/en/lang.css?f4b7d" rel="stylesheet" type="text/css" />
-	<link href="<?php echo GP_LOCATE ?>travian.css?f4b7d" rel="stylesheet" type="text/css" />
-		<link href="<?php echo GP_LOCATE ?>lang/en/lang.css" rel="stylesheet" type="text/css" />
-
+<?php
+// local redesign: logged-out frame (Templates/layout/outgame_*.tpl, css/outgame.css);
+// the registration wizard keeps its own styles and artwork
+ob_start(); ?>
 <style type="text/css">
 /* ======================================================================== */
 /*  Registration wizard - fits inside the original #content.signup column    */
@@ -284,21 +270,16 @@ ul.rw-err{margin:0 0 6px;padding:0 0 0 16px;color:#c0392b;font:bold 12px/17px Ar
 .rw-back:hover{text-decoration:underline}
 .rw-foot{margin:2px 0 0;text-align:center;font:11px Arial;color:#8a7a63}
 </style>
-	   </head>
-
-<body class="v35 ie ie7" onload="initCounter()">
-
-<div class="wrapper">
-<div id="dynamic_header">
-</div>
-<div id="header"></div>
-<div id="mid">
-<?php include("Templates/menu.tpl");
-if(REG_OPEN == true){ ?>
-<div id="content"  class="signup">
-
-<h1><img src="img/x.gif" class="anmelden" alt="register for the game" /></h1>
-
+<?php
+$ogHead   = ob_get_clean();
+$ogTitle  = 'Registration';
+$ogActive = 'register';
+include("Templates/layout/outgame_top.tpl");
+?>
+<div class="og-grid">
+<section class="og-card og-register">
+<h1><?php echo defined('REGISTER') ? REGISTER : 'Register'; ?></h1>
+<?php if (REG_OPEN == true) { ?>
 <form name="snd" method="post" action="anmelden.php" id="regform">
 <input type="hidden" name="invited" value="<?php echo htmlspecialchars($invited, ENT_QUOTES, 'UTF-8'); ?>" />
 <input type="hidden" name="ft" value="a1" />
@@ -416,7 +397,6 @@ echo $form->getError('agree');
 	<div class="rw-bot"></div>
 </div>
 </form>
-</div>
 
 <script type="text/javascript">
 /* ------------------------------------------------------------------ */
@@ -532,30 +512,16 @@ echo $form->getError('agree');
 	<style type="text/css">.rw-step{display:block !important}</style>
 </noscript>
 
-<?php }else{ ?>
-<div id="content"  class="signup">
-
-<h1><img src="img/x.gif" class="anmelden" alt="register for the game" /></h1>
-<h5><img src="img/x.gif" class="img_u05" alt="registration"/></h5>
-
-<p><?php echo REGISTER_CLOSED; ?></p>
-</div>
+<?php } else { ?>
+<p class="og-error"><?php echo REGISTER_CLOSED; ?></p>
 <?php } ?>
-<div id="side_info" class="outgame">
-<?php
-if(NEWSBOX1) { include("Templates/News/newsbox1.tpl"); }
-if(NEWSBOX2) { include("Templates/News/newsbox2.tpl"); }
-if(NEWSBOX3) { include("Templates/News/newsbox3.tpl"); }
-?>
-			</div>
-
-<div class="clear"></div>
-			</div>
-
-			<div class="footer-stopper outgame"></div>
-			<div class="clear"></div>
-
-<?php include("Templates/footer.tpl"); ?>
-<div id="ce"></div>
-</body>
-</html>
+<p class="og-muted">Already have an account? <a href="login.php"><?php echo LOGIN; ?></a></p>
+</section>
+<aside class="og-stack">
+	<section class="og-card og-serverinfo">
+		<h2>Server info</h2>
+		<?php if (NEWSBOX1) { include("Templates/News/newsbox1.tpl"); } ?>
+	</section>
+</aside>
+</div>
+<?php include("Templates/layout/outgame_bottom.tpl"); ?>

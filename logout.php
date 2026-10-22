@@ -28,74 +28,28 @@ include("GameEngine/Account.php");
 AccessLogger::logRequest();
 
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
-	<head>
-		<title><?php echo SERVER_NAME; ?> - Logged Out</title>
-		<meta name="content-language" content="en" />
-		<meta http-equiv="cache-control" content="max-age=0" />
-		<meta http-equiv="imagetoolbar" content="no" />
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<script src="mt-core.js?2389c" type="text/javascript"></script>
-
-		<script src="mt-more.js?2389c" type="text/javascript"></script>
-		<script src="unx.js?f4b7m" type="text/javascript"></script>
-		<script src="new.js?2389c" type="text/javascript"></script>
-	<link href="<?php echo GP_LOCATE; ?>lang/en/lang.css?f4b7d" rel="stylesheet" type="text/css" />
-	<link href="<?php echo GP_LOCATE; ?>lang/en/compact.css?f4b7i" rel="stylesheet" type="text/css" />
-	<?php
-	// GP_LOCATE contine deja pachetul efectiv: alegerea jucatorului cand
-	// e permisa si valida, altfel pachetul serverului (vezi config.php).
-	echo "
-	<link href='".GP_LOCATE."travian.css?e21d2' rel='stylesheet' type='text/css' />
-	<link href='".GP_LOCATE."lang/en/lang.css?e21d2' rel='stylesheet' type='text/css' />";
-	?>
-	<script type="text/javascript">
-
-		window.addEvent('domready', start);
-	</script>
-</head>
-
-
-<body class="v35 ie ie8">
-<div class="wrapper">
-<img style="filter:chroma();" src="img/x.gif" id="msfilter" alt="" />
-<div id="dynamic_header">
-	</div>
-<div id="header"></div>
-
-<div id="mid">
-<?php include("Templates/menu.tpl"); ?>
-		<div id="content"  class="logout">
-<h1><?php echo PUBLIC_LOGOUT_SUCCESS_TITLE; ?></h1><img class="roman" src="img/x.gif" alt="" /><p><?php echo PUBLIC_LOGOUT_THANKS; ?></p>
+<?php
+// local redesign: logged-out frame (Templates/layout/outgame_*.tpl, css/outgame.css)
+$ogTitle  = 'Logged Out';
+$ogActive = '';
+include("Templates/layout/outgame_top.tpl");
+?>
+<div class="og-grid">
+<section class="og-card og-doc og-classic">
+<h1><?php echo PUBLIC_LOGOUT_SUCCESS_TITLE; ?></h1>
+<p><?php echo PUBLIC_LOGOUT_THANKS; ?></p>
 
 		<p><?php echo PUBLIC_DELETE_COOKIES_NOTICE; ?><br /><a href="login.php?del_cookie">&raquo; <?php echo PUBLIC_DELETE_COOKIES; ?></a></p>
+<div class="og-btn-row">
+	<a class="og-btn og-btn-gold" href="login.php"><?php echo LOGIN; ?></a>
+	<a class="og-btn" href="index.php"><?php echo defined('HOME') ? HOME : 'Homepage'; ?></a>
 </div>
-
-<br /><br /><br /><br /><div id="side_info">
-<?php
-include("Templates/news.tpl");
-?>
+</section>
+<aside class="og-stack">
+	<section class="og-card og-serverinfo">
+		<h2>Server info</h2>
+		<?php if (NEWSBOX1) { include("Templates/News/newsbox1.tpl"); } ?>
+	</section>
+</aside>
 </div>
-<div class="clear"></div>
-</div>
-<div class="footer-stopper"></div>
-<div class="clear"></div>
-
-<?php
-include("Templates/footer.tpl");
-?>
-<div id="stime">
-<div id="ltime">
-<div id="ltimeWrap">
-<?php echo CALCULATED_IN;?> <b><?php
-echo round(($generator->pageLoadTimeEnd()-$start_timer)*1000);
-?></b> ms
-
-<br /><?php echo SERVER_TIME;?> <span id="tp1" class="b"><?php echo date('H:i:s'); ?></span>
-</div>
-	</div>
-</div>
-<div id="ce"></div>
-</body>
-</html>
+<?php include("Templates/layout/outgame_bottom.tpl"); ?>
