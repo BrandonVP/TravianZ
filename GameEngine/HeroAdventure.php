@@ -78,7 +78,7 @@ class HeroAdventure
     {
         $uid = (int) $uid; $now = time();
         $stmt = $this->db->prepare(
-            "SELECT id, uid, wref, difficulty, duration, created, expire, status, moveid
+            "SELECT id, uid, wref, difficulty, type, restype, duration, created, expire, status, moveid
                FROM " . TB_PREFIX . "hero_adventure
               WHERE uid = ? AND status = 0 AND expire > ?
               ORDER BY difficulty ASC, duration ASC"
@@ -171,7 +171,7 @@ class HeroAdventure
         // box doesn't wrap around the map seam, so plain coordinate distance
         // is exact within it).
         $stmt = $this->db->prepare(
-            "SELECT id, x, y FROM " . TB_PREFIX . "wdata
+            "SELECT id, x, y, fieldtype, oasistype FROM " . TB_PREFIX . "wdata
               WHERE occupied = 0 AND id <> ?
                 AND x BETWEEN ? AND ? AND y BETWEEN ? AND ?
                 AND (POW(x - ?, 2) + POW(y - ?, 2)) >= ?
@@ -196,14 +196,16 @@ class HeroAdventure
             $difficulty = (mt_rand(1, 100) <= 30) ? 1 : 0;
             $duration   = $this->travelSeconds($uid, $dist);
             $expire     = $now + (int) $heroAdventureConfig['offer_lifetime'];
+            // local redesign: what kind of site it is (terrain-weighted)
+            list($type, $restype) = $this->pickType($tile);
 
             $stmt = $this->db->prepare(
                 "INSERT INTO " . TB_PREFIX . "hero_adventure
-                        (uid, wref, difficulty, duration, created, expire, status, moveid)
-                 VALUES (?, ?, ?, ?, ?, ?, 0, 0)"
+                        (uid, wref, difficulty, type, restype, duration, created, expire, status, moveid)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0)"
             );
             $tileId = (int) $tile['id'];
-            $stmt->bind_param('iiiiii', $uid, $tileId, $difficulty, $duration, $now, $expire);
+            $stmt->bind_param('iiiiiiii', $uid, $tileId, $difficulty, $type, $restype, $duration, $now, $expire);
             $stmt->execute();
             $stmt->close();
             $created++;
@@ -362,7 +364,7 @@ class HeroAdventure
         $now = time();
 
         $q = "SELECT m.moveid, m.`from`, m.`to`, m.ref, m.endtime,
-                     a.id AS advid, a.uid, a.difficulty
+                     a.id AS advid, a.uid, a.difficulty, a.type, a.restype
                 FROM " . TB_PREFIX . "movement m
                 JOIN " . TB_PREFIX . "hero_adventure a ON a.id = m.ref
                WHERE m.sort_type = " . (int) MOVEMENT_ADVENTURE_OUT . "
@@ -388,33 +390,14 @@ class HeroAdventure
                 continue;
             }
 
-            /* ---- Roll rewards ---- */
-            $exp    = mt_rand($cfg['exp'][0], $cfg['exp'][1]);
-            $silver = mt_rand($cfg['silver'][0], $cfg['silver'][1]);
-            // local redesign: hero silver is switched off (GameEngine/Data/gold.php)
-            include_once __DIR__ . '/Data/gold.php';
-            if (!TZ_SILVER_ENABLED) $silver = 0;
-            $hpLoss = mt_rand($cfg['hp_loss'][0], $cfg['hp_loss'][1]);
-            $wood   = mt_rand($cfg['resources'][0], $cfg['resources'][1]);
-            $clay   = mt_rand($cfg['resources'][0], $cfg['resources'][1]);
-            $iron   = mt_rand($cfg['resources'][0], $cfg['resources'][1]);
-            $crop   = mt_rand($cfg['resources'][0], $cfg['resources'][1]);
-
-            // Item drop: gear first (rarer, tier-weighted toward T1), and only
-            // if no gear dropped, roll the consumable pool. One item max.
-            $itemId = 0; $itemQty = 0;
-            if (mt_rand(1, 100) <= (int) ($cfg['equip_chance'] ?? 0)) {
-                $itemId  = $this->rollEquipment($uid);
-                $itemQty = ($itemId > 0) ? 1 : 0;
-            }
-            if ($itemId === 0 && mt_rand(1, 100) <= (int) $cfg['item_chance']) {
-                $pool    = $cfg['consumable'];
-                $itemId  = (int) $pool[array_rand($pool)];
-                $itemQty = 1;
-            }
+            /* ---- Roll rewards (local redesign: see rollOutcome) ---- */
+            $o = $this->rollOutcome($uid, $hero, $data);
+            $exp = $o['exp']; $silver = $o['silver']; $hpLoss = $o['hp']; $heal = $o['heal'];
+            $wood = $o['wood']; $clay = $o['clay']; $iron = $o['iron']; $crop = $o['crop'];
+            $itemId = $o['itemId']; $itemQty = $o['itemQty']; $story = $o['story'];
 
             $health    = (float) $hero['health'];
-            $newHealth = $health - $hpLoss;
+            $newHealth = min(100, $health - $hpLoss + $heal);
 
             if ($newHealth <= 0) {
                 /* ---- Hero dies at the site: loot forfeited, no return trip. ---- */
@@ -450,7 +433,7 @@ class HeroAdventure
                           WHERE v.owner = " . $heroOwner . " AND e.hero > 0");
                 }
 
-                $payload = 'difficulty=' . (int) $data['difficulty'] . '&died=1&hp=' . $hpLoss;
+                $payload = 'difficulty=' . (int) $data['difficulty'] . '&type=' . (int) $data['type'] . '&died=1&hp=' . $hpLoss;
                 $database->addNotice($uid, (int) $data['from'], 0, NTYPE_ADVENTURE_REPORT,
                     'Hero fell on an adventure', $payload, $now);
 
@@ -520,6 +503,7 @@ class HeroAdventure
 
             /* ---- Report (ntype 26) ---- */
             $payload = 'difficulty=' . (int) $data['difficulty']
+                     . '&type=' . (int) $data['type'] . '&story=' . $story . '&heal=' . $heal
                      . '&exp=' . $xpGain . '&silver=' . $silver . '&hp=' . $hpLoss
                      . '&wood=' . $wood . '&clay=' . $clay . '&iron=' . $iron . '&crop=' . $crop;
             if ($itemId > 0) {
@@ -587,13 +571,15 @@ class HeroAdventure
      * if the rolled tier happens to be empty (defensive; never true with
      * the shipped catalog).
      */
-    public function rollEquipment($uid = 0)
+    public function rollEquipment($uid = 0, $weights = null)
     {
         global $database, $heroItemCatalog, $heroAdventureConfig;
 
         $tribe = ((int) $uid > 0) ? (int) $database->getUserField((int) $uid, 'tribe', 0) : 0;
 
-        $weights = $heroAdventureConfig['equip_tier_weights'];
+        if (!is_array($weights) || !$weights) {
+            $weights = $heroAdventureConfig['equip_tier_weights'];
+        }
         $roll = mt_rand(1, 100); $acc = 0; $tier = 1;
         foreach ($weights as $t => $w) {
             $acc += (int) $w;
@@ -612,6 +598,206 @@ class HeroAdventure
             $pool[] = $iid;
         }
         return count($pool) ? (int) $pool[array_rand($pool)] : 0;
+    }
+
+
+    /* =========================================================================
+     *  SITE TYPES AND REWARD PROFILE (local redesign)
+     * ===================================================================== */
+
+    /**
+     * Pick a site type for a tile. Oases and tiles next to one favour beast
+     * lairs; croppers favour caravans (of crop). Returns [type, restype],
+     * restype 1-4 = wood/clay/iron/crop for single-resource sites.
+     */
+    public function pickType($tile)
+    {
+        global $heroAdventureConfig;
+        $types = $heroAdventureConfig['types'];
+
+        $fieldtype = (int) ($tile['fieldtype'] ?? 0);
+        $oasis = (int) ($tile['oasistype'] ?? 0) > 0;
+        if (!$oasis && isset($tile['x'], $tile['y'])) {
+            $x = (int) $tile['x']; $y = (int) $tile['y'];
+            $r = mysqli_query($this->db, "SELECT 1 FROM " . TB_PREFIX . "wdata
+                  WHERE x BETWEEN " . ($x - 1) . " AND " . ($x + 1) . "
+                    AND y BETWEEN " . ($y - 1) . " AND " . ($y + 1) . " AND oasistype > 0 LIMIT 1");
+            $oasis = $r && mysqli_num_rows($r) > 0;
+        }
+        $cropper = in_array($fieldtype, array(1, 6), true);
+
+        $weights = array();
+        foreach ($types as $id => $def) {
+            $w = (int) ($def['weight'] ?? 0);
+            if ($id === 3 && $oasis)   $w *= 2;  // beast lair
+            if ($id === 4 && $cropper) $w *= 2;  // lost caravan
+            if ($w > 0) $weights[$id] = $w;
+        }
+        $roll = mt_rand(1, max(1, array_sum($weights))); $acc = 0; $type = 1;
+        foreach ($weights as $id => $w) {
+            $acc += $w;
+            if ($roll <= $acc) { $type = (int) $id; break; }
+        }
+
+        $restype = 0;
+        if (!empty($types[$type]['single_res'])) {
+            // the resource the valley is richest in (croppers: crop)
+            $fields = array(1 => array(3, 3, 3, 9), 2 => array(3, 4, 5, 6), 3 => array(4, 4, 4, 6), 4 => array(4, 5, 3, 6),
+                            5 => array(5, 3, 4, 6), 6 => array(1, 1, 1, 15), 7 => array(4, 4, 3, 7), 8 => array(3, 4, 4, 7),
+                            9 => array(4, 3, 4, 7), 10 => array(3, 5, 4, 6), 11 => array(4, 3, 5, 6), 12 => array(5, 4, 3, 6));
+            if ($cropper) {
+                $restype = 4;
+            } elseif (isset($fields[$fieldtype])) {
+                $f = array_slice($fields[$fieldtype], 0, 3);
+                $best = array_keys($f, max($f));
+                $restype = $best[array_rand($best)] + 1;
+            } else {
+                $restype = mt_rand(1, 4);
+            }
+        }
+        return array($type, $restype);
+    }
+
+    /**
+     * Hero fighting strength for adventures: offence + average defence of the
+     * hero's unit with its attribute points, plus fighting-strength gear.
+     * 'ref' is the same for a hero of this level that put half its points
+     * into attack/defence - the baseline the site's danger is tuned to.
+     */
+    public function strength($uid, $hero)
+    {
+        $unit = (int) ($hero['unit'] ?? 0);
+        $hd = isset($GLOBALS['h' . $unit]) ? $GLOBALS['h' . $unit] : null;
+        if (!$hd) {
+            include __DIR__ . '/Data/unitdata.php';
+            $var = 'h' . $unit;
+            $hd = isset($$var) ? $$var : null;
+        }
+        if (!$hd) {
+            return array('power' => 1, 'ref' => 1, 'reduce' => 0);
+        }
+        $calc = function ($atkPts, $defPts) use ($hd) {
+            $atk = $hd['atk'] + 5 * floor($atkPts * $hd['atkp'] / 5);
+            $di  = $hd['di']  + 5 * floor($defPts * $hd['dip'] / 5);
+            $dc  = $hd['dc']  + 5 * floor($defPts * $hd['dcp'] / 5);
+            return $atk + ($di + $dc) / 2;
+        };
+        $bon = (new HeroItems())->getBonuses((int) $uid);
+        $half = (int) round(1.25 * ((int) $hero['level'] + 1));
+        return array(
+            'power'  => $calc((int) ($hero['attack'] ?? 0), (int) ($hero['defence'] ?? 0)) + (int) ($bon[HB_FIGHT] ?? 0),
+            'ref'    => $calc($half, $half),
+            'reduce' => (int) ($bon[HB_DMG_REDUCE] ?? 0),
+        );
+    }
+
+    /**
+     * Everything an adventure can give, as ranges, for this hero and trip.
+     * Used both for the offer list and for the roll on arrival, so what the
+     * page shows is what can happen. XP excludes the helmet bonus (applied
+     * on arrival).
+     */
+    public function profile($uid, $hero, $difficulty, $type, $restype, $dist)
+    {
+        global $heroAdventureConfig;
+        $C   = $heroAdventureConfig;
+        $cfg = $C[$difficulty] ?? $C[0];
+        $T   = $C['types'][$type] ?? $C['types'][0];
+        $L   = (int) ($hero['level'] ?? 0);
+
+        $d = ($dist - self::SITE_MIN_RADIUS) / max(1, self::SITE_MAX_RADIUS - self::SITE_MIN_RADIUS);
+        $d = max(0, min(1, $d));
+        $xpMul   = (float) $T['xp'] * (1 + $C['level_xp'] * $L) * (1 + $C['dist_bonus'] * $d);
+        $resMul  = (float) $T['res'] * (1 + $C['level_res'] * $L) * (1 + $C['dist_bonus'] * $d);
+        $itemMul = 1 + $C['dist_item_bonus'] * $d;
+
+        $res = array();
+        $r = array((int) round($cfg['resources'][0] * $resMul), (int) round($cfg['resources'][1] * $resMul));
+        for ($k = 1; $k <= 4; $k++) {
+            if (!empty($T['single_res'])) {
+                $res[] = ($k === (int) $restype) ? $r : array(0, 0);
+            } else {
+                $res[] = $r;
+            }
+        }
+
+        $heal = array(0, 0); $hp = array(0, 0); $factor = 1;
+        if (!empty($T['heal'])) {
+            $heal = $T['heal'][$difficulty] ?? $T['heal'][0];
+        } else {
+            $s = $this->strength($uid, $hero);
+            $factor = $s['ref'] / max(1, $s['power']);
+            $factor = max($C['strength_clamp'][0], min($C['strength_clamp'][1], $factor));
+            foreach (array(0, 1) as $k) {
+                $hp[$k] = max(0, (int) round($cfg['hp_loss'][$k] * (float) $T['hp'] * $factor) - $s['reduce']);
+            }
+        }
+
+        return array(
+            'exp'     => array(max(1, (int) round($cfg['exp'][0] * $xpMul)), max(1, (int) round($cfg['exp'][1] * $xpMul))),
+            'res'     => $res,
+            'hp'      => $hp,
+            'heal'    => $heal,
+            'factor'  => $factor,
+            'gear'    => min(90, (int) round($cfg['equip_chance'] * (float) $T['gear'] * $itemMul)),
+            'cons'    => min(90, (int) round($cfg['item_chance'] * (float) $T['cons'] * $itemMul)),
+            'pool'    => $T['pool'] ?? $cfg['consumable'],
+            'tiers'   => $T['tiers'] ?? ($cfg['tier_weights'] ?? $C['equip_tier_weights']),
+            'stories' => count($T['story'] ?? array()),
+            'name'    => $T['name'],
+            'hint'    => $T['hint'],
+        );
+    }
+
+    /**
+     * Roll an arrival inside the site's profile (type, hero level, distance,
+     * hero strength). No database writes - processArrivals applies it.
+     */
+    public function rollOutcome($uid, $hero, $data)
+    {
+        global $database, $heroAdventureConfig;
+        $cfg = $heroAdventureConfig[(int) $data['difficulty']] ?? $heroAdventureConfig[0];
+        $cHome = $database->getCoor((int) $data['from']);
+        $cSite = $database->getCoor((int) $data['to']);
+        $dist  = ($cHome && $cSite) ? $database->getDistance($cHome['x'], $cHome['y'], $cSite['x'], $cSite['y']) : self::SITE_MIN_RADIUS;
+        $prof  = $this->profile($uid, $hero, (int) $data['difficulty'], (int) $data['type'], (int) $data['restype'], $dist);
+
+        $exp    = mt_rand($prof['exp'][0], $prof['exp'][1]);
+        $silver = mt_rand($cfg['silver'][0], $cfg['silver'][1]);
+        // local redesign: hero silver is switched off (GameEngine/Data/gold.php)
+        include_once __DIR__ . '/Data/gold.php';
+        if (!TZ_SILVER_ENABLED) $silver = 0;
+        $hpLoss = mt_rand($prof['hp'][0], $prof['hp'][1]);
+        $heal   = mt_rand($prof['heal'][0], $prof['heal'][1]);
+        $loot   = array();
+        foreach ($prof['res'] as $k => $range) {
+            $loot[$k] = ($range[1] > 0) ? mt_rand($range[0], $range[1]) : 0;
+        }
+        list($wood, $clay, $iron, $crop) = $loot;
+
+        // Item drop: gear first (rarer, tier-weighted toward T1), and only
+        // if no gear dropped, roll the consumable pool. One item max.
+        $itemId = 0; $itemQty = 0;
+        if (mt_rand(1, 100) <= $prof['gear']) {
+            $itemId  = $this->rollEquipment($uid, $prof['tiers']);
+            $itemQty = ($itemId > 0) ? 1 : 0;
+        }
+        if ($itemId === 0 && mt_rand(1, 100) <= $prof['cons']) {
+            $pool    = $prof['pool'];
+            $itemId  = (int) $pool[array_rand($pool)];
+            $itemQty = 1;
+        }
+        $story = mt_rand(0, max(0, $prof['stories'] - 1));
+
+        return array('exp' => $exp, 'silver' => $silver, 'hp' => $hpLoss, 'heal' => $heal,
+                     'wood' => $wood, 'clay' => $clay, 'iron' => $iron, 'crop' => $crop,
+                     'itemId' => $itemId, 'itemQty' => $itemQty, 'story' => $story);
+    }
+
+    /** Hero row for the offer list (same columns the arrival roll uses). */
+    public function livingHero($uid)
+    {
+        return $this->getLivingHero($uid);
     }
 
     /* =========================================================================
@@ -686,7 +872,7 @@ class HeroAdventure
     {
         $uid  = (int) $uid;
         $stmt = $this->db->prepare(
-            "SELECT heroid, uid, unit, wref, level, experience, health, dead
+            "SELECT heroid, uid, unit, wref, level, experience, health, dead, attack, defence
                FROM " . TB_PREFIX . "hero WHERE uid = ? AND dead = 0 LIMIT 1"
         );
         $stmt->bind_param('i', $uid);

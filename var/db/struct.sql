@@ -1238,6 +1238,8 @@ CREATE TABLE IF NOT EXISTS `%PREFIX%hero_adventure` (
  `uid`        int(11)    NOT NULL,
  `wref`       int(11)    NOT NULL DEFAULT 0,
  `difficulty` tinyint(1) NOT NULL DEFAULT 0,
+ `type`       tinyint(2) NOT NULL DEFAULT 0,
+ `restype`    tinyint(1) NOT NULL DEFAULT 0,
  `duration`   int(11)    NOT NULL DEFAULT 0,
  `created`    int(11)    NOT NULL DEFAULT 0,
  `expire`     int(11)    NOT NULL DEFAULT 0,

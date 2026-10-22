@@ -336,25 +336,105 @@ $heroAdventureConfig = array(
     // Tier weights for equipment drops (percent, must sum to 100).
     'equip_tier_weights' => array(1 => 70, 2 => 25, 3 => 5),
 
+    /* local redesign: adventures scale with the hero and the trip.
+     * XP x (1 + level_xp * level), resources x (1 + level_res * level);
+     * the farthest sites (SITE_MAX_RADIUS) pay up to dist_bonus more XP and
+     * resources and dist_item_bonus more item chance than the nearest. */
+    'level_xp'        => 0.20,
+    'level_res'       => 0.10,
+    'dist_bonus'      => 0.60,
+    'dist_item_bonus' => 0.30,
+    // health loss x (reference strength for the hero's level / actual
+    // strength), clamped - points in attack/defence and fighting gear make
+    // adventures safer, an untrained hero gets hurt more
+    'strength_clamp'  => array(0.5, 2.0),
+
     0 => array( // NORMAL
         'label'        => 'HERO_ADV_NORMAL',
-        'exp'          => array(6, 12),
+        'exp'          => array(10, 20),
         'silver'       => array(0, 40),
-        'hp_loss'      => array(0, 8),
-        'resources'    => array(0, 400),
+        'hp_loss'      => array(3, 10),
+        'resources'    => array(100, 400),
         'equip_chance' => 20,                              // % chance: 1 random piece of gear
         'item_chance'  => 40,                              // % chance: consumables (rolled only if no gear dropped)
         'consumable'   => array(200, 201, 208),           // Ointment, Scroll, Cage
     ),
-    1 => array( // HARD
+    1 => array( // HARD - riskier, so every reward is better (item chances were lower than normal)
         'label'        => 'HERO_ADV_HARD',
-        'exp'          => array(18, 30),
+        'exp'          => array(30, 50),
         'silver'       => array(30, 120),
-        'hp_loss'      => array(10, 35),
-        'resources'    => array(200, 1200),
-        'equip_chance' => 10,
-        'item_chance'  => 20,
+        'hp_loss'      => array(12, 30),
+        'resources'    => array(300, 1000),
+        'equip_chance' => 30,
+        'item_chance'  => 45,
         'consumable'   => array(200, 201, 203, 206, 208), // + Law Tablet, Small Bandage
+        'tier_weights' => array(1 => 55, 2 => 35, 3 => 10),
+    ),
+
+    /* Site types. Multipliers apply to the difficulty's base ranges above.
+     * 'weight' = how often it is offered (terrain adjusts it, see
+     * HeroAdventure::pickType); 'single_res' = all resources as one kind;
+     * 'heal' = health restored instead of lost (per difficulty);
+     * 'pool' = consumables found there; 'tiers' = gear tier weights. */
+    'types' => array(
+        0 => array( // offers made before site types existed
+            'name' => 'Abandoned valley', 'hint' => 'A bit of everything',
+            'weight' => 0, 'xp' => 1, 'res' => 1, 'hp' => 1, 'gear' => 1, 'cons' => 1,
+            'story' => array('Your hero searched the valley and came back with what could be found.'),
+        ),
+        1 => array(
+            'name' => 'Bandit camp', 'hint' => 'Mostly resources',
+            'weight' => 25, 'xp' => 0.8, 'res' => 1.8, 'hp' => 1.1, 'gear' => 0.6, 'cons' => 0.8,
+            'pool' => array(206, 207, 203, 200),
+            'story' => array(
+                'Your hero scattered the bandits and carted off their stolen goods.',
+                'The camp fought back hard, but its storehouse was worth the bruises.',
+                'Bandits fled into the woods, leaving their plunder behind.',
+            ),
+        ),
+        2 => array(
+            'name' => 'Ancient ruins', 'hint' => 'Best chance of gear',
+            'weight' => 20, 'xp' => 0.8, 'res' => 0.3, 'hp' => 0.7, 'gear' => 2.0, 'cons' => 0.7,
+            'pool' => array(201, 201, 201, 201, 203, 203, 203, 204, 205),
+            'tiers' => array(1 => 45, 2 => 40, 3 => 15),
+            'story' => array(
+                'Your hero picked through crumbling halls of a forgotten fort.',
+                'Beneath the rubble lay a sealed chamber nobody had opened in centuries.',
+                'Old traps still guarded the ruins, but your hero found a way through.',
+            ),
+        ),
+        3 => array(
+            'name' => 'Beast lair', 'hint' => 'Lots of XP, dangerous',
+            'weight' => 20, 'xp' => 2.0, 'res' => 0.4, 'hp' => 1.5, 'gear' => 0.7, 'cons' => 1.3,
+            'pool' => array(208, 208, 208, 200, 206),
+            'story' => array(
+                'Your hero tracked the beast to its den and drove it out.',
+                'Something large lived in that cave. It does not any more.',
+                'A long fight in the dark - your hero came out bloodied but wiser.',
+            ),
+        ),
+        4 => array(
+            'name' => 'Lost caravan', 'hint' => 'Safe, one kind of resource',
+            'weight' => 20, 'xp' => 0.5, 'res' => 3.0, 'hp' => 0.3, 'gear' => 0.3, 'cons' => 0.7,
+            'single_res' => true,
+            'pool' => array(200, 201, 206),
+            'story' => array(
+                'Your hero found the overturned wagons and salvaged their cargo.',
+                'The merchants were long gone, but their goods were not.',
+                'A broken axle had stranded the caravan - easy pickings.',
+            ),
+        ),
+        5 => array(
+            'name' => "Hermit's shrine", 'hint' => 'XP and healing',
+            'weight' => 15, 'xp' => 1.6, 'res' => 0, 'hp' => 0, 'gear' => 0.4, 'cons' => 1.3,
+            'heal' => array(0 => array(5, 15), 1 => array(10, 25)),
+            'pool' => array(200, 200, 201, 201, 202),
+            'story' => array(
+                'An old hermit tended your hero\'s wounds and shared stories of the old wars.',
+                'Your hero rested at the shrine and left with a clearer mind.',
+                'The hermit asked for nothing - only that your hero listen.',
+            ),
+        ),
     ),
 );
 

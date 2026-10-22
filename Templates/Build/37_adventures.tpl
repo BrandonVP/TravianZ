@@ -67,18 +67,39 @@ if (class_exists('HeroItems') && defined('HB_XP')) {
 $tzAdvHero = mysqli_fetch_assoc(mysqli_query($database->dblink, "SELECT health FROM " . TB_PREFIX . "hero WHERE uid = " . (int) $session->uid . " AND dead = 0 ORDER BY heroid DESC LIMIT 1"));
 $tzAdvHealth = $tzAdvHero ? (float) $tzAdvHero['health'] : 0;
 $tzAdvFirst = !mysqli_fetch_row(mysqli_query($database->dblink, "SELECT 1 FROM " . TB_PREFIX . "hero_adventure WHERE uid = " . (int) $session->uid . " AND status = 2 LIMIT 1"));
-$tzAdvDetails = function ($difficulty) use ($heroAdventureConfig, $tzAdvXpBonus, $tzAdvHealth, $tzAdvFirst) {
-    $c = $heroAdventureConfig[(int) $difficulty] ?? null;
-    if (!$c) return '';
+$tzAdvHeroRow = $t4Adventures->livingHero($session->uid);
+$tzAdvHome = $tzAdvHeroRow ? $database->getCoor((int) $tzAdvHeroRow['wref']) : null;
+// local redesign: each offer's own profile - site type, hero level, distance
+// and hero strength - exactly the ranges the arrival roll uses
+$tzAdvProfile = function ($offer) use ($t4Adventures, $tzAdvHeroRow, $tzAdvHome, $database, $session) {
+    if (!$tzAdvHeroRow || !$tzAdvHome) return null;
+    $site = $database->getCoor((int) $offer['wref']);
+    $dist = $site ? $database->getDistance($tzAdvHome['x'], $tzAdvHome['y'], $site['x'], $site['y']) : HeroAdventure::SITE_MIN_RADIUS;
+    return $t4Adventures->profile($session->uid, $tzAdvHeroRow, (int) $offer['difficulty'], (int) ($offer['type'] ?? 0), (int) ($offer['restype'] ?? 0), $dist);
+};
+$tzAdvDetails = function ($offer, $prof) use ($tzAdvXpBonus, $tzAdvHealth, $tzAdvFirst) {
+    if (!$prof) return '';
     $xp = function ($n) use ($tzAdvXpBonus) { return (int) floor($n * (100 + $tzAdvXpBonus) / 100); };
-    $gear = (int) ($c['equip_chance'] ?? 0);
-    $cons = (int) round((100 - $gear) * (int) $c['item_chance'] / 100);
+    $gear = (int) $prof['gear'];
+    $cons = (int) round((100 - $gear) * (int) $prof['cons'] / 100);
     $parts = [];
-    $parts[] = '<b>XP</b> ' . $xp($c['exp'][0]) . '&ndash;' . $xp($c['exp'][1]) . ($tzAdvXpBonus > 0 ? ' <span class="tz-adv-dim">(+' . $tzAdvXpBonus . '% helmet)</span>' : '');
-    $risky = $tzAdvHealth > 0 && $c['hp_loss'][1] >= $tzAdvHealth;
-    $parts[] = '<span class="' . ($risky ? 'tz-adv-risk' : '') . '"><b>Health</b> &minus;' . (int) $c['hp_loss'][0] . '&ndash;' . (int) $c['hp_loss'][1] . '%'
-             . ($risky ? ' &mdash; could be fatal at ' . floor($tzAdvHealth) . '% health' : '') . '</span>';
-    $parts[] = '<b>Resources</b> ' . number_format($c['resources'][0]) . '&ndash;' . number_format($c['resources'][1]) . ' of each';
+    $parts[] = '<b>XP</b> ' . $xp($prof['exp'][0]) . '&ndash;' . $xp($prof['exp'][1]) . ($tzAdvXpBonus > 0 ? ' <span class="tz-adv-dim">(+' . $tzAdvXpBonus . '% helmet)</span>' : '');
+    if ($prof['heal'][1] > 0) {
+        $parts[] = '<span class="tz-adv-good"><b>Health</b> +' . (int) $prof['heal'][0] . '&ndash;' . (int) $prof['heal'][1] . '%</span>';
+    } else {
+        $risky = $tzAdvHealth > 0 && $prof['hp'][1] >= $tzAdvHealth;
+        $parts[] = '<span class="' . ($risky ? 'tz-adv-risk' : '') . '"><b>Health</b> &minus;' . (int) $prof['hp'][0] . '&ndash;' . (int) $prof['hp'][1] . '%'
+                 . ($risky ? ' &mdash; could be fatal at ' . floor($tzAdvHealth) . '% health' : '') . '</span>';
+    }
+    $names = array(1 => 'lumber', 2 => 'clay', 3 => 'iron', 4 => 'crop');
+    $nonzero = array();
+    foreach ($prof['res'] as $k => $r) if ($r[1] > 0) $nonzero[$k + 1] = $r;
+    if (count($nonzero) === 4) {
+        $r = reset($nonzero);
+        $parts[] = '<b>Resources</b> ' . number_format($r[0]) . '&ndash;' . number_format($r[1]) . ' of each';
+    } elseif ($nonzero) {
+        foreach ($nonzero as $k => $r) $parts[] = '<b>' . ucfirst($names[$k]) . '</b> ' . number_format($r[0]) . '&ndash;' . number_format($r[1]);
+    }
     if ($tzAdvFirst) {
         $parts[] = '<b>First adventure:</b> ' . (function_exists('heroItemName') ? heroItemName(HeroAdventure::FIRST_ADVENTURE_ITEM) : 'a special item');
     } else {
@@ -86,6 +107,20 @@ $tzAdvDetails = function ($difficulty) use ($heroAdventureConfig, $tzAdvXpBonus,
     }
     return implode(' &middot; ', $parts);
 };
+// how the hero's strength changes the danger, shown once above the list
+$tzAdvStrengthNote = '';
+if ($tzAdvHeroRow) {
+    $tzS = $t4Adventures->strength($session->uid, $tzAdvHeroRow);
+    $tzF = $tzS['ref'] / max(1, $tzS['power']);
+    if ($tzF > 1.05) {
+        $tzAdvStrengthNote = 'Your hero is weaker than usual for level ' . (int) $tzAdvHeroRow['level'] . ' (fighting strength ' . number_format($tzS['power']) . ' vs ' . number_format($tzS['ref']) . '), so adventures hurt more. Points in attack or defence, or fighting gear, make them safer.';
+    } elseif ($tzF < 0.95) {
+        $tzAdvStrengthNote = 'Your hero is strong for level ' . (int) $tzAdvHeroRow['level'] . ' (fighting strength ' . number_format($tzS['power']) . ' vs ' . number_format($tzS['ref']) . '), so adventures hurt less.';
+    }
+    if ($tzS['reduce'] > 0) {
+        $tzAdvStrengthNote .= ($tzAdvStrengthNote ? ' ' : '') . 'Armour takes ' . (int) $tzS['reduce'] . ' off every health loss.';
+    }
+}
 $t4Running = $t4Adventures->getRunning($session->uid);
 $t4Now     = time();
 
@@ -211,6 +246,23 @@ table.t4adv td.t4empty { color: #a5a19a; text-align: center; }
 
 .t4advRunning b { color: #3f6b1c; }
 
+/* local redesign: site types */
+table.t4adv .tz-adv-type {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    margin-right: 6px; vertical-align: middle; background: #b8a98a;
+}
+table.t4adv .tz-adv-t1 { background: #b5552f; }   /* bandit camp */
+table.t4adv .tz-adv-t2 { background: #7a5fa8; }   /* ancient ruins */
+table.t4adv .tz-adv-t3 { background: #4f6e2a; }   /* beast lair */
+table.t4adv .tz-adv-t4 { background: #c8962a; }   /* lost caravan */
+table.t4adv .tz-adv-t5 { background: #3b86a8; }   /* hermit's shrine */
+table.t4adv .t4placeName { font-weight: 700; }
+table.t4adv .tz-adv-hint { font-weight: 400; color: #8a7a62; font-size: 0.92em; margin-left: 4px; }
+table.t4adv .tz-adv-safe { color: #3f7a2a; font-weight: 700; }
+table.t4adv .tz-adv-hard { display: block; color: #a0402a; font-size: 0.85em; font-weight: 700; }
+table.t4adv .tz-adv-good { color: #3f7a2a; }
+.tz-adv-note { margin: 0 0 10px; color: #6b5a45; }
+
 .t4advRunning .t4advClock {
     font-weight: bold;
     font-variant-numeric: tabular-nums;
@@ -237,6 +289,7 @@ table.t4adv td.t4empty { color: #a5a19a; text-align: center; }
 </div>
 <?php } ?>
 
+<?php if ($tzAdvStrengthNote !== '') { ?><p class="tz-adv-note"><?php echo htmlspecialchars($tzAdvStrengthNote); ?></p><?php } ?>
 <table id="distribution" class="t4adv" cellpadding="1" cellspacing="1">
     <thead>
         <tr><th colspan="5"><?php echo HERO_ADV_LIST; ?></th></tr>
@@ -255,10 +308,12 @@ table.t4adv td.t4empty { color: #a5a19a; text-align: center; }
             <?php
                 $t4Place = $t4PlaceInfo($t4Offer['wref']);
                 $t4Hard  = ((int) $t4Offer['difficulty'] === 1);
+                $tzProf  = $tzAdvProfile($t4Offer);
+                $tzType  = (int) ($t4Offer['type'] ?? 0);
             ?>
         <tr>
             <td class="t4place">
-                <span class="t4placeName"><?php echo $t4Place ? $t4Place['name'] : '&mdash;'; ?></span>
+                <span class="t4placeName"><?php if ($tzProf && $tzType > 0) { ?><span class="tz-adv-type tz-adv-t<?php echo $tzType; ?>"></span><?php echo htmlspecialchars($tzProf['name']); ?> <span class="tz-adv-hint"><?php echo htmlspecialchars($tzProf['hint']); ?></span><?php } else { echo $t4Place ? $t4Place['name'] : '&mdash;'; } ?></span>
                 <?php if ($t4Place) { ?>
                 <span class="t4coord">
                     <a href="karte.php?d=<?php echo $t4Place['wref']; ?>&amp;c=<?php echo $t4Place['check']; ?>">(<?php echo $t4Place['x']; ?>|<?php echo $t4Place['y']; ?>)</a>
@@ -269,9 +324,12 @@ table.t4adv td.t4empty { color: #a5a19a; text-align: center; }
             <td class="t4dur"><?php echo $generator->getTimeFormat((int) $t4Offer['duration']); ?></td>
 
             <td class="t4dan">
+                <?php if ($tzProf && $tzProf['heal'][1] > 0) { ?><span class="tz-adv-safe" title="Safe - heals your hero">Safe</span><?php } else { ?>
                 <img class="t4danIco" src="img/hero/<?php echo $t4Hard ? 'dangerGreat.gif' : 'danger.gif'; ?>"
                      alt="<?php echo $t4Hard ? HERO_ADV_DIFF_HARD : HERO_ADV_DIFF_NORMAL; ?>"
                      title="<?php echo $t4Hard ? HERO_ADV_DIFF_HARD : HERO_ADV_DIFF_NORMAL; ?>">
+                <?php if ($t4Hard) { ?><span class="tz-adv-hard">Hard</span><?php } ?>
+                <?php } ?>
             </td>
 
             <td class="t4exp"><span id="timer<?php echo ++$session->timer; ?>"><?php echo $generator->getTimeFormat(max(0, $t4Offer['expire'] - $t4Now)); ?></span></td>
@@ -288,7 +346,7 @@ table.t4adv td.t4empty { color: #a5a19a; text-align: center; }
                 <?php } ?>
             </td>
         </tr>
-        <tr class="tz-adv-details"><td colspan="5"><?php echo $tzAdvDetails($t4Offer['difficulty']); ?></td></tr>
+        <tr class="tz-adv-details"><td colspan="5"><?php echo $tzAdvDetails($t4Offer, $tzProf); ?></td></tr>
         <?php } ?>
     <?php } else { ?>
         <tr><td colspan="5" class="t4empty"><?php echo HERO_ADV_NONE; ?></td></tr>

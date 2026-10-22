@@ -38,16 +38,26 @@ $iron       = (int)($adv['iron']   ?? 0);
 $crop       = (int)($adv['crop']   ?? 0);
 $itemId     = (int)($adv['itemid'] ?? 0);
 $itemQty    = (int)($adv['itemqty'] ?? 0);
+// local redesign: site type, story line and healing (hermit's shrine)
+$advType    = (int)($adv['type']   ?? 0);
+$advStory   = isset($adv['story']) ? (int) $adv['story'] : -1;
+$heal       = (int)($adv['heal']   ?? 0);
 
 // Resolve the item name from the catalog (heroItemName falls back safely).
 // berichte.php runs from the web root, so the relative path is stable.
-if ($itemId > 0 && !function_exists('heroItemName')) {
+global $heroAdventureConfig;
+if (!isset($heroAdventureConfig) || !function_exists('heroItemName')) {
     include_once 'GameEngine/Data/hero_items.php';
 }
 
 $diffLabel = $difficulty === 1
     ? tz_hero_adv('HERO_ADV_HARD',   'a hard adventure')
     : tz_hero_adv('HERO_ADV_NORMAL', 'a normal adventure');
+$advDef   = ($advType > 0 && isset($heroAdventureConfig['types'][$advType])) ? $heroAdventureConfig['types'][$advType] : null;
+if ($advDef) {
+    $diffLabel = htmlspecialchars($advDef['name']) . ($difficulty === 1 ? ' (hard)' : '');
+}
+$advStoryText = ($advDef && $advStory >= 0 && isset($advDef['story'][$advStory])) ? $advDef['story'][$advStory] : '';
 ?>
 
 <table cellpadding="1" cellspacing="1" id="report_surround">
@@ -78,6 +88,7 @@ $diffLabel = $difficulty === 1
     <?php } else { ?>
 
     <p><?php echo tz_hero_adv('HERO_ADV_RETURNED', 'Your hero has returned from'); ?> <b><?php echo $diffLabel; ?></b>.</p>
+    <?php if ($advStoryText !== '') { ?><p><i><?php echo htmlspecialchars($advStoryText); ?></i></p><?php } ?>
 
     <table class="adventureReward" cellpadding="1" cellspacing="1" style="width:100%;margin-top:8px;">
         <tr>
@@ -109,6 +120,12 @@ $diffLabel = $difficulty === 1
         <tr>
             <td><?php echo tz_hero_adv('HERO_ADV_ITEM_FOUND', 'Item found'); ?></td>
             <td style="text-align:right;"><?php echo $itemQty; ?>&times; <?php echo heroItemName($itemId); ?></td>
+        </tr>
+        <?php } ?>
+        <?php if ($heal > 0) { ?>
+        <tr>
+            <td>Health restored</td>
+            <td style="text-align:right;color:#3f7a2a;">+<?php echo $heal; ?>%</td>
         </tr>
         <?php } ?>
         <?php if ($hp > 0) { ?>
