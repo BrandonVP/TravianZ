@@ -1030,10 +1030,12 @@ class Technology {
 	}
 
 	public function meetRRequirement($tech) {
+		// local redesign: Blacksmith/Armoury upgrades are account-wide, so research no longer
+		// needs one in this village; Main Building 3 (what those buildings needed) instead
 		global $session, $building;
 		switch($tech) {
-			case 2: return $building->getTypeLevel(22) >= 1 && $building->getTypeLevel(13) >= 1;
-			case 3: return $building->getTypeLevel(22) >= 5 && $building->getTypeLevel(12) >= 1;
+			case 2: return $building->getTypeLevel(22) >= 1 && $building->getTypeLevel(15) >= 3;
+			case 3: return $building->getTypeLevel(22) >= 5 && $building->getTypeLevel(15) >= 3;
 			
 			case 4:
 			case 23: return$building->getTypeLevel(22) >= 5 && $building->getTypeLevel(20) >= 1;
@@ -1052,7 +1054,7 @@ class Technology {
 
 			case 13:
 			case 33:
-			case 43: return $building->getTypeLevel(22) >= 3 && $building->getTypeLevel(12) >= 1;
+			case 43: return $building->getTypeLevel(22) >= 3 && $building->getTypeLevel(15) >= 3;
 
 			case 14:
 			case 34:
@@ -1083,7 +1085,7 @@ class Technology {
 			case 39:
 			case 49: return $building->getTypeLevel(22) >= 20 && $building->getTypeLevel(16) >= 5;
 			
-			case 22: return $building->getTypeLevel(22) >= 3 && $building->getTypeLevel(12) >= 1;
+			case 22: return $building->getTypeLevel(22) >= 3 && $building->getTypeLevel(15) >= 3;
 			
 			case 24: return $building->getTypeLevel(22) >= 5 && $building->getTypeLevel(20) >= 3;
 
@@ -1093,19 +1095,19 @@ class Technology {
 
 			// scout de infanterie: Huni (cerinta proiectului) + Spartani (Sentinel: Academie 1 + Fierarie 1)
 			case 52: return $building->getTypeLevel(22) >= 1 && $building->getTypeLevel(15) >= 5;
-			case 74: return $building->getTypeLevel(22) >= 1 && $building->getTypeLevel(12) >= 1;
+			case 74: return $building->getTypeLevel(22) >= 1 && $building->getTypeLevel(15) >= 3;
 
 			// infanterie defensiva (ca 2)
 			case 62:
-			case 72: return $building->getTypeLevel(22) >= 1 && $building->getTypeLevel(13) >= 1;
+			case 72: return $building->getTypeLevel(22) >= 1 && $building->getTypeLevel(15) >= 3;
 
 			// infanterie elita/ofensiva (ca 3)
 			case 73:
-			case 84: return $building->getTypeLevel(22) >= 5 && $building->getTypeLevel(12) >= 1;
+			case 84: return $building->getTypeLevel(22) >= 5 && $building->getTypeLevel(15) >= 3;
 
 			// infanterie de atac (ca 13/33/43)
 			case 63:
-			case 83: return $building->getTypeLevel(22) >= 3 && $building->getTypeLevel(12) >= 1;
+			case 83: return $building->getTypeLevel(22) >= 3 && $building->getTypeLevel(15) >= 3;
 
 			// scout de infanterie (ca 14/34/44)
 			case 82: return $building->getTypeLevel(22) >= 1 && $building->getTypeLevel(15) >= 5;

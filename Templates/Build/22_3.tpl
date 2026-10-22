@@ -80,7 +80,7 @@ $level = (int)$village->resarray['f'.$id];
     <thead><tr><td colspan="2"><?php echo PREREQUISITES;?></td></tr></thead>
     <tbody>
         <?php if (!$technology->meetRRequirement(22) &&!$technology->getTech(22)):?>
-        <tr><td class="desc"><div class="tit"><img class="unit u22" src="img/x.gif" alt="<?php echo U22;?>"/><a onclick="return Popup(22,1);" href="#"><?php echo U22;?></a></div></td><td class="cond"><a href="#" onclick="return Popup(22,4);"><?php echo ACADEMY;?></a> <span><?php echo LEVEL;?> 3</span><br><a href="#" onclick="return Popup(12,4);"><?php echo BLACKSMITH;?></a> <span><?php echo LEVEL;?> 1</span></td></tr>
+        <tr><td class="desc"><div class="tit"><img class="unit u22" src="img/x.gif" alt="<?php echo U22;?>"/><a onclick="return Popup(22,1);" href="#"><?php echo U22;?></a></div></td><td class="cond"><a href="#" onclick="return Popup(22,4);"><?php echo ACADEMY;?></a> <span><?php echo LEVEL;?> 3</span><br><a href="#" onclick="return Popup(15,4);"><?php echo MAINBUILDING;?></a> <span><?php echo LEVEL;?> 3</span></td></tr>
         <?php endif;?>
         <?php if (!$technology->meetRRequirement(23) &&!$technology->getTech(23)):?>
         <tr><td class="desc"><div class="tit"><img class="unit u23" src="img/x.gif" alt="<?php echo U23;?>"/><a onclick="return Popup(23,1);" href="#"><?php echo U23;?></a></div></td><td class="cond"><a href="#" onclick="return Popup(22,4);"><?php echo ACADEMY;?></a> <span><?php echo LEVEL;?> 5</span><br><a href="#" onclick="return Popup(20,4);"><?php echo STABLE;?></a> <span><?php echo LEVEL;?> 1</span></td></tr>
