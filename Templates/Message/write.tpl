@@ -52,31 +52,34 @@ function submitDefault(type,uid) {
 }
 </script>
 
-<div id="write_head" class="msg_head"></div>
-<div id="write_content" class="msg_content">
+<!-- local redesign: themed card instead of the notepad artwork -->
+<div id="write_content" class="msg_content tz-msg-card">
 
 <form method="post" action="nachrichten.php" accept-charset="UTF-8" name="msg">
 <input type="hidden" name="c" value="3e9" />
 <input type="hidden" name="p" value="" />
 
-<img src="img/x.gif" id="label" class="send" alt="" />
-
-<div id="heading">
+<div id="heading" class="tz-msg-fields">
 
 <!-- ======================================================
      RECEIVER
 ====================================================== -->
+<label class="tz-msg-label" for="receiver"><?php echo defined('RECEIVER') ? RECEIVER : 'Recipient'; ?></label>
 <input class="text" type="text" name="an" id="receiver"
 value="<?php
-if (isset($id)) {
+// only when the URL names a recipient (reply / "write to player"); a stray
+// $id from earlier page code used to prefill some unrelated player here
+if (isset($_GET['id']) && isset($id)) {
     echo getCachedUsername($id, $database, $userCache);
 }
 ?>"
-maxlength="20" tabindex="1" /><br />
+maxlength="20" tabindex="1" />
+<a id="adbook" class="tz-btn tz-btn-sm" href="#" onclick="toggleFriendsList(); return false;"><?php echo ADDRESSBOOK; ?></a>
 
 <!-- ======================================================
      SUBJECT (reply logic păstrată 100%)
 ====================================================== -->
+<label class="tz-msg-label" for="subject"><?php echo defined('SUBJECT') ? SUBJECT : 'Subject'; ?></label>
 <input class="text" type="text" name="be" id="subject"
 value="<?php
 if (isset($message->reply['topic'])) {
@@ -93,12 +96,7 @@ maxlength="35" tabindex="2" />
 
 </div>
 
-<a id="adbook" href="#" onclick="toggleFriendsList(); return false;">
-    <img src="img/x.gif" alt="<?php echo ADDRESSBOOK; ?>" title="<?php echo ADDRESSBOOK; ?>" />
-</a>
-
 <div class="clear"></div>
-<div class="line"></div>
 
 <!-- ======================================================
      MESSAGE AREA (NU MODIFICĂM BB EDITOR)
@@ -259,19 +257,13 @@ for ($i = 0; $i < 20; $i++) {
 
 </form>
 
-<a href="#" onclick="closeFriendsList(); return false;">
-<img src="img/x.gif" id="close" alt="<?php echo TZ_CLOSE_ADRESSBOOK; ?>" />
-</a>
+<a href="#" class="tz-msg-close" title="<?php echo TZ_CLOSE_ADRESSBOOK; ?>" onclick="closeFriendsList(); return false;">&times;</a>
 
 </div>
 </div>
 
-<div id="write_foot" class="msg_foot"></div>
-
-<br />
-
-<span style="color: #DD0000">
+<p class="tz-msg-hint">
 <b><?php echo TZ_WARNING; ?></b> <?php echo TZ_YOU_CAN_T_USE_THE_VALUES; ?> <b>[message]</b> <?php echo constant('OR'); ?> <b>[/message]</b>
-</span>
+</p>
 
 </div>

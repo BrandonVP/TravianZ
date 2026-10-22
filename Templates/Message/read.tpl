@@ -50,19 +50,16 @@ $date = $generator->procMtime($reading['time']);
 
 <form method="post" action="nachrichten.php">
 
-<div id="read_head" class="msg_head"></div>
-
-<div id="read_content" class="msg_content">
-
-<img src="img/x.gif" id="label" class="read" alt="" />
+<!-- local redesign: themed card instead of the notepad artwork -->
+<div id="read_content" class="msg_content tz-msg-card">
 
 <!-- ======================================================
      HEADER (SENDER + SUBJECT)
 ====================================================== -->
-<div id="heading">
+<div id="heading" class="tz-msg-readhead">
 
     <!-- Sender -->
-    <div>
+    <div class="tz-msg-from"><span class="tz-msg-label"><?php echo defined('SENDER') ? SENDER : 'From'; ?></span>
         <?php
         if ($linkSender) {
             echo '<a href="' . rtrim(SERVER, '/') . '/spieler.php?uid=' . $ownerId . '">';
@@ -77,7 +74,7 @@ $date = $generator->procMtime($reading['time']);
     </div>
 
     <!-- Subject -->
-    <div><?php echo tz_expand_report($reading['topic']); ?></div>
+    <div class="tz-msg-subject"><?php echo tz_expand_report($reading['topic']); ?></div>
 
 </div>
 
@@ -90,7 +87,6 @@ $date = $generator->procMtime($reading['time']);
 </div>
 
 <div class="clear"></div>
-<div class="line"></div>
 
 <!-- ======================================================
      MESSAGE CONTENT (CRITICAL: NU MODIFICĂM FLOW)
@@ -115,7 +111,6 @@ echo stripslashes(nl2br($bbcoded));
 
 </div>
 
-<div id="read_foot" class="msg_foot"></div>
 
 </form>
 

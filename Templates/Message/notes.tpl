@@ -13,7 +13,9 @@
 
 <form method="post" action="nachrichten.php">
 
-<div id="block">
+<!-- local redesign: themed card instead of the notepad artwork -->
+<div id="block" class="tz-msg-card tz-msg-notes">
+    <h3 class="tz-msg-notes-h"><?php echo NOTES; ?> <span>Only you can see these.</span></h3>
 
     <!-- ======================================================
          FORM TYPE (UNCHANGED)
@@ -31,7 +33,6 @@
     ======================================================= -->
     <p class="btn">
         <button id="btn_save" name="s1" class="trav_buttons"><?php echo SAVE; ?></button>
-        <br />&nbsp;
     </p>
 
 </div>

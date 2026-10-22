@@ -1899,3 +1899,71 @@ div#content.forum table#edit_post textarea { width: 100%; box-sizing: border-box
 @media (max-width: 760px) {
     .tz-ally-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+/* ===================== Messages: write / read / notes (local redesign) ===================== */
+/* the old notepad artwork (img/msg/block_bg*.gif, underline.gif) is dropped */
+div#content.messages { width: auto; }
+div#content.messages div.tz-msg-card {
+    width: auto; position: relative; padding: 14px 16px 16px;
+    background: var(--tz-panel) none; border: 1px solid var(--tz-line); border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(60, 40, 10, .08);
+}
+div#content.messages .tz-msg-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #8a7a62; }
+/* write: recipient / subject */
+div#content.messages div.msg_content div#heading.tz-msg-fields {
+    float: none; padding: 0; display: grid; grid-template-columns: 90px minmax(0, 1fr) auto; gap: 8px 10px; align-items: center; margin-bottom: 10px;
+}
+div#content.messages div.msg_content div#heading.tz-msg-fields * { height: auto; }
+div#content.messages #write_content div#heading input.text {
+    width: 100%; box-sizing: border-box; height: 32px; padding: 5px 10px;
+    border: 1px solid var(--tz-line); border-radius: 8px; background: #fffdf7 none; color: var(--tz-ink); font: inherit; font-size: 13px;
+}
+div#content.messages #write_content div#heading input.text:focus,
+div#content.messages #write_content textarea:focus,
+div#content.messages div#block textarea:focus { outline: none; border-color: var(--tz-gold); box-shadow: 0 0 0 2px rgba(201, 151, 46, .25); }
+div#content.messages #write_content div#heading input#subject { grid-column: 2 / 4; }
+div#content.messages div.msg_content div#heading.tz-msg-fields a#adbook { float: none; width: auto; height: auto; margin: 0; padding: 5px 12px; white-space: nowrap; }
+/* write: formatting toolbar + text */
+div#content.messages #message_toolbar { background: var(--tz-cream); border: 1px solid var(--tz-line); border-radius: 8px 8px 0 0; padding: 5px 6px; }
+div#content.messages #write_content .line.bbLine { display: none; }
+div#content.messages #write_content textarea {
+    display: block; width: 100%; box-sizing: border-box; margin: 0; height: 300px; padding: 8px 10px;
+    border: 1px solid var(--tz-line); border-top: 0; border-radius: 0 0 8px 8px; background: #fffdf7 none; color: var(--tz-ink); font: inherit; font-size: 13px; line-height: 1.5;
+}
+div#content.messages div.msg_content p.btn { margin: 12px 0 0; text-align: left; }
+div#content.messages div#message_preview.message { width: auto; margin: 0; padding: 8px 10px; min-height: 0; }
+div#content.messages .tz-msg-hint { margin: 8px 0 0; font-size: 12px; color: #8a2f1c; }
+/* address book: a card over the form */
+div#content.messages div#adressbook {
+    top: 54px; right: 16px; left: auto; bottom: auto; width: 440px; max-width: calc(100% - 32px); height: auto; padding: 12px 14px;
+    background: var(--tz-panel) none; border: 1px solid var(--tz-line); border-radius: 12px; box-shadow: 0 8px 24px rgba(40, 25, 5, .25); text-align: left;
+}
+div#content.messages div#adressbook h2 { margin: 0 0 6px; font-size: 16px; }
+div#content.messages div#adressbook input.text { width: 100%; box-sizing: border-box; padding: 3px 6px; border: 1px solid var(--tz-line); border-radius: 6px; background: #fffdf7; }
+div#content.messages a.tz-msg-close { position: absolute; top: 8px; right: 12px; font-size: 22px; line-height: 1; text-decoration: none; color: #6b5a45; }
+div#content.messages a.tz-msg-close:hover { color: var(--tz-ink); }
+/* read */
+div#content.messages div.msg_content div#heading.tz-msg-readhead { float: left; padding: 0; }
+div#content.messages div#read_content div#heading.tz-msg-readhead div { width: auto; height: auto; background: none; }
+div#content.messages div.tz-msg-from { font-size: 13px; }
+div#content.messages div.tz-msg-from .tz-msg-label { margin-right: 6px; }
+div#content.messages div.tz-msg-from a { font-weight: 700; }
+div#content.messages div.tz-msg-subject { font-family: "Cinzel", Georgia, serif; font-size: 17px; font-weight: 700; color: var(--tz-ink); margin-top: 2px; }
+div#content.messages div#read_content div#time { padding-right: 0; color: #8a7a62; font-size: 12px; }
+div#content.messages div#read_content div#time div { height: auto; }
+div#content.messages div#read_content div.message {
+    clear: both; width: auto; margin: 10px 0 0; min-height: 120px; padding: 12px 14px;
+    background: #fffdf7 none; border: 1px solid var(--tz-line); border-radius: 8px; font-size: 13px; line-height: 1.55;
+}
+/* notes */
+div#content.messages div#block.tz-msg-notes { height: auto; margin: 0; }
+div#content.messages h3.tz-msg-notes-h { margin: 0 0 8px; font-family: "Cinzel", Georgia, serif; font-size: 15px; }
+div#content.messages h3.tz-msg-notes-h span { font-family: "Source Sans 3", "Segoe UI", sans-serif; font-size: 12px; font-weight: 400; color: #8a7a62; margin-left: 6px; }
+div#content.messages div#block textarea {
+    position: static; display: block; width: 100%; box-sizing: border-box; height: 360px; padding: 10px 12px;
+    border: 1px solid var(--tz-line); border-radius: 8px; background: #fffdf7 none; color: var(--tz-ink); font: inherit; font-size: 13px; line-height: 1.55;
+}
+div#content.messages div#block p.btn { position: static; top: auto; margin: 10px 0 0; text-align: left; }
+@media (max-width: 760px) {
+    div#content.messages div.msg_content div#heading.tz-msg-fields { grid-template-columns: minmax(0, 1fr); }
+    div#content.messages #write_content div#heading input#subject { grid-column: auto; }
+}
