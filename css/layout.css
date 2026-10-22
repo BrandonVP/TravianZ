@@ -1967,3 +1967,73 @@ div#content.messages div#block p.btn { position: static; top: auto; margin: 10px
     div#content.messages div.msg_content div#heading.tz-msg-fields { grid-template-columns: minmax(0, 1fr); }
     div#content.messages #write_content div#heading input#subject { grid-column: auto; }
 }
+/* ===================== Player profile (local redesign) ===================== */
+.tz-prof-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin: 4px 0 12px; padding: 12px 14px; border: 1px solid var(--tz-line); border-radius: 12px; background: var(--tz-panel); }
+.tz-prof-name { font-family: "Cinzel", Georgia, serif; font-size: 22px; font-weight: 700; color: var(--tz-ink); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tz-prof-flag { font-family: "Source Sans 3", "Segoe UI", sans-serif; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; }
+.tz-prof-flag-admin { background: #f3d5cc; color: #8a2f1c; }
+.tz-prof-flag-mh { background: #d6e2f0; color: #24476b; }
+.tz-prof-flag-banned { background: #e3e3e3; color: #555; }
+.tz-prof-flag-vac { background: #e9d7a6; color: #5a4128; }
+.tz-prof-facts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.tz-prof-fact { font-size: 12px; padding: 2px 9px; border: 1px solid var(--tz-line); border-radius: 999px; background: var(--tz-cream); color: var(--tz-ink); }
+.tz-prof-fact span { color: #8a7a62; }
+.tz-prof-action { flex: none; }
+.tz-prof-dim { color: #8a7a62; font-size: 12px; }
+.tz-ally-v.tz-prof-ally { font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tz-prof-villages { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.tz-prof-village { border: 1px solid var(--tz-line); border-radius: 10px; background: var(--tz-panel); padding: 8px 12px; }
+.tz-prof-vname { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.tz-prof-vname a { font-weight: 700; }
+.tz-prof-village img { vertical-align: middle; }
+
+/* edit / preferences / account */
+.tz-prof-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-bottom: 10px; }
+.tz-prof-card { border: 1px solid var(--tz-line); border-radius: 12px; background: var(--tz-panel); padding: 12px 14px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(60, 40, 10, .06); }
+.tz-prof-grid > .tz-prof-card { margin-bottom: 0; }
+.tz-prof-card h3 { margin: 0 0 8px; font-family: "Cinzel", Georgia, serif; font-size: 15px; color: var(--tz-ink); }
+.tz-prof-card h3 span { font-family: "Source Sans 3", "Segoe UI", sans-serif; font-size: 12px; font-weight: 400; color: #8a7a62; margin-left: 6px; }
+.tz-prof-card h3.tz-prof-h3b { margin-top: 12px; }
+.tz-prof-note { margin: -2px 0 8px; font-size: 12px; color: #6b5a45; }
+.tz-prof-form { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 7px 10px; align-items: center; }
+.tz-prof-form > label { font-size: 12px; font-weight: 700; color: #6b5a45; }
+.tz-prof-card input.text, .tz-prof-card select.dropdown, .tz-prof-card textarea {
+    box-sizing: border-box; padding: 5px 9px; border: 1px solid var(--tz-line); border-radius: 8px;
+    background: #fffdf7 none; color: var(--tz-ink); font: inherit; font-size: 13px;
+}
+.tz-prof-form > input.text, .tz-prof-form > select.dropdown { width: 100%; }
+.tz-prof-card input.text:focus, .tz-prof-card select.dropdown:focus, .tz-prof-card textarea:focus { outline: none; border-color: var(--tz-gold); box-shadow: 0 0 0 2px rgba(201, 151, 46, .25); }
+.tz-prof-birth { display: flex; gap: 6px; min-width: 0; }
+.tz-prof-birth input.day { width: 48px; }
+.tz-prof-birth input.year { width: 64px; }
+.tz-prof-birth select.dropdown { flex: 1; min-width: 0; }
+.tz-prof-radios { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; }
+.tz-prof-radios.tz-prof-stack { flex-direction: column; }
+.tz-prof-value { font-size: 13px; color: var(--tz-ink); overflow-wrap: anywhere; }
+textarea.tz-prof-ta { display: block; width: 100%; height: 220px; line-height: 1.5; resize: vertical; }
+.tz-prof-check { display: flex; align-items: flex-start; gap: 7px; padding: 4px 0; font-size: 13px; cursor: pointer; }
+.tz-prof-check input { margin-top: 2px; }
+table.tz-prof-table { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid var(--tz-line); border-radius: 8px; overflow: hidden; background: #fffdf7; }
+table.tz-prof-table th { background: var(--tz-cream); color: var(--tz-ink); font-weight: 700; text-align: left; padding: 5px 8px; border: 0; border-bottom: 1px solid var(--tz-line); font-size: 12px; }
+table.tz-prof-table td { padding: 5px 8px; border: 0; border-top: 1px solid var(--tz-cream-2); text-align: left; font-size: 12px; background: transparent; }
+table.tz-prof-table tr:nth-child(2) td { border-top: 0; }
+table.tz-prof-links td.nr input.text { width: 44px; }
+table.tz-prof-links td.nam input.text, table.tz-prof-links td.txt input.text { width: 100%; }
+div#content.player table.tz-prof-plain { width: 100%; border: 0; background: transparent; margin: 0; }
+div#content.player table.tz-prof-plain th, div#content.player table.tz-prof-plain td { border: 0; background: transparent; padding: 4px 0; text-align: left; }
+div#content.player table.tz-prof-plain td.note { color: #6b5a45; font-size: 12px; padding: 2px 0 8px; }
+div#content.player table.tz-prof-plain th { width: 150px; font-size: 12px; font-weight: 700; color: #6b5a45; }
+div#content.player table.tz-prof-plain input.text { padding: 5px 9px; border: 1px solid var(--tz-line); border-radius: 8px; background: #fffdf7; font: inherit; font-size: 13px; }
+.tz-prof-danger { border-color: #d9a99a; background: #fbefe9; }
+.tz-prof-danger h3 { color: #8a2f1c; }
+.tz-prof-medals { margin-top: 10px; }
+div#content.player p.btn { text-align: left; }
+
+/* vacation: same panel colours as the other cards */
+div#content .vacationBox { background: var(--tz-panel); border-color: var(--tz-line); }
+div#content .vacationBox .vacationDesc, div#content .vacationBox .vacationActivate { background: #fffdf7; border-color: var(--tz-line); }
+
+@media (max-width: 760px) {
+    .tz-prof-head { flex-direction: column; }
+    .tz-prof-form { grid-template-columns: minmax(0, 1fr); }
+}

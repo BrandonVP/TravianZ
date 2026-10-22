@@ -36,142 +36,73 @@ $varmedal = $database->getProfileMedal($session->uid);
 <input type="hidden" name="ft" value="p1" />
 <input type="hidden" name="id" value="<?php echo isset($id) ? (int)$id : 0; ?>" />
 
-<table cellpadding="1" cellspacing="1" id="edit">
-
-<thead>
-<tr>
-    <th colspan="3"><?php echo PLAYER; ?> <?php echo htmlspecialchars($session->username, ENT_QUOTES, 'UTF-8'); ?></th>
-</tr>
-<tr>
-    <td colspan="2"><?php echo DETAIL; ?></td>
-    <td><?php echo DESCRIPTION; ?></td>
-</tr>
-</thead>
-
-<tbody>
-
-<tr>
-<td colspan="2" class="empty"></td>
-<td class="empty"></td>
-</tr>
-
 <?php
 // =========================
-// BIRTHDAY SAFE PARSE
+// local redesign: card layout (same field names as before)
 // =========================
 $birthday = $session->userinfo['birthday'] ?? 0;
 $bday = ($birthday != 0) ? explode("-", $birthday) : array('', '', '');
-?>
-
-<tr>
-<th><?php echo BDAY; ?></th>
-<td class="birth">
-
-<input tabindex="1" class="text day" type="text" name="tag"
-value="<?php echo $bday[2] ?? ''; ?>" maxlength="2" />
-
-<select tabindex="2" name="monat" class="dropdown">
-<option value="0"></option>
-
-<?php
-$months = [
-1=>'Jan',2=>'Feb',3=>'Mar',4=>'Apr',5=>'May',6=>'June',
-7=>'July',8=>'Aug',9=>'Sep',10=>'Oct',11=>'Nov',12=>'Dec'
-];
-
-foreach ($months as $k => $v) {
-    $sel = (isset($bday[1]) && $bday[1] == $k) ? 'selected' : '';
-    echo "<option value='$k' $sel>$v</option>";
-}
-?>
-
-</select>
-
-<input tabindex="3" type="text" name="jahr"
-value="<?php echo $bday[0] ?? ''; ?>"
-maxlength="4" class="text year">
-
-</td>
-
-<!-- DESCRIPTION RIGHT -->
-<td rowspan="<?php echo 7 + count($database->getProfileVillages($session->uid)); ?>" class="desc1">
-<textarea tabindex="7" name="be1" maxlength="3000"><?= htmlspecialchars($session->userinfo['desc2'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
-</td>
-</tr>
-
-<!-- =========================
-     GENDER
-========================= -->
-<tr>
-<th><?php echo GENDER; ?></th>
-<td class="gend">
-
-<label><input class="radio" type="radio" name="mw" value="0"
-<?php if (($session->userinfo['gender'] ?? 0) == 0) echo "checked"; ?>> n/a</label>
-
-<label><input class="radio" type="radio" name="mw" value="1"
-<?php if (($session->userinfo['gender'] ?? 0) == 1) echo "checked"; ?>> m</label>
-
-<label><input class="radio" type="radio" name="mw" value="2"
-<?php if (($session->userinfo['gender'] ?? 0) == 2) echo "checked"; ?>> f</label>
-
-</td>
-</tr>
-
-<!-- LOCATION -->
-<tr>
-<th><?php echo LOCATION; ?></th>
-<td>
-<input tabindex="5" type="text" name="ort"
-value="<?= htmlspecialchars($session->userinfo['location'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
-maxlength="30" class="text">
-</td>
-</tr>
-
-<tr><td colspan="2" class="empty"></td></tr>
-
-<?php
-// =========================
-// VILLAGES LIST (SAFE BUT ALLOWS ')
-// =========================
+$months = [1=>'Jan',2=>'Feb',3=>'Mar',4=>'Apr',5=>'May',6=>'June',7=>'July',8=>'Aug',9=>'Sep',10=>'Oct',11=>'Nov',12=>'Dec'];
+$gender = (int) ($session->userinfo['gender'] ?? 0);
 $varray = $database->getProfileVillages($session->uid);
-
-for ($i = 0; $i < count($varray); $i++):
 ?>
-<tr>
-<th><?php echo VILLAGE_NAME; ?></th>
-<td>
-<input tabindex="6" type="text"
-name="dname<?php echo $i; ?>"
-value="<?= htmlspecialchars($varray[$i]['name'], ENT_QUOTES, 'UTF-8') ?>"
-maxlength="30" class="text">
-</td>
-</tr>
-<?php endfor; ?>
+<div class="tz-prof-grid">
+    <div class="tz-prof-card">
+        <h3>About you</h3>
+        <div class="tz-prof-form">
+            <label><?php echo BDAY; ?></label>
+            <div class="tz-prof-birth">
+                <input tabindex="1" class="text day" type="text" name="tag" value="<?php echo $bday[2] ?? ''; ?>" maxlength="2" placeholder="DD" />
+                <select tabindex="2" name="monat" class="dropdown">
+                    <option value="0"></option>
+                    <?php foreach ($months as $k => $v) { ?><option value="<?php echo $k; ?>" <?php echo (isset($bday[1]) && $bday[1] == $k) ? 'selected' : ''; ?>><?php echo $v; ?></option><?php } ?>
+                </select>
+                <input tabindex="3" type="text" name="jahr" value="<?php echo $bday[0] ?? ''; ?>" maxlength="4" class="text year" placeholder="YYYY" />
+            </div>
+            <label><?php echo GENDER; ?></label>
+            <div class="tz-prof-radios">
+                <label><input class="radio" type="radio" name="mw" value="0" <?php if ($gender == 0) echo "checked"; ?>> n/a</label>
+                <label><input class="radio" type="radio" name="mw" value="1" <?php if ($gender == 1) echo "checked"; ?>> <?php echo MALE; ?></label>
+                <label><input class="radio" type="radio" name="mw" value="2" <?php if ($gender == 2) echo "checked"; ?>> <?php echo FEMALE; ?></label>
+            </div>
+            <label><?php echo LOCATION; ?></label>
+            <input tabindex="5" type="text" name="ort" value="<?= htmlspecialchars($session->userinfo['location'] ?? '', ENT_QUOTES, 'UTF-8') ?>" maxlength="30" class="text">
+        </div>
+    </div>
+    <div class="tz-prof-card">
+        <h3><?php echo VILLAGES; ?></h3>
+        <div class="tz-prof-form">
+        <?php for ($i = 0; $i < count($varray); $i++) { ?>
+            <label><?php echo VILLAGE_NAME; ?> <?php echo $i + 1; ?></label>
+            <input tabindex="6" type="text" name="dname<?php echo $i; ?>" value="<?= htmlspecialchars($varray[$i]['name'], ENT_QUOTES, 'UTF-8') ?>" maxlength="30" class="text">
+        <?php } ?>
+        </div>
+    </div>
+</div>
 
-<!-- DESCRIPTION LEFT -->
-<tr>
-<td colspan="2" class="desc2">
-<textarea tabindex="8" name="be2" maxlength="3000"><?= htmlspecialchars($session->userinfo['desc1'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
-</td>
-</tr>
-
-</tbody>
-</table>
+<div class="tz-prof-grid">
+    <div class="tz-prof-card">
+        <h3><?php echo DESCRIPTION; ?> <span>the main text on your profile</span></h3>
+        <textarea tabindex="7" name="be1" maxlength="3000" class="tz-prof-ta"><?= htmlspecialchars($session->userinfo['desc2'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+    </div>
+    <div class="tz-prof-card">
+        <h3>Notes &amp; medals <span>a second, smaller box</span></h3>
+        <textarea tabindex="8" name="be2" maxlength="3000" class="tz-prof-ta"><?= htmlspecialchars($session->userinfo['desc1'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+    </div>
+</div>
 
 <!-- =========================
      MEDALS TABLE
 ========================= -->
-<p>
-<table cellspacing="1" cellpadding="2" class="tbg">
-
-<tr><td class="rbg" colspan="4"><?php echo MEDALS; ?></td></tr>
+<div class="tz-prof-card tz-prof-medals">
+<h3><?php echo MEDALS; ?> <span>click a code to add the medal to a description</span></h3>
+<table cellspacing="0" cellpadding="0" class="tz-prof-table">
 
 <tr>
-<td><?php echo CATEGORY; ?></td>
-<td><?php echo RANK; ?></td>
-<td><?php echo WEEK; ?></td>
-<td><?php echo BB_CODE; ?></td>
+<th><?php echo CATEGORY; ?></th>
+<th><?php echo RANK; ?></th>
+<th><?php echo WEEK; ?></th>
+<th><?php echo BB_CODE; ?></th>
 </tr>
 
 <?php
@@ -415,12 +346,17 @@ if(defined('NEW_FUNCTIONS_SPECIAL_MEDALS_SYSTEM') && NEW_FUNCTIONS_SPECIAL_MEDAL
 ?>
 
 </table>
-</p>
+</div>
 
 <!-- JS -->
 <script>
+// the description box used last (the main one by default)
+var tzMedalTarget = 'be1';
+document.addEventListener('focusin', function (e) {
+    if (e.target && (e.target.name === 'be1' || e.target.name === 'be2')) tzMedalTarget = e.target.name;
+});
 function insertMedal(code) {
-    const textarea = document.querySelector('textarea[name="be1"]');
+    const textarea = document.querySelector('textarea[name="' + tzMedalTarget + '"]');
     if (!textarea) return;
 
     textarea.focus();

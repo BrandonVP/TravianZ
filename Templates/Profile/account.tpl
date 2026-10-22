@@ -107,29 +107,18 @@ function sitterPermView($mask, $list) {
 <!-- =========================
      CHANGE PASSWORD
 ========================= -->
-<table cellpadding="1" cellspacing="1" id="change_pass" class="account">
-<thead>
-<tr>
-    <th colspan="2"><?php echo CHANGE_PASSWORD; ?></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-    <th><?php echo OLD_PASSWORD; ?></th>
-    <td><input class="text" type="password" name="pw1" maxlength="30" /></td>
-</tr>
-
-<tr>
-    <th><?php echo NEW_PASSWORD; ?></th>
-    <td><input class="text" type="password" name="pw2" maxlength="30" /></td>
-</tr>
-
-<tr>
-    <th><?php echo NEW_PASSWORD; ?></th>
-    <td><input class="text" type="password" name="pw3" maxlength="30" /></td>
-</tr>
-</tbody>
-</table>
+<!-- local redesign: cards (same field names as before) -->
+<div class="tz-prof-grid">
+<div class="tz-prof-card">
+    <h3><?php echo CHANGE_PASSWORD; ?></h3>
+    <div class="tz-prof-form">
+        <label><?php echo OLD_PASSWORD; ?></label>
+        <input class="text" type="password" name="pw1" maxlength="30" autocomplete="current-password" />
+        <label><?php echo NEW_PASSWORD; ?></label>
+        <input class="text" type="password" name="pw2" maxlength="30" autocomplete="new-password" />
+        <label>Repeat new password</label>
+        <input class="text" type="password" name="pw3" maxlength="30" autocomplete="new-password" />
+    </div>
 
 <?php
 // Password error output (unchanged logic)
@@ -137,45 +126,30 @@ if (!empty($pwError)) {
     echo "<span class=\"error\">".$pwError."</span>";
 }
 ?>
+</div>
 
 <!-- =========================
      CHANGE EMAIL
 ========================= -->
-<table cellpadding="1" cellspacing="1" id="change_mail" class="account">
-<thead>
-<tr>
-    <th colspan="2"><?php echo CHANGE_EMAIL; ?></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-    <td class="note" colspan="2">
-        <?php echo TZ_PLEASE_ENTER_YOUR_OLD_AND_YOUR_NEW; ?>
-    </td>
-</tr>
-
-<tr>
-    <th><?php echo CURRENT_EMAIL; ?></th>
-    <td><?php echo htmlspecialchars($session->userinfo['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
-</tr>
-
-<tr>
-    <th><?php echo OLD_EMAIL; ?></th>
-    <td><input class="text" type="text" name="email_alt" /></td>
-</tr>
-
-<tr>
-    <th><?php echo NEW_EMAIL; ?></th>
-    <td><input class="text" type="text" name="email_neu" /></td>
-</tr>
-</tbody>
-</table>
+<div class="tz-prof-card">
+    <h3><?php echo CHANGE_EMAIL; ?></h3>
+    <p class="tz-prof-note"><?php echo TZ_PLEASE_ENTER_YOUR_OLD_AND_YOUR_NEW; ?></p>
+    <div class="tz-prof-form">
+        <label><?php echo CURRENT_EMAIL; ?></label>
+        <div class="tz-prof-value"><?php echo htmlspecialchars($session->userinfo['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?></div>
+        <label><?php echo OLD_EMAIL; ?></label>
+        <input class="text" type="text" name="email_alt" />
+        <label><?php echo NEW_EMAIL; ?></label>
+        <input class="text" type="text" name="email_neu" />
+    </div>
 
 <?php
 if (!empty($emailError)) {
     echo "<span class=\"error\">".$emailError."</span>";
 }
 ?>
+</div>
+</div>
 
 <style type="text/css">
 /* =======================================================================
@@ -191,9 +165,9 @@ if (!empty($emailError)) {
 #sitter .sitterCard {
     margin: 0 0 8px 0;
     padding: 7px 9px;
-    background: #fbfaf8;
-    border: 1px solid #dedbd4;
-    border-radius: 4px;
+    background: #fffdf7;
+    border: 1px solid var(--tz-line);
+    border-radius: 8px;
 }
 
 #sitter .sitterCard:last-child { margin-bottom: 0; }
@@ -203,7 +177,7 @@ if (!empty($emailError)) {
 #sitter .sitterHead {
     padding-bottom: 6px;
     margin-bottom: 7px;
-    border-bottom: 1px solid #e8e5df;
+    border-bottom: 1px solid var(--tz-cream-2);
 }
 
 #sitter .sitterHead .del  { margin-right: 6px; vertical-align: -1px; cursor: pointer; }
@@ -273,12 +247,9 @@ if (!empty($emailError)) {
 <!-- =========================
      SITTERS
 ========================= -->
-<table cellpadding="1" cellspacing="1" id="sitter" class="account">
-<thead>
-<tr>
-    <th colspan="2"><?php echo ACCOUNT_SITTERS; ?></th>
-</tr>
-</thead>
+<div class="tz-prof-card">
+<h3><?php echo ACCOUNT_SITTERS; ?></h3>
+<table cellpadding="0" cellspacing="0" id="sitter" class="account tz-prof-plain">
 
 <tbody>
 <tr>
@@ -424,6 +395,7 @@ if (count($sitee) == 0) {
 </tr>
 </tbody>
 </table>
+</div>
 
 <?php
 if (!empty($sitterError)) {
@@ -434,12 +406,9 @@ if (!empty($sitterError)) {
 <!-- =========================
      DELETE ACCOUNT
 ========================= -->
-<table cellpadding="1" cellspacing="1" id="del_acc" class="account">
-<thead>
-<tr>
-    <th colspan="2"><?php echo VAC_OP6; ?></th>
-</tr>
-</thead>
+<div class="tz-prof-card tz-prof-danger">
+<h3><?php echo VAC_OP6; ?></h3>
+<table cellpadding="0" cellspacing="0" id="del_acc" class="account tz-prof-plain">
 
 <tbody>
 <tr>
@@ -479,6 +448,7 @@ if ($timestamp) {
 </tr>
 </tbody>
 </table>
+</div>
 
 <?php
 if (!empty($deleteError = $form->getError("del"))) {

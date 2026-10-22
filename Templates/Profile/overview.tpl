@@ -88,297 +88,125 @@ if ($uid == $session->uid) {
 }
 ?>
 
-<table id="profile" cellpadding="1" cellspacing="1">
-
-<thead>
-
-<tr>
-    <th colspan="2">
-        <?php echo PLAYER; ?> <?php echo htmlspecialchars($displayarray['username'], ENT_QUOTES, 'UTF-8'); ?>
-    </th>
-</tr>
-
 <?php
-// =========================
-// STATUS FLAGS
-// =========================
-if ($displayarray['access'] == ADMIN)
-    echo "<tr><th colspan='2'><font color='Red'><center><b>".PROFILE_FLAG_ADMIN."</b></center></font></th></tr>";
+/* =========================
+   local redesign: header card, stat tiles, detail chips, description cards
+   and village cards instead of the old nested tables
+========================= */
+$tribeArrays = [TRIBE1, TRIBE2, TRIBE3, TRIBE4, TRIBE5, TRIBE6, TRIBE7, TRIBE8, TRIBE9];
+$tribeIndex  = (int) ($displayarray['tribe'] ?? 0) - 1;
+$tzTribe     = isset($tribeArrays[$tribeIndex]) ? $tribeArrays[$tribeIndex] : '';
 
-if ($displayarray['access'] == MULTIHUNTER)
-    echo "<tr><th colspan='2'><font color='Blue'><center><b>".PROFILE_FLAG_MULTIHUNTER."</b></center></font></th></tr>";
+$tzFlags = [];
+if ($displayarray['access'] == ADMIN)       $tzFlags[] = ['admin', PROFILE_FLAG_ADMIN];
+if ($displayarray['access'] == MULTIHUNTER) $tzFlags[] = ['mh', PROFILE_FLAG_MULTIHUNTER];
+if ($displayarray['access'] == BANNED)      $tzFlags[] = ['banned', PROFILE_FLAG_BANNED];
+if ($displayarray['vac_mode'] == 1)         $tzFlags[] = ['vac', PROFILE_FLAG_VACATION];
 
-if ($displayarray['access'] == BANNED)
-    echo "<tr><th colspan='2'><font color='Green'><center><b>".PROFILE_FLAG_BANNED."</b></center></font></th></tr>";
-
-if ($displayarray['vac_mode'] == 1)
-    echo "<tr><th colspan='2'><font color='Maroon'><center><b>".PROFILE_FLAG_VACATION."</b></center></font></th></tr>";
-?>
-
-<tr>
-    <td><?php echo DETAIL; ?></td>
-    <td><?php echo DESCRIPTION; ?></td>
-</tr>
-
-</thead>
-
-<tbody>
-
-<tr>
-    <td class="empty"></td>
-    <td class="empty"></td>
-</tr>
-
-<tr>
-
-<td class="details">
-
-<table cellpadding="0" cellspacing="0">
-
-<?php
-if ($displayarray['access'] == BANNED) {
-    echo "<tr><td colspan='2'><center><b>BANNED</b></center></td></tr>";
-}
-?>
-
-<tr>
-    <th><?php echo RANK; ?></th>
-    <td><?php echo $ranking->getUserRank($displayarray['id']); ?></td>
-</tr>
-
-<tr>
-    <th><?php echo TRIBE; ?></th>
-    <td>
-        <?php
-        $tribeArrays = [TRIBE1, TRIBE2, TRIBE3, TRIBE4, TRIBE5, TRIBE6, TRIBE7, TRIBE8, TRIBE9];
-
-        // Un cont fara trib (tribe = 0, de exemplu conturile de sistem sau unul
-        // inca neinregistrat complet) dadea indexul -1.
-        $tribeIndex = (int) ($displayarray['tribe'] ?? 0) - 1;
-
-        echo isset($tribeArrays[$tribeIndex]) ? $tribeArrays[$tribeIndex] : '';
-        ?>
-    </td>
-</tr>
-
-<tr>
-    <th><?php echo ALLIANCE; ?></th>
-    <td>
-        <?php
-        if ($displayarray['alliance'] == 0) {
-            echo "-";
-        } else {
-            $displayalliance = $database->getAllianceName($displayarray['alliance']);
-            echo '<a href="allianz.php?aid=' . (int)$displayarray['alliance'] . '">' .
-                 htmlspecialchars($displayalliance, ENT_QUOTES, 'UTF-8') .
-                 '</a>';
-        }
-        ?>
-    </td>
-</tr>
-
-<tr>
-    <th><?php echo VILLAGES; ?></th>
-    <td><?php echo count($varray); ?></td>
-</tr>
-
-<tr>
-    <th><?php echo POP; ?></th>
-    <td><?php echo (int)$totalpop; ?></td>
-</tr>
-
-<?php
-// =========================
-// AGE
-// =========================
+$tzFacts = [];
+if ($tzTribe !== '') $tzFacts[] = [TRIBE, $tzTribe];
 if (!empty($displayarray['birthday'])) {
     $age = date('Y') - substr($displayarray['birthday'], 0, 4);
-
     if ((date('m') - substr($displayarray['birthday'], 5, 2)) < 0) $age--;
     elseif ((date('m') - substr($displayarray['birthday'], 5, 2)) == 0) {
         if (date('d') < substr($displayarray['birthday'], 8, 2)) $age--;
     }
-
-    echo "<tr><th>".AGE."</th><td>$age</td></tr>";
+    $tzFacts[] = [AGE, (int) $age];
 }
+if (!empty($displayarray['gender'])) $tzFacts[] = [GENDER, ($displayarray['gender'] == 1) ? MALE : FEMALE];
+if (!empty($displayarray['location'])) $tzFacts[] = [LOCATION, htmlspecialchars($displayarray['location'], ENT_QUOTES, 'UTF-8')];
 
-// =========================
-// GENDER
-// =========================
-if (!empty($displayarray['gender'])) {
-    $gender = ($displayarray['gender'] == 1) ? MALE : FEMALE;
-    echo "<tr><th>".GENDER."</th><td>$gender</td></tr>";
-}
-
-// =========================
-// LOCATION
-// =========================
-if (!empty($displayarray['location'])) {
-    echo "<tr><th>".LOCATION."</th><td>" .
-         htmlspecialchars($displayarray['location'], ENT_QUOTES, 'UTF-8') .
-         "</td></tr>";
-}
-?>
-
-<tr>
-    <td colspan="2" class="empty"></td>
-</tr>
-
-<tr>
-<?php
-// =========================
-// ACTION BUTTONS
-// =========================
-
-// Natar tribe (de obicei 5 în Travian-like setups)
-$isNatar = (isset($displayarray['tribe']) && $displayarray['tribe'] == 5);
-
-// Nature special account (fixed UID = 2)
+$isNatar  = (isset($displayarray['tribe']) && $displayarray['tribe'] == 5);
 $isNature = ($uid == 2);
 
-if ($uid == $session->uid) {
-
-    // =========================
-    // OWN PROFILE ACTION
-    // =========================
-    if ($session->sit == 0) {
-        echo '<td colspan="2"><a href="spieler.php?s=1">&raquo; '.CHANGE_PROFILE.'</a></td>';
-    } else {
-        echo '<td colspan="2"><span class="none"><b>&raquo; '.CHANGE_PROFILE.'</b></span></td>';
-    }
-
-} else {
-
-    // =========================
-    // BLOCK SYSTEM ACCOUNTS
-    // =========================
-    if ($isNatar || $isNature) {
-
-        echo '<td colspan="2"><span class="none"><b>&raquo; '.WRITE_MESSAGE_UNAVAILABLE.'</b></span></td>';
-
-    } else {
-
-        echo '<td colspan="2"><a href="nachrichten.php?t=1&amp;id=' . (int)$uid . '">&raquo; '.WRITE_MESSAGE.'</a></td>';
-    }
-}
+$tzHasText = function ($html) { return trim(strip_tags($html)) !== '' || strpos($html, '<img') !== false; };
+$tzDescMain = $tzHasText($profiel[1]);
+$tzDescSide = $tzHasText($profiel[0]);
+$tzOasisOn  = defined('NEW_FUNCTIONS_OASIS') && NEW_FUNCTIONS_OASIS;
+$tzOasisIcon = [1 => ['r100', '+25% Lumber'], 2 => ['r100', '+25% Lumber'], 3 => ['r200', '+25% Lumber +25% Crop'],
+                4 => ['r400', '+25% Clay'], 5 => ['r400', '+25% Clay'], 6 => ['r500', '+25% Clay +25% Crop'],
+                7 => ['r700', '+25% Iron'], 8 => ['r700', '+25% Iron'], 9 => ['r800', '+25% Iron +25% Crop'],
+                10 => ['r1000', '+25% Crop'], 11 => ['r1000', '+25% Crop'], 12 => ['r1100', '+50% Crop']];
 ?>
-</tr>
 
-<tr>
-<td colspan="2" class="desc2">
-<div class="desc2div">
-    <!-- Issue #250: the "messages" wrapper re-uses the existing smiley sprite
-         CSS (scoped to div.messages/div.forum) so BBCode smileys render here too;
-         its only layout rule (padding/width) is overridden inline. -->
-    <div class="messages" style="padding:0;width:auto">
-    <?php echo nl2br($profiel[0]); ?>
+<div class="tz-prof">
+    <div class="tz-prof-head">
+        <div>
+            <div class="tz-prof-name"><?php echo htmlspecialchars($displayarray['username'], ENT_QUOTES, 'UTF-8'); ?>
+                <?php foreach ($tzFlags as $f) { ?><span class="tz-prof-flag tz-prof-flag-<?php echo $f[0]; ?>"><?php echo $f[1]; ?></span><?php } ?>
+            </div>
+            <?php if ($tzFacts) { ?>
+            <div class="tz-prof-facts">
+                <?php foreach ($tzFacts as $f) { ?><span class="tz-prof-fact"><span><?php echo $f[0]; ?></span> <?php echo $f[1]; ?></span><?php } ?>
+            </div>
+            <?php } ?>
+        </div>
+        <div class="tz-prof-action">
+        <?php if ($uid == $session->uid) { ?>
+            <?php if ($session->sit == 0) { ?><a class="tz-btn" href="spieler.php?s=1"><?php echo CHANGE_PROFILE; ?></a><?php } ?>
+        <?php } elseif ($isNatar || $isNature) { ?>
+            <span class="tz-prof-dim"><?php echo WRITE_MESSAGE_UNAVAILABLE; ?></span>
+        <?php } else { ?>
+            <a class="tz-btn" href="nachrichten.php?t=1&amp;id=<?php echo (int) $uid; ?>"><?php echo WRITE_MESSAGE; ?></a>
+        <?php } ?>
+        </div>
     </div>
-</div>
-    </td>
-</tr>
 
-</table>
-
-</td>
-
-<td class="desc1">
-<div class="desc1div">
-    <!-- Issue #250: see the matching wrapper above (enables BBCode smileys). -->
-    <div class="messages" style="padding:0;width:auto">
-    <?php echo nl2br($profiel[1]); ?>
+    <div class="tz-ally-stats">
+        <div class="tz-ally-stat"><span class="tz-ally-k"><?php echo RANK; ?></span><span class="tz-ally-v"><?php echo $ranking->getUserRank($displayarray['id']); ?>.</span></div>
+        <div class="tz-ally-stat"><span class="tz-ally-k"><?php echo POP; ?></span><span class="tz-ally-v"><?php echo number_format((int) $totalpop); ?></span></div>
+        <div class="tz-ally-stat"><span class="tz-ally-k"><?php echo VILLAGES; ?></span><span class="tz-ally-v"><?php echo count($varray); ?></span></div>
+        <div class="tz-ally-stat"><span class="tz-ally-k"><?php echo ALLIANCE; ?></span><span class="tz-ally-v tz-prof-ally"><?php
+            if ($displayarray['alliance'] == 0) {
+                echo '<span class="tz-prof-dim">-</span>';
+            } else {
+                echo '<a href="allianz.php?aid=' . (int) $displayarray['alliance'] . '">' . htmlspecialchars($database->getAllianceName($displayarray['alliance']), ENT_QUOTES, 'UTF-8') . '</a>';
+            }
+        ?></span></div>
     </div>
-</div>
-</td>
 
-</tr>
-
-</tbody>
-
-</table>
-
-<!-- ========================= VILLAGES ========================= -->
-
-<table cellpadding="1" cellspacing="1" id="villages">
-
-<thead>
-
-<tr>
-    <th colspan="<?php echo (defined('NEW_FUNCTIONS_OASIS') && NEW_FUNCTIONS_OASIS) ? 4 : 3; ?>">
-        <?php echo VILLAGES; ?>
-    </th>
-</tr>
-
-<tr>
-    <td><?php echo NAME; ?></td>
-
-    <?php if (defined('NEW_FUNCTIONS_OASIS') && NEW_FUNCTIONS_OASIS) { ?>
-        <td><?php echo OASIS; ?></td>
+    <?php if ($tzDescMain || $tzDescSide) { ?>
+    <div class="tz-ally-texts">
+        <?php if ($tzDescMain) { ?>
+        <div class="tz-ally-text">
+            <h3><?php echo DESCRIPTION; ?></h3>
+            <!-- Issue #250: the "messages" wrapper re-uses the smiley sprite CSS -->
+            <div class="tz-ally-body messages" style="padding:0;width:auto"><?php echo nl2br($profiel[1]); ?></div>
+        </div>
+        <?php } ?>
+        <?php if ($tzDescSide) { ?>
+        <div class="tz-ally-text">
+            <h3>Notes &amp; medals</h3>
+            <div class="tz-ally-body messages" style="padding:0;width:auto"><?php echo nl2br($profiel[0]); ?></div>
+        </div>
+        <?php } ?>
+    </div>
+    <?php } elseif ($uid == $session->uid && $session->sit == 0) { ?>
+    <div class="tz-ally-texts"><div class="tz-ally-text tz-ally-empty">No description yet. <a href="spieler.php?s=1">Write one</a> - other players see it here.</div></div>
     <?php } ?>
 
-    <td><?php echo INHABITANTS; ?></td>
-    <td><?php echo COORDINATES; ?></td>
-</tr>
-
-</thead>
-
-<tbody>
-
-<?php
-foreach ($varray as $vil) {
-
-    $hasArtifact = $database->villageHasArtefact($vil['wref']);
-    $coor = $database->getCoor($vil['wref']);
-
-    echo "<tr><td class=\"nam\">
-          <a href=\"karte.php?d=" . (int)$vil['wref'] . "&amp;c=" . $generator->getMapCheck($vil['wref']) . "\">"
-          . htmlspecialchars($vil['name'], ENT_QUOTES, 'UTF-8') .
-          "</a>";
-
-    if ($vil['capital'] == 1) echo "<span class=\"none3\"> (".CAPITAL_TAG.")</span>";
-
-    if (defined('NEW_FUNCTIONS_DISPLAY_ARTIFACT') && NEW_FUNCTIONS_DISPLAY_ARTIFACT) {
-        if ($hasArtifact) echo "<span class=\"none3\"> (Artifact)</span>";
-    }
-
-    if (defined('NEW_FUNCTIONS_DISPLAY_WONDER') && NEW_FUNCTIONS_DISPLAY_WONDER) {
-        if ($vil['natar'] == 1) echo "<span class=\"none3\"> (WoW)</span>";
-    }
-
-    // OASIS
-    if (defined('NEW_FUNCTIONS_OASIS') && NEW_FUNCTIONS_OASIS) {
-
-        echo "<td class=\"hab\">";
-
-        $oases = $database->getOasis($vil['wref']);
-
-        foreach ($oases as $oasis) {
-            switch ($oasis['type']) {
-                case 1:
-                case 2: echo "<img class='r100' src='img/x.gif' title='+25% Lumber'> "; break;
-                case 3: echo "<img class='r200' src='img/x.gif' title='+25% Lumber +25% Crop'> "; break;
-                case 4:
-                case 5: echo "<img class='r400' src='img/x.gif' title='+25% Clay'> "; break;
-                case 6: echo "<img class='r500' src='img/x.gif' title='+25% Clay +25% Crop'> "; break;
-                case 7:
-                case 8: echo "<img class='r700' src='img/x.gif' title='+25% Iron'> "; break;
-                case 9: echo "<img class='r800' src='img/x.gif' title='+25% Iron +25% Crop'> "; break;
-                case 10:
-                case 11: echo "<img class='r1000' src='img/x.gif' title='+25% Crop'> "; break;
-                case 12: echo "<img class='r1100' src='img/x.gif' title='+50% Crop'> "; break;
-            }
-        }
-
-        echo "</td>";
-    }
-
-    echo "<td class=\"hab\">" . (int)$vil['pop'] . "</td>
-          <td class=\"aligned_coords\">
-          <div class=\"cox\">(" . $coor['x'] . "</div>
-          <div class=\"pi\">|</div>
-          <div class=\"coy\">" . $coor['y'] . ")</div></td></tr>";
-}
-?>
-
-</tbody>
-
-</table>
+    <h2 class="tz-ally-h2"><?php echo VILLAGES; ?> <span><?php echo count($varray); ?></span></h2>
+    <div class="tz-prof-villages">
+    <?php foreach ($varray as $vil) {
+        $coor = $database->getCoor($vil['wref']);
+        $tags = [];
+        if ($vil['capital'] == 1) $tags[] = CAPITAL_TAG;
+        if (defined('NEW_FUNCTIONS_DISPLAY_ARTIFACT') && NEW_FUNCTIONS_DISPLAY_ARTIFACT && $database->villageHasArtefact($vil['wref'])) $tags[] = 'Artifact';
+        if (defined('NEW_FUNCTIONS_DISPLAY_WONDER') && NEW_FUNCTIONS_DISPLAY_WONDER && $vil['natar'] == 1) $tags[] = 'WoW';
+    ?>
+        <div class="tz-prof-village">
+            <div class="tz-prof-vname">
+                <a href="karte.php?d=<?php echo (int) $vil['wref']; ?>&amp;c=<?php echo $generator->getMapCheck($vil['wref']); ?>"><?php echo htmlspecialchars($vil['name'], ENT_QUOTES, 'UTF-8'); ?></a>
+                <?php foreach ($tags as $tg) { ?><span class="tz-ally-role"><?php echo $tg; ?></span><?php } ?>
+            </div>
+            <div class="tz-ally-mstats">
+                <?php echo number_format((int) $vil['pop']); ?> <?php echo strtolower(INHABITANTS); ?> &middot; (<?php echo $coor['x']; ?>|<?php echo $coor['y']; ?>)
+                <?php if ($tzOasisOn) { foreach ((array) $database->getOasis($vil['wref']) as $oasis) {
+                    $oi = $tzOasisIcon[(int) $oasis['type']] ?? null;
+                    if ($oi) echo " <img class='" . $oi[0] . "' src='img/x.gif' title='" . $oi[1] . "' alt=''>";
+                } } ?>
+            </div>
+        </div>
+    <?php } ?>
+    </div>
+</div>

@@ -247,20 +247,19 @@ if (!empty($_SESSION['tz_link_error'])) {
     unset($_SESSION['tz_link_error']);
 }
 ?>
+<div class="tz-prof-card">
+<h3><?php echo DIRECT_LINKS; ?></h3>
 <p class="tz-link-help">Direct links appear in the side column for quick access (Plus).
     Target: a game page such as <b>build.php?gid=17</b> (Marketplace), <b>build.php?gid=16&amp;t=99</b> (Rally Point Gold Club)
     or <b>karte.php</b>, or a web address starting with http://. End the target with <b>*</b> to open it in a new tab.</p>
 
-<table cellpadding="1" cellspacing="1" id="links">
+<table cellpadding="0" cellspacing="0" id="links" class="tz-prof-table tz-prof-links">
     <thead>
         <tr>
-            <th colspan="4"><?php echo DIRECT_LINKS; ?></th>
-        </tr>
-        <tr>
-            <td><?php echo DELETE; ?></td>
-            <td><?php echo TZ_NO; ?></td>
-            <td><?php echo LINK_NAME; ?></td>
-            <td><?php echo LINK_TARGET; ?></td>
+            <th></th>
+            <th><?php echo TZ_NO; ?></th>
+            <th><?php echo LINK_NAME; ?></th>
+            <th><?php echo LINK_TARGET; ?></th>
         </tr>
     </thead>
 
@@ -352,205 +351,72 @@ if (!empty($_SESSION['tz_link_error'])) {
 
     </tbody>
 </table>
+</div>
 
-<!-- =========================
-     AUTO COMPLETION
-========================= -->
-<table cellpadding="1" cellspacing="1" id="completion" class="set">
-<thead>
-<tr>
-  <th colspan="2">
-    <?php echo AUTO_COMPL; ?>
-  </th>
-</tr>
-<tr><td colspan="2"><?php echo TZ_USED_FOR_RALLY_POINT_AND_MARKETPLA; ?></td></tr>
-</thead>
-<tbody>
+<?php
+// local redesign: settings as cards (same field names as before)
+$tzU = $session->userinfo;
+$tzCheck = function ($name, $label, $on, $value = '1') {
+    return '<label class="tz-prof-check"><input class="check" type="checkbox" name="' . $name . '"' . ($value !== null ? ' value="' . $value . '"' : '') . ($on ? ' checked' : '') . '> <span>' . $label . '</span></label>';
+};
+?>
+<div class="tz-prof-grid">
+    <div class="tz-prof-card">
+        <h3><?php echo AUTO_COMPL; ?></h3>
+        <p class="tz-prof-note"><?php echo TZ_USED_FOR_RALLY_POINT_AND_MARKETPLA; ?></p>
+        <?php echo $tzCheck('v1', OWN_VILLAGES, $tzU['v1']); ?>
+        <?php echo $tzCheck('v2', VILLAGES_NEAR, $tzU['v2']); ?>
+        <?php echo $tzCheck('v3', VILLAGES_ALLI_PLAYERS, $tzU['v3']); ?>
+    </div>
+    <div class="tz-prof-card">
+        <h3><?php echo REPORT_FILTER; ?></h3>
+        <?php echo $tzCheck('v4', TZ_NO_REPORTS_FOR_TRANSFERS_TO_OWN_VI, $tzU['v4']); ?>
+        <?php echo $tzCheck('v5', TZ_NO_REPORTS_FOR_TRANSFERS_TO_FOREIG, $tzU['v5']); ?>
+        <?php echo $tzCheck('v6', TZ_NO_REPORTS_FOR_TRANSFERS_FROM_FORE, $tzU['v6']); ?>
+        <h3 class="tz-prof-h3b"><?php echo LARGE_MAP; ?></h3>
+        <?php echo $tzCheck('map', TZ_SHOW_THE_LARGE_MAP_IN_AN_EXTRA_WIN, $tzU['map'], null); ?>
+    </div>
+</div>
 
-<tr>
-<td class="sel"><input class="check" type="checkbox" name="v1" value="1" <?php if($session->userinfo['v1']) echo 'checked'; ?>></td>
-<td><?php echo OWN_VILLAGES; ?></td>
-</tr>
-
-<tr>
-<td class="sel"><input class="check" type="checkbox" name="v2" value="1" <?php if($session->userinfo['v2']) echo 'checked'; ?>></td>
-<td><?php echo VILLAGES_NEAR; ?></td>
-</tr>
-
-<tr>
-<td class="sel"><input class="check" type="checkbox" name="v3" value="1" <?php if($session->userinfo['v3']) echo 'checked'; ?>></td>
-<td><?php echo VILLAGES_ALLI_PLAYERS; ?></td>
-</tr>
-
-</tbody>
-</table>
-
-<!-- =========================
-     LARGE MAP
-========================= -->
-<table cellpadding="1" cellspacing="1" id="big_map" class="set">
-<thead>
-<tr>
-  <th colspan="2">
-    <?php echo LARGE_MAP; ?>
-  </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="sel">
-<input class="check" type="checkbox" name="map" <?php if($session->userinfo['map']) echo 'checked'; ?>>
-</td>
-<td><?php echo TZ_SHOW_THE_LARGE_MAP_IN_AN_EXTRA_WIN; ?></td>
-</tr>
-</tbody>
-</table>
-
-<!-- =========================
-     REPORT FILTER
-========================= -->
-<table cellpadding="1" cellspacing="1" id="report_filter" class="set">
-<thead>
-<tr>
-  <th colspan="2">
-    <?php echo REPORT_FILTER; ?>
-  </th>
-</tr>
-</thead>
-<tbody>
-
-<tr>
-<td class="sel"><input class="check" type="checkbox" name="v4" value="1" <?php if($session->userinfo['v4']) echo 'checked'; ?>></td>
-<td><?php echo TZ_NO_REPORTS_FOR_TRANSFERS_TO_OWN_VI; ?></td>
-</tr>
-
-<tr>
-<td class="sel"><input class="check" type="checkbox" name="v5" value="1" <?php if($session->userinfo['v5']) echo 'checked'; ?>></td>
-<td><?php echo TZ_NO_REPORTS_FOR_TRANSFERS_TO_FOREIG; ?></td>
-</tr>
-
-<tr>
-<td class="sel"><input class="check" type="checkbox" name="v6" value="1" <?php if($session->userinfo['v6']) echo 'checked'; ?>></td>
-<td><?php echo TZ_NO_REPORTS_FOR_TRANSFERS_FROM_FORE; ?></td>
-</tr>
-
-</tbody>
-</table>
-
-<!-- =========================
-     TIME SETTINGS
-========================= -->
-<table cellpadding="1" cellspacing="1" id="time" class="set">
-<thead>
-<tr>
-  <th colspan="2">
-    <?php echo TZ_TIME_PREFERENCE; ?>
-  </th>
-</tr>
-<tr><td colspan="2"><?php echo TZ_HERE_YOU_CAN_CHANGE_TRAVIAN_S_DISP; ?></td></tr>
-</thead>
-<tbody>
-
-<tr>
-<th><?php echo TZ_TIME_ZONES; ?></th>
-<td>
-<select name="timezone" class="dropdown">
-
-<optgroup label="local time zones">
-    <option value="495" <?php if($session->userinfo['timezone']==495) echo 'selected'; ?>><?php echo TIME_ZONE_L1; ?></option>
-    <option value="99" <?php if($session->userinfo['timezone']==99) echo 'selected'; ?>><?php echo TIME_ZONE_L2; ?></option>
-    <option value="492" <?php if($session->userinfo['timezone']==492) echo 'selected'; ?>><?php echo TIME_ZONE_L3; ?></option>
-    <option value="328" <?php if($session->userinfo['timezone']==328) echo 'selected'; ?>><?php echo TIME_ZONE_L4; ?></option>
-    <option value="345" <?php if($session->userinfo['timezone']==345) echo 'selected'; ?>><?php echo TIME_ZONE_L5; ?></option>
-    <option value="257" <?php if($session->userinfo['timezone']==257) echo 'selected'; ?>><?php echo TIME_ZONE_L6; ?></option>
-    <option value="189" <?php if($session->userinfo['timezone']==189) echo 'selected'; ?>><?php echo TIME_ZONE_L7; ?></option>
-    <option value="474" <?php if($session->userinfo['timezone']==474) echo 'selected'; ?>><?php echo TIME_ZONE_L8; ?></option>
-</optgroup>
-
-<optgroup label="general time zones">
-    <option value="12" <?php if($session->userinfo['timezone']==12) echo 'selected'; ?>><?php echo TZ_UTC_11_2; ?></option>
-    <option value="13" <?php if($session->userinfo['timezone']==13) echo 'selected'; ?>><?php echo TZ_UTC_10_2; ?></option>
-    <option value="14" <?php if($session->userinfo['timezone']==14) echo 'selected'; ?>><?php echo TZ_UTC_9_2; ?></option>
-    <option value="15" <?php if($session->userinfo['timezone']==15) echo 'selected'; ?>><?php echo TZ_UTC_8_2; ?></option>
-    <option value="16" <?php if($session->userinfo['timezone']==16) echo 'selected'; ?>><?php echo TZ_UTC_7_2; ?></option>
-    <option value="17" <?php if($session->userinfo['timezone']==17) echo 'selected'; ?>><?php echo TZ_UTC_6_2; ?></option>
-    <option value="18" <?php if($session->userinfo['timezone']==18) echo 'selected'; ?>><?php echo TZ_UTC_5_2; ?></option>
-    <option value="19" <?php if($session->userinfo['timezone']==19) echo 'selected'; ?>><?php echo TZ_UTC_4_2; ?></option>
-    <option value="20" <?php if($session->userinfo['timezone']==20) echo 'selected'; ?>><?php echo TZ_UTC_3_2; ?></option>
-    <option value="21" <?php if($session->userinfo['timezone']==21) echo 'selected'; ?>><?php echo TZ_UTC_2_2; ?></option>
-    <option value="22" <?php if($session->userinfo['timezone']==22) echo 'selected'; ?>><?php echo TZ_UTC_1_2; ?></option>
-    <option value="23" <?php if($session->userinfo['timezone']==23) echo 'selected'; ?>>UTC</option>
-    <option value="0" <?php if($session->userinfo['timezone']==0) echo 'selected'; ?>><?php echo TZ_UTC_1; ?></option>
-    <option value="1" <?php if($session->userinfo['timezone']==1) echo 'selected'; ?>><?php echo TZ_UTC_2; ?></option>
-    <option value="2" <?php if($session->userinfo['timezone']==2) echo 'selected'; ?>><?php echo TZ_UTC_3; ?></option>
-    <option value="3" <?php if($session->userinfo['timezone']==3) echo 'selected'; ?>><?php echo TZ_UTC_4; ?></option>
-    <option value="4" <?php if($session->userinfo['timezone']==4) echo 'selected'; ?>><?php echo TZ_UTC_5; ?></option>
-    <option value="5" <?php if($session->userinfo['timezone']==5) echo 'selected'; ?>><?php echo TZ_UTC_6; ?></option>
-    <option value="6" <?php if($session->userinfo['timezone']==6) echo 'selected'; ?>><?php echo TZ_UTC_7; ?></option>
-    <option value="7" <?php if($session->userinfo['timezone']==7) echo 'selected'; ?>><?php echo TZ_UTC_8; ?></option>
-    <option value="8" <?php if($session->userinfo['timezone']==8) echo 'selected'; ?>><?php echo TZ_UTC_9; ?></option>
-    <option value="9" <?php if($session->userinfo['timezone']==9) echo 'selected'; ?>><?php echo TZ_UTC_10; ?></option>
-    <option value="10" <?php if($session->userinfo['timezone']==10) echo 'selected'; ?>><?php echo TZ_UTC_11; ?></option>
-    <option value="11" <?php if($session->userinfo['timezone']==11) echo 'selected'; ?>><?php echo TZ_UTC_12; ?></option>
-</optgroup>
-
-</select>
-</td>
-</tr>
-
-<tr>
-<th><?php echo DATE; ?></th>
-<td>
-
-<label><input class="radio" type="radio" name="tformat" value="0" <?php if($session->userinfo['tformat']==0) echo 'checked'; ?>> <?php echo TZ_EU_DD_MM_YY_24H; ?></label><br>
-<label><input class="radio" type="radio" name="tformat" value="1" <?php if($session->userinfo['tformat']==1) echo 'checked'; ?>> <?php echo TZ_US_MM_DD_YY_12H; ?></label><br>
-<label><input class="radio" type="radio" name="tformat" value="2" <?php if($session->userinfo['tformat']==2) echo 'checked'; ?>> <?php echo TZ_UK_DD_MM_YY_12H; ?></label><br>
-<label><input class="radio" type="radio" name="tformat" value="3" <?php if($session->userinfo['tformat']==3) echo 'checked'; ?>> <?php echo TZ_ISO_YY_MM_DD_24H; ?></label>
-
-</td>
-</tr>
-
-</tbody>
-</table>
-<!-- =========================
-     LANGUAGE SETTINGS
-========================= -->
-<table cellpadding="1" cellspacing="1" id="language" class="set">
-<thead>
-<tr>
-  <th colspan="2">
-    <?php echo TZ_LANGUAGE_SETTINGS; ?>
-  </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-    <th><?php echo TZ_GAME_LANGUAGE; ?></th>
-    <td>
-        <select name="lang" class="dropdown">
-            <option value="en" <?php if($session->userinfo['lang']=="en") echo 'selected'; ?>>
-                <?php echo TZ_ENGLISH; ?>
-            </option>
-            <option value="ro" <?php if($session->userinfo['lang']=="ro") echo 'selected'; ?>>
-                <?php echo TZ_ROMANIAN; ?>
-            </option>
-            <option value="zh" <?php if($session->userinfo['lang']=="zh") echo 'selected'; ?>>
-                <?php echo TZ_CHINESE; ?>
-            </option>
-            <option value="fr" <?php if($session->userinfo['lang']=="fr") echo 'selected'; ?>>
-                <?php echo TZ_FRENCH; ?>
-            </option>
-            <option value="it" <?php if($session->userinfo['lang']=="it") echo 'selected'; ?>>
-                <?php echo TZ_ITALIAN; ?>
-            </option>
-            <option value="es" <?php if($session->userinfo['lang']=="es") echo 'selected'; ?>>
-                <?php echo TZ_SPANISH; ?>
-            </option>
-        </select>
-    </td>
-</tr>
-</tbody>
-</table>
+<div class="tz-prof-grid">
+    <div class="tz-prof-card">
+        <h3><?php echo TZ_TIME_PREFERENCE; ?></h3>
+        <p class="tz-prof-note"><?php echo TZ_HERE_YOU_CAN_CHANGE_TRAVIAN_S_DISP; ?></p>
+        <div class="tz-prof-form">
+            <label><?php echo TZ_TIME_ZONES; ?></label>
+            <select name="timezone" class="dropdown">
+                <optgroup label="local time zones">
+                <?php foreach ([495 => TIME_ZONE_L1, 99 => TIME_ZONE_L2, 492 => TIME_ZONE_L3, 328 => TIME_ZONE_L4, 345 => TIME_ZONE_L5, 257 => TIME_ZONE_L6, 189 => TIME_ZONE_L7, 474 => TIME_ZONE_L8] as $v => $l) { ?>
+                    <option value="<?php echo $v; ?>" <?php if ($tzU['timezone'] == $v) echo 'selected'; ?>><?php echo $l; ?></option>
+                <?php } ?>
+                </optgroup>
+                <optgroup label="general time zones">
+                <?php foreach ([12 => TZ_UTC_11_2, 13 => TZ_UTC_10_2, 14 => TZ_UTC_9_2, 15 => TZ_UTC_8_2, 16 => TZ_UTC_7_2, 17 => TZ_UTC_6_2, 18 => TZ_UTC_5_2, 19 => TZ_UTC_4_2, 20 => TZ_UTC_3_2, 21 => TZ_UTC_2_2, 22 => TZ_UTC_1_2, 23 => 'UTC',
+                               0 => TZ_UTC_1, 1 => TZ_UTC_2, 2 => TZ_UTC_3, 3 => TZ_UTC_4, 4 => TZ_UTC_5, 5 => TZ_UTC_6, 6 => TZ_UTC_7, 7 => TZ_UTC_8, 8 => TZ_UTC_9, 9 => TZ_UTC_10, 10 => TZ_UTC_11, 11 => TZ_UTC_12] as $v => $l) { ?>
+                    <option value="<?php echo $v; ?>" <?php if ($tzU['timezone'] == $v) echo 'selected'; ?>><?php echo $l; ?></option>
+                <?php } ?>
+                </optgroup>
+            </select>
+            <label><?php echo DATE; ?></label>
+            <div class="tz-prof-radios tz-prof-stack">
+            <?php foreach ([0 => TZ_EU_DD_MM_YY_24H, 1 => TZ_US_MM_DD_YY_12H, 2 => TZ_UK_DD_MM_YY_12H, 3 => TZ_ISO_YY_MM_DD_24H] as $v => $l) { ?>
+                <label><input class="radio" type="radio" name="tformat" value="<?php echo $v; ?>" <?php if ($tzU['tformat'] == $v) echo 'checked'; ?>> <?php echo $l; ?></label>
+            <?php } ?>
+            </div>
+        </div>
+    </div>
+    <div class="tz-prof-card">
+        <h3><?php echo TZ_LANGUAGE_SETTINGS; ?></h3>
+        <div class="tz-prof-form">
+            <label><?php echo TZ_GAME_LANGUAGE; ?></label>
+            <select name="lang" class="dropdown">
+            <?php foreach (['en' => TZ_ENGLISH, 'ro' => TZ_ROMANIAN, 'zh' => TZ_CHINESE, 'fr' => TZ_FRENCH, 'it' => TZ_ITALIAN, 'es' => TZ_SPANISH] as $v => $l) { ?>
+                <option value="<?php echo $v; ?>" <?php if ($tzU['lang'] == $v) echo 'selected'; ?>><?php echo $l; ?></option>
+            <?php } ?>
+            </select>
+        </div>
+    </div>
+</div>
 <!-- =========================
      SAVE BUTTON
 ========================= -->
