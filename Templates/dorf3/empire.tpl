@@ -40,6 +40,12 @@ $tzEmpUnitDef = function ($n) {
     $d = $GLOBALS['u' . $n] ?? null;
     return $d ? [(int) $d['di'], (int) $d['dc']] : [0, 0];
 };
+// short defence numbers so the table fits: 406,175 -> 406k (exact on hover)
+$tzEmpShort = function ($n) {
+    $n = (int) round($n);
+    $s = $n >= 10000000 ? round($n / 1000000, 1) . 'M' : ($n >= 100000 ? round($n / 1000) . 'k' : number_format($n));
+    return '<span title="' . number_format($n) . '">' . $s . '</span>';
+};
 $tzEmpWalls = [31 => CITYWALL, 32 => EARTHWALL, 33 => PALISADE, 42 => STONEWALL, 43 => MAKESHIFTWALL, 47 => DEFENSIVEWALL];
 
 if (!function_exists('tzEmpTime')) {
@@ -224,8 +230,8 @@ $tzEmpArmyTotal = array_sum($tzEmpArmy['all']);
                 <?php } ?>
                 <th title="Troops other villages (yours or allies') and tamed animals stationed here">Support</th>
                 <th>Wall</th>
-                <th title="Defence against infantry">Def inf</th>
-                <th title="Defence against cavalry">Def cav</th>
+                <th class="tz-emp-defh" title="Defence against infantry">Def<br />inf</th>
+                <th class="tz-emp-defh" title="Defence against cavalry">Def<br />cav</th>
             </tr>
         </thead>
         <tbody>
@@ -241,7 +247,7 @@ $tzEmpArmyTotal = array_sum($tzEmpArmy['all']);
             ?>
             <tr class="<?php echo ((int) $s['wid'] === (int) $village->wid) ? 'tz-cur' : ''; ?>">
                 <th class="tz-emp-vil">
-                    <a href="build.php?newdid=<?php echo (int) $s['wid']; ?>&amp;id=39"><?php echo htmlspecialchars($s['name']); ?></a>
+                    <a href="build.php?newdid=<?php echo (int) $s['wid']; ?>&amp;id=39" title="<?php echo htmlspecialchars($s['name']); ?>"><?php echo htmlspecialchars($s['name']); ?></a>
                     <?php if ($row['attacks'] > 0) { ?><span class="tz-emp-att" title="<?php echo $row['attacks']; ?> incoming attack(s)">&#9876; <?php echo $row['attacks']; ?></span><?php } ?>
                 </th>
                 <?php foreach ($tzEmpUnits as $u) { $n = $d['units'][$u]; ?>
@@ -249,8 +255,8 @@ $tzEmpArmyTotal = array_sum($tzEmpArmy['all']);
                 <?php } ?>
                 <td class="<?php echo $d['support'] == 0 ? 'none' : ''; ?>" title="<?php echo htmlspecialchars(implode("\n", $tzFromTitle)); ?>"><?php echo number_format($d['support']); ?></td>
                 <td class="<?php echo $d['wall'] ? '' : 'none'; ?>" title="<?php echo $d['wall'] ? htmlspecialchars($d['wall'][0]) : 'No wall'; ?>"><?php echo $d['wall'] ? $d['wall'][1] : '-'; ?></td>
-                <td class="tz-emp-defv"><?php echo number_format($d['di']); ?></td>
-                <td class="tz-emp-defv"><?php echo number_format($d['dc']); ?></td>
+                <td class="tz-emp-defv"><?php echo $tzEmpShort($d['di']); ?></td>
+                <td class="tz-emp-defv"><?php echo $tzEmpShort($d['dc']); ?></td>
             </tr>
             <?php } ?>
             <tr class="tz-emp-all">
@@ -260,8 +266,8 @@ $tzEmpArmyTotal = array_sum($tzEmpArmy['all']);
                 <?php } ?>
                 <td class="<?php echo $tzDefTot['support'] == 0 ? 'none' : ''; ?>"><?php echo number_format($tzDefTot['support']); ?></td>
                 <td></td>
-                <td class="tz-emp-defv"><?php echo number_format($tzDefTot['di']); ?></td>
-                <td class="tz-emp-defv"><?php echo number_format($tzDefTot['dc']); ?></td>
+                <td class="tz-emp-defv"><?php echo $tzEmpShort($tzDefTot['di']); ?></td>
+                <td class="tz-emp-defv"><?php echo $tzEmpShort($tzDefTot['dc']); ?></td>
             </tr>
         </tbody>
     </table>
