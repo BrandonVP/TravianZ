@@ -3,7 +3,7 @@
  * Logged-out page frame, part 1 (local redesign): <head>, wood top bar, opens
  * <main>. Set before including:
  *   $ogTitle   page title (after the server name)
- *   $ogActive  'home' | 'login' | 'register' - highlights the nav link
+ *   $ogActive  'home' | 'tutorial' | 'manual' | 'login' | 'register' - highlights the nav link
  *   $ogHead    optional extra <head> markup (scripts)
  * Close with Templates/layout/outgame_bottom.tpl. Styles: css/outgame.css.
  */
@@ -12,7 +12,8 @@ $ogActive = isset($ogActive) ? $ogActive : '';
 $ogRegisterLabel = defined('REGISTER') ? REGISTER : 'Register';
 $ogNav = [
     'home'     => ['index.php', defined('HOME') ? HOME : 'Homepage'],
-    'manual'   => ['anleitung.php', defined('MANUAL') ? MANUAL : 'Manual'],
+    'tutorial' => ['tutorial.php', defined('TUTORIAL') ? TUTORIAL : 'Tutorial'],
+    'manual'   => ['anleitung.php', defined('PUBLIC_MANUAL') ? PUBLIC_MANUAL : 'Manual'],
     'login'    => ['login.php', defined('LOGIN') ? LOGIN : 'Login'],
     'register' => ['anmelden.php', $ogRegisterLabel],
 ];

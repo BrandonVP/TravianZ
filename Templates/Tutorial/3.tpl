@@ -50,20 +50,3 @@
                     </tr>
                 </tbody>
             </table>
-        </div> 
-        <div class="clear"></div> 
-    </div> 
-    <div id="footer">
-        <div class="container">
-            <a href="#" class="logo"><img src="img/x.gif" alt="<?php echo TZ_TRAVIAN_GAMES; ?>" class="logo_traviangames" /></a>
-            <ul class="menu">
-                <li><a href="anleitung.php?s=3"><?php echo FAQ; ?></a>|</li>
-                <li><a href="index.php?screenshots"><?php echo SCREENSHOTS; ?></a>|</li>
-                <li><a href="spielregeln.php"><?php echo GAME_RULES; ?></a>|</li>
-                <li><a href="agb.php"><?php echo TZ_TERMS; ?></a>|</li>
-                <li><a href="impressum.php"><?php echo IMPRINT; ?></a></li>
-                <li class="copyright">&copy; 2010 - <?php echo date('Y') . ' ' . (defined('SERVER_NAME') ? SERVER_NAME : 'TravianZ');?> All rights reserved</li>
-            </ul>
-        </div>
-    </div> 
-</div>

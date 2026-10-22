@@ -58,20 +58,3 @@
 <p class="question"><?php echo ANL_FAQ_LOSE_VILLAGE_Q; ?></p>
 
 <p class="answer"><?php echo ANL_FAQ_LOSE_VILLAGE_A; ?></p>
-
-</div>
-	<div class="clear"></div> 
-</div> 
- 
-<div id="footer">
-
-	<div class="container">
-
-		<a href="#" class="logo"><img src="img/x.gif" alt="Travian Games" class="logo_traviangames" /></a>
-
-			<li class="copyright">&copy; 2010 - <?php echo date('Y') . ' ' . (defined('SERVER_NAME') ? SERVER_NAME : 'TravianZ');?> All rights reserved</li>
-
-	</div>
-
-</div> 
-</div> 

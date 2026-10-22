@@ -776,19 +776,3 @@ Velocity: 24 fields/hour.    <br>
     <br>
 
     <?php echo ANL_REQ_RALLY_POINT_15; ?></p>
-	</div>
-	<div class="clear"></div>
-</div>
-
-<div id="footer">
-
-	<div class="container">
-
-		<a href="#" class="logo"><img src="img/x.gif" alt="Travian Games" class="logo_traviangames" /></a>
-
-			<li class="copyright">&copy; 2010 - <?php echo date('Y') . ' ' . (defined('SERVER_NAME') ? SERVER_NAME : 'TravianZ');?> All rights reserved</li>
-
-	</div>
-
-</div>
-</div>

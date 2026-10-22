@@ -251,6 +251,35 @@ body.og a.og-btn.og-btn-gold:visited { background: var(--og-gold); border-color:
 .og-lightbox-close { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--og-gold); background: var(--og-wood); color: var(--og-gold-2); font-size: 20px; line-height: 26px; cursor: pointer; }
 .og-lightbox-box .og-btn-row { justify-content: center; }
 
+/* ---------- info pages (manual, tutorial, rules, terms, imprint) ---------- */
+
+.og-doc { overflow-wrap: anywhere; }
+.og-doc h1 { margin-bottom: 8px; }
+.og-doc h2, .og-doc h3, .og-doc h4 { font-family: "Cinzel", Georgia, serif; color: var(--og-ink); margin: 18px 0 8px; }
+.og-doc h3.pop, .og-doc .popgreen { color: var(--og-ink) !important; font-size: 17px; }
+.og-doc p.submenu { padding: 8px 12px; background: var(--og-cream-2); border-radius: 8px; }
+.og-doc p.submenu a { font-weight: 700; }
+.og-doc strong[style], .og-doc b[style], .og-doc span[style*="color"] { color: var(--og-link) !important; }
+.og-doc img { max-width: 100%; height: auto; vertical-align: middle; }
+.og-doc table { border-collapse: collapse; margin: 8px 0 14px; max-width: 100%; }
+.og-doc table td, .og-doc table th { padding: 4px 6px; border-bottom: 1px solid var(--og-cream-2); vertical-align: top; }
+.og-doc table thead th, .og-doc table thead td, .og-doc table tr.top th, .og-doc table th[colspan] { background: var(--og-cream-2); font-weight: 700; }
+.og-doc table.table_data { width: 100%; font-size: 13px; }
+.og-doc table.table_data td { text-align: center; }
+.og-doc table.tutorial_table { width: 100%; }
+.og-doc table.tutorial_table td.visual { width: 50%; text-align: center; font-weight: 600; }
+.og-doc table.tutorial_table td.visual img { display: block; margin: 0 auto 6px; border-radius: 8px; border: 1px solid var(--og-line); }
+.og-doc table#tutorial_nav { width: 100%; }
+.og-doc table#tutorial_nav td { border: 0; }
+.og-doc table#tutorial_nav td.nav_next { text-align: right; }
+.og-doc table#tutorial_nav a { display: inline-block; padding: 6px 16px; border: 1px solid #8a6a22; border-radius: 999px; text-decoration: none; font-weight: 700; color: var(--og-wood); background: var(--og-cream); }
+.og-doc table#tutorial_nav a:hover { background: var(--og-gold-2); }
+.og-doc p.question { margin: 16px 0 4px; font-weight: 700; color: var(--og-ink); }
+.og-doc p.answer { margin: 0 0 10px; padding-left: 12px; border-left: 3px solid var(--og-cream-2); }
+.og-doc ul.rules, .og-doc ul.rules ul { padding-left: 20px; }
+.og-doc ul.rules li { margin: 6px 0; }
+.og-doc .terms-box { line-height: 1.55; }
+.og-doc .characteristics { padding-left: 20px; }
 /* ---------- server info (Templates/News/newsbox1.tpl) ---------- */
 
 .og-serverinfo h5 { display: none; }

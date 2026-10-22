@@ -1185,22 +1185,3 @@
 <li><?php echo ANL_TEUTON_CHEAP_TROOPS; ?></li>
 
 <li><?php echo ANL_TEUTON_WEAK_DEFENCE; ?></li></ul>
-
-
-
-	</div>
-	<div class="clear"></div>
-</div>
-
-<div id="footer">
-
-	<div class="container">
-
-		<a href="#" class="logo"><img src="img/x.gif" alt="Travian Games" class="logo_traviangames" /></a>
-
-			<li class="copyright">&copy; 2010 - <?php echo date('Y') . ' ' . (defined('SERVER_NAME') ? SERVER_NAME : 'TravianZ');?> All rights reserved</li>
-
-	</div>
-
-</div>
-</div>
