@@ -178,180 +178,113 @@ return isset($units[$k])? (int)$units[$k] : 0;
 $isStaff = isset($session) && $session->access >= 8; // MH si Admin
 ?>
 
-<!-- ================= WORLD STATS ================= -->
-<table cellpadding="1" cellspacing="1" id="world_player" class="world">
-<thead><tr><th colspan="2"><?php echo TZ_WORLD_STATS;?></th></tr>
-<tr><td><?php echo TZ_TOTAL_VILLAGES;?></td><td><?php echo TZ_TOTAL_POPULATION;?></td></tr></thead>
-<tbody><tr><td><?= $num_villages?></td><td><?= $total_pop?></td></tr></tbody>
-</table>
-<br />
+<!-- local redesign: stat tiles and cards instead of stacked tables -->
+<div class="tz-stats-general">
+<div class="tz-ally-stats tz-stats-tiles">
+    <div class="tz-ally-stat"><span class="tz-ally-k"><?php echo TZ_TOTAL_VILLAGES; ?></span><span class="tz-ally-v"><?= number_format($num_villages) ?></span></div>
+    <div class="tz-ally-stat"><span class="tz-ally-k"><?php echo TZ_TOTAL_POPULATION; ?></span><span class="tz-ally-v"><?= number_format($total_pop) ?></span></div>
+    <div class="tz-ally-stat"><span class="tz-ally-k"><?php echo TZ_REGISTERED_PLAYERS; ?></span><span class="tz-ally-v"><?= number_format($users) ?></span></div>
+    <div class="tz-ally-stat"><span class="tz-ally-k">Days since start</span><span class="tz-ally-v"><?= (int) $daysSinceStart ?></span></div>
+</div>
 
-<!-- ================= PLAYERS ================= -->
-<table cellpadding="1" cellspacing="1" class="world">
-<thead><tr><th colspan="2"><?php echo PLAYERS;?></th></tr></thead>
-<tbody>
-<tr><th><?php echo TZ_REGISTERED_PLAYERS;?></th><td><?= $users?></td></tr>
-<tr><th><?php echo ACTIVE_PLAYERS;?></th><td><?= $active?></td></tr>
-<tr><th>Players online</th><td><?= $online?></td></tr>
-</tbody>
-</table>
-<br />
+<div class="tz-prof-grid">
+    <div class="tz-prof-card">
+        <h3><?php echo PLAYERS; ?></h3>
+        <div class="tz-stats-kv">
+            <span><?php echo ACTIVE_PLAYERS; ?></span><b><?= $active ?></b>
+            <span>Online now</span><b><?= $online ?></b>
+            <span>New today</span><b><?= $newToday ?></b>
+        </div>
+    </div>
+    <div class="tz-prof-card">
+        <h3>World</h3>
+        <div class="tz-stats-kv">
+            <span>Alliances</span><b><?= $alliCount ?></b>
+            <span>Conquered oases</span><b><?= $oasis ?></b>
+            <span>Natar villages</span><b><?= $natars ?></b>
+            <?php if ($isStaff) { ?><span><?php echo GOLD; ?> (staff)</span><b><?= number_format($total_gold) ?></b><?php } ?>
+        </div>
+    </div>
+</div>
 
-<!-- ================= SERVER 2026 ================= -->
-<table cellpadding="1" cellspacing="1" class="world">
-<thead><tr><th colspan="2">Server Information</th></tr></thead>
-<tbody>
-<tr><th>Days Since Start</th><td><?= $daysSinceStart?></td></tr>
-<tr><th>Active Alliance</th><td><?= $alliCount?></td></tr>
-<tr><th>Natars Villages</th><td><?= $natars?></td></tr>
-<tr><th>Conquered Oasis</th><td><?= $oasis?></td></tr>
-<tr><th>New Players Today</th><td><?= $newToday?></td></tr>
-</tbody>
-</table>
-<br />
+<div class="tz-prof-grid">
+    <div class="tz-prof-card">
+        <h3><?php echo TZ_TRIBES; ?></h3>
+        <?php foreach ($activeTribes as $tid):
+            $cnt = $tribes[$tid];
+            $pct = ($users > 0) ? round(100 * $cnt / $users, 1) : 0;
+            $tribeName = defined('TRIBE'.$tid) ? constant('TRIBE'.$tid) : ('Tribe '.$tid);
+        ?>
+        <div class="tz-stats-bar">
+            <span class="tz-stats-bar-l"><?= $tribeName ?></span>
+            <span class="tz-stats-bar-t"><i style="width:<?= $pct ?>%"></i></span>
+            <span class="tz-stats-bar-v"><?= $cnt ?> &middot; <?= $pct ?>%</span>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <div class="tz-prof-card">
+        <h3>Largest alliances</h3>
+        <?php if (empty($topAlliances)) { ?><p class="tz-prof-note">No alliances yet.</p><?php } else { ?>
+        <table class="tz-prof-table" cellpadding="0" cellspacing="0">
+            <tr><th>Tag</th><th><?php echo NAME; ?></th><th class="tz-stats-r">Members</th></tr>
+            <?php foreach ($topAlliances as $a) { ?>
+            <tr><td><b><?= htmlspecialchars($a['tag']) ?></b></td><td><?= htmlspecialchars($a['name']) ?></td><td class="tz-stats-r"><?= (int) $a['members'] ?></td></tr>
+            <?php } ?>
+        </table>
+        <?php } ?>
+    </div>
+</div>
 
-<!-- ================= TRIBES ================= -->
-<table cellpadding="1" cellspacing="1" class="world">
-<thead><tr><th colspan="3"><?php echo TZ_TRIBES;?></th></tr>
-<tr><td><?php echo TRIBE;?></td><td><?php echo TZ_REGISTERED;?></td><td><?php echo PERCENT;?></td></tr></thead>
-<tbody>
-<?php foreach ($activeTribes as $tid):
-    $cnt = $tribes[$tid];
-    $pct = ($users > 0) ? round(100 * $cnt / $users, 2) : 0;
-    $tribeName = defined('TRIBE'.$tid) ? constant('TRIBE'.$tid) : ('Tribe '.$tid);
-?>
-<tr><td><?= $tribeName ?></td><td><?= $cnt ?></td><td><?= $pct ?>%</td></tr>
-<?php endforeach; ?>
-</tbody>
-</table>
-<br />
+<div class="tz-prof-grid">
+    <div class="tz-prof-card">
+        <h3><?php echo TZ_MISCELLANEOUS; ?> <span>the last 7 days</span></h3>
+        <table class="tz-prof-table" cellpadding="0" cellspacing="0">
+            <tr><th><?php echo DATE; ?></th><th class="tz-stats-r"><?php echo TZ_ATTACKS; ?></th><th class="tz-stats-r"><?php echo CASUALTIES; ?></th></tr>
+            <?php for ($d = 0; $d <= 6; $d++) { ?>
+            <tr><td><?= date("j. M", time() - (86400 * $d)) ?></td>
+                <td class="tz-stats-r"><?= number_format((int) $database->getAttackByDate(time() - (86400 * $d))) ?></td>
+                <td class="tz-stats-r"><?= number_format((int) $database->getAttackCasualties(time() - (86400 * $d))) ?></td></tr>
+            <?php } ?>
+        </table>
+    </div>
+    <div class="tz-prof-card">
+        <h3>Endgame</h3>
+        <div class="tz-stats-kv">
+            <span>Wonders of the World</span><b><?php if (empty($wonders)) echo '-'; else foreach ($wonders as $w) echo htmlspecialchars($w['village']) . ' <span class="tz-prof-dim">lv ' . (int) $w['level'] . '</span><br>'; ?></b>
+            <span>Artefacts</span><b><?php if (empty($artefacts)) echo '-'; else foreach ($artefacts as $a) echo htmlspecialchars($a['name']) . ' <span class="tz-prof-dim">' . htmlspecialchars($a['username'] ?? 'Natars') . '</span><br>'; ?></b>
+        </div>
+    </div>
+</div>
 
-<?php if($isStaff): ?>
-<!-- ================= GOLD ================= -->
-<table cellpadding="1" cellspacing="1" class="world">
-<thead><tr><th colspan="2">Total <?= SERVER_NAME?> <img src="./<?= GP_LOCATE?>img/a/gold.gif"> Gold</th></tr></thead>
-<tbody><tr><td><?php echo GOLD;?></td><td><?= $total_gold?></td></tr></tbody>
-</table>
-<br />
+<?php if ($isStaff): ?>
+<div class="tz-prof-card">
+    <h3>Top players <span>staff only</span></h3>
+    <table class="tz-prof-table" cellpadding="0" cellspacing="0">
+        <tr><th><?php echo POP; ?></th><th class="tz-stats-r"></th><th>Attackers</th><th class="tz-stats-r"></th><th>Defenders</th><th class="tz-stats-r"></th></tr>
+        <?php for ($i = 0; $i < 10; $i++):
+            $p = $topPop[$i] ?? null; $a = $topAtk[$i] ?? null; $d = $topDef[$i] ?? null; ?>
+        <tr>
+            <td><?= ($i + 1) . '. ' . ($p ? htmlspecialchars($p['username']) : '-') ?></td><td class="tz-stats-r"><?= $p ? number_format((int) ($p['totalpop'] ?? 0)) : 0 ?></td>
+            <td><?= ($i + 1) . '. ' . ($a ? htmlspecialchars($a['username']) : '-') ?></td><td class="tz-stats-r"><?= $a ? number_format((int) $a['points']) : 0 ?></td>
+            <td><?= ($i + 1) . '. ' . ($d ? htmlspecialchars($d['username']) : '-') ?></td><td class="tz-stats-r"><?= $d ? number_format((int) $d['points']) : 0 ?></td>
+        </tr>
+        <?php endfor; ?>
+    </table>
+</div>
+<div class="tz-prof-card">
+    <h3><?php echo TROOPS; ?> <span>all players, staff only</span></h3>
+    <div class="tz-stats-troops">
+    <?php foreach ($activeTribes as $tid): $tribeName = defined('TRIBE'.$tid) ? constant('TRIBE'.$tid) : ('Tribe '.$tid); ?>
+        <div class="tz-stats-troopcol">
+            <div class="tz-stats-troophead"><?= $tribeName ?></div>
+            <?php for ($i = 1; $i <= 10; $i++): $u = ($tid - 1) * 10 + $i; ?>
+            <div class="tz-stats-troop"><img src="img/x.gif" class="unit u<?= $u ?>" alt=""> <?= number_format(u($units, 'u' . $u)) ?></div>
+            <?php endfor; ?>
+        </div>
+    <?php endforeach; ?>
+    </div>
+</div>
 <?php endif; ?>
-
-<!-- ================= TOP ALLIANCES ================= -->
-<table cellpadding="1" cellspacing="1" class="world">
-<thead><tr><th colspan="3">Top 5 Alliances</th></tr>
-<tr><td>Tag</td><td>Nume</td><td>Members</td></tr></thead>
-<tbody>
-<?php foreach($topAlliances as $a):?>
-<tr><td><?=htmlspecialchars($a['tag'])?></td><td><?=htmlspecialchars($a['name'])?></td><td><?=(int)$a['members']?></td></tr>
-<?php endforeach; if(empty($topAlliances)) echo '<tr><td colspan="3">-</td></tr>';?>
-</tbody>
-</table>
-<br />
-
-<?php if($isStaff): ?>
-<!-- ================= TROOPS ================= -->
-<?php
-// imaginile de antet pentru triburile vechi; pentru cele noi folosim numele
-$tribeHeaderImg = [
-	1 => 'gpack/travian_default/img/u/9.gif', 
-	2 => 'gpack/travian_default/img/u/19.gif', 
-	3 => 'gpack/travian_default/img/u/29.gif', 
-	6 => 'gpack/travian_default/img/u/59.gif',
-	7 => 'gpack/travian_default/img/u/69.gif',
-	8 => 'gpack/travian_default/img/u/79.gif',
-	9 => 'gpack/travian_default/img/u/89.gif'
-	];
-// afisez trupele in grupuri de cate 3 triburi (ca sa nu iasa tabelul prea lat)
-$troopChunks = array_chunk($activeTribes, 3);
-foreach ($troopChunks as $chunk):
-?>
-<table cellpadding="1" cellspacing="1" class="world">
-<thead>
-<tr><th colspan="<?= count($chunk)*2 ?>"><?php echo TROOPS;?></th></tr>
-<tr>
-<?php foreach ($chunk as $tid):
-    $tribeName = defined('TRIBE'.$tid) ? constant('TRIBE'.$tid) : ('Tribe '.$tid);
-    if (isset($tribeHeaderImg[$tid])): ?>
-    <td><img src="<?= $tribeHeaderImg[$tid] ?>" alt="<?= $tribeName ?>" title="<?= $tribeName ?>"></td><td><?php echo TZ_TOTAL;?></td>
-    <?php else: ?>
-    <td><b><?= $tribeName ?></b></td><td><?php echo TZ_TOTAL;?></td>
-    <?php endif; endforeach; ?>
-</tr>
-</thead>
-<tbody>
-<?php for($i=1;$i<=10;$i++):?>
-<tr>
-<?php foreach ($chunk as $tid): $u = ($tid-1)*10 + $i; ?>
-<td><img src="img/x.gif" class="unit u<?= $u ?>"></td><td><?= u($units,'u'.$u) ?></td>
-<?php endforeach; ?>
-</tr>
-<?php endfor;?>
-</tbody>
-</table>
-<br />
-<?php endforeach; ?>
-<?php endif; ?>
-
-<?php if($isStaff): ?>
-<!-- ================= TOP PLAYERS ================= -->
-<table cellpadding="1" cellspacing="1" class="world">
-<thead>
-<tr><th colspan="6">Top Players</th></tr>
-<tr>
-    <td>Population</td><td>Pct</td>
-    <td>Attackers</td><td>Pct</td>
-    <td>Defenders</td><td>Pct</td>
-</tr>
-</thead>
-<tbody>
-<?php for($i=0; $i<10; $i++):
-    $p = $topPop[$i] ?? null;
-    $a = $topAtk[$i] ?? null;
-    $d = $topDef[$i] ?? null;
-?>
-<tr>
-    <!-- Populatie -->
-    <td><?= ($i+1).'. '.($p ? htmlspecialchars($p['username']) : '-') ?></td>
-    <td><?= $p ? (int)($p['totalpop'] ?? 0) : 0 ?></td>
-
-    <!-- Atacatori -->
-    <td><?= ($i+1).'. '.($a ? htmlspecialchars($a['username']) : '-') ?></td>
-    <td><?= $a ? (int)$a['points'] : 0 ?></td>
-
-    <!-- Aparători -->
-    <td><?= ($i+1).'. '.($d ? htmlspecialchars($d['username']) : '-') ?></td>
-    <td><?= $d ? (int)$d['points'] : 0 ?></td>
-</tr>
-<?php endfor; ?>
-</tbody>
-</table>
-<br />
-<?php endif; ?>
-
-<!-- ================= ENDGAME ================= -->
-<table cellpadding="1" cellspacing="1" class="world">
-<thead><tr><th colspan="3">Endgame</th></tr>
-<tr><td>WW</td><td>Level</td><td>Artefacts</td></tr></thead>
-<tbody><tr>
-<td valign="top"><?php foreach($wonders as $w) echo htmlspecialchars($w['village'])." (".$w['level'].")<br>"; if(empty($wonders)) echo "-";?></td>
-<td valign="top"><?php foreach($wonders as $w) echo $w['level']."<br>"; if(empty($wonders)) echo "-";?></td>
-<td valign="top"><?php foreach($artefacts as $a) echo htmlspecialchars($a['name'])." - ".htmlspecialchars($a['username']??'Natars')."<br>"; if(empty($artefacts)) echo "-";?></td>
-</tr></tbody>
-</table>
-<br />
-
-<!-- ================= MISC ================= -->
-<table cellpadding="1" cellspacing="1" class="world">
-<thead><tr><th colspan="3"><?php echo TZ_MISCELLANEOUS;?></th></tr>
-<tr><td><?php echo TZ_ATTACKS;?></td><td><?php echo CASUALTIES;?></td><td><?php echo DATE;?></td></tr></thead>
-<tbody>
-<?php for($d=0;$d<=6;$d++):?>
-<tr>
-<td><?= $database->getAttackByDate(time()-(86400*$d))?></td>
-<td><?= $database->getAttackCasualties(time()-(86400*$d))?></td>
-<td><?= date("j. M", time()-(86400*$d))?></td>
-</tr>
-<?php endfor;?>
-</tbody>
-</table>
+</div>
 <?php?>
 <table cellpadding="1" cellspacing="1" id="search_navi">

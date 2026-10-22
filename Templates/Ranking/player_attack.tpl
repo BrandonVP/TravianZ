@@ -15,7 +15,7 @@
 #################################################################################
 
 // Validare search
-if (!isset($_SESSION['search']) || !is_numeric($_SESSION['search'])) {
+if (isset($_SESSION['search']) && $_SESSION['search'] !== '' && !is_numeric($_SESSION['search'])) {
 ?>
     <center>
         <font color="orange" size="2">
@@ -27,7 +27,7 @@ if (!isset($_SESSION['search']) || !is_numeric($_SESSION['search'])) {
 <?php
     $search = 0;
 } else {
-    $search = (int)$_SESSION['search'];
+    $search = (int)($_SESSION['search'] ?? 0);
 }
 ?>
 

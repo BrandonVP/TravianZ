@@ -120,6 +120,41 @@ if (!empty($_GET['id'])) {
  'WW'; } else { echo ''; }?></a>
 </div>
 <?php
+// local redesign: one row of text sub-tabs for the player and alliance
+// rankings (replaces the icon buttons inside each table header)
+$tzSid = isset($_GET['id']) ? (int) $_GET['id'] : 1;
+$tzSub = [];
+if (in_array($tzSid, [1, 31, 32, 7, 50, 11, 12, 13, 16, 17, 18, 19], true)) {
+    $tzSub = [1 => POP, 31 => ATTACKER, 32 => DEFENDER, 7 => TZ_TOP_10];
+    if (defined('NEW_FUNCTIONS_PLUS_STATISTICS') && NEW_FUNCTIONS_PLUS_STATISTICS && !empty($session->plus)) {
+        $tzSub[50] = defined('PLUSSTATS_TITLE') ? PLUSSTATS_TITLE : 'Graphs';
+    }
+    $tzTribes = [11 => TRIBE1, 12 => TRIBE2, 13 => TRIBE3];
+    foreach ([16 => ['NEW_FUNCTION_TRIBE_HUNS', TRIBE6], 17 => ['NEW_FUNCTION_TRIBE_EGIPTEANS', TRIBE7],
+              18 => ['NEW_FUNCTION_TRIBE_SPARTANS', TRIBE8], 19 => ['NEW_FUNCTION_TRIBE_VIKINGS', TRIBE9]] as $k => $v) {
+        if (defined($v[0]) && constant($v[0])) $tzTribes[$k] = $v[1];
+    }
+} elseif (in_array($tzSid, [4, 41, 42, 43], true)) {
+    $tzSub = [4 => POP, 41 => ATTACKER, 42 => DEFENDER, 43 => TZ_TOP_10];
+}
+if ($tzSub) {
+    echo '<div class="tz-stats-sub">';
+    foreach ($tzSub as $k => $label) {
+        echo '<a href="statistiken.php?id=' . $k . '"' . ($k === $tzSid || ($k === 1 && $tzSid >= 11 && $tzSid <= 19) ? ' class="on"' : '') . '>' . $label . '</a>';
+    }
+    echo '</div>';
+    if (!empty($tzTribes) && ($tzSid === 1 || ($tzSid >= 11 && $tzSid <= 19))) {
+        echo '<div class="tz-stats-sub tz-stats-tribes"><a href="statistiken.php?id=1"' . ($tzSid === 1 ? ' class="on"' : '') . '>All tribes</a>';
+        foreach ($tzTribes as $k => $label) {
+            echo '<a href="statistiken.php?id=' . $k . '"' . ($k === $tzSid ? ' class="on"' : '') . '>' . $label . '</a>';
+        }
+        echo '</div>';
+    }
+}
+// capture the ranking output to mark ranks 1-3 (gold/silver/bronze badges)
+ob_start();
+?>
+<?php
 if(isset($_GET['id'])) {
 	switch($_GET['id']) {
 		case 31:
@@ -192,6 +227,10 @@ if(isset($_GET['id'])) {
 else {
 	include("Templates/Ranking/overview.tpl");
 }
+// local redesign: rank 1-3 cells get a medal class
+echo preg_replace_callback('/<td class="ra([^"]*)">\s*([123])\.(&nbsp;)?\s*<\/td>/', function ($m) {
+    return '<td class="ra' . $m[1] . ' tz-rank tz-rank' . $m[2] . '"><span>' . $m[2] . '</span></td>';
+}, ob_get_clean());
 ?>
  </div>
 						</td>
