@@ -1,3 +1,43 @@
+# TravianZ — redesign fork
+
+> **About this fork.** This is a personally run fork of [Shadowss/TravianZ](https://github.com/Shadowss/TravianZ),
+> released under the same [GPLv3 licence](LICENSE). All credit for the original game engine goes to Shadow and the
+> TravianZ contributors; their original README follows below. Branches: **`live`** is what the server runs,
+> **`ui-redesign`** is development, and **`master`** mirrors the official project.
+
+## What this fork changes
+
+**A new look.** A modern card-based layout across the whole game: a top bar with Fields / Village / Empire / Map /
+Reports / Messages / Alliance, resource cards with live production, themed side cards, full-width building pages
+with back buttons, and new logged-out pages (homepage, login, registration, manual, tutorial). It is built for the
+Travian Modern graphics pack (set it as the server pack and turn off pack choice in GameEngine/config.php).
+
+**Village gold.** Gold is no longer an account balance bought with money: every village produces its own gold
+(more with Main Building and Marketplace levels), holds up to 8,000, or more with a **Treasury** that also protects it
+from raids, and merchants can carry it. Plus, the production bonuses and the Gold Club are bought (and auto-renewed)
+in the capital's Main Building. Quests, invites, gold codes and the gold shop all pay into the capital.
+
+**New ways to use gold and resources**
+- **Trade Office:** resource contracts (buy resources from the NPC), express caravans between your own villages.
+- **Marketplace:** gold in offers and trade routes; routes can auto-renew or send when storage is full.
+- **Hero's Mansion:** finish a revive, heal, find new adventures.
+- **Tournament Square:** war games, a timed exercise that strengthens the next attack.
+- **Residence / Palace festivities:** Harvest Feast and Travelling Players (loyalty), Patron of the Arts and the
+  Village Monument (culture points), each once a week.
+- **Warehouse / Granary:** levels 21–25 (up to 2,000,000) and day-long rented carts / grain lofts.
+
+**Gameplay changes**
+- Build queue with two lanes (fields and buildings) and per-job *Finish now*.
+- Blacksmith and Armoury upgrades are account-wide; Academy research and the Stable no longer need a
+  Blacksmith or Armoury in every village.
+- Cranny up to level 20; Gold Club evasion paid with village gold; NPC trading deliberately expensive.
+- Empire overview (Plus), reports with 20 per page and *Delete all*, direct links that accept game pages.
+
+Setup is the same as upstream (see below); per-server settings live in `GameEngine/config.php`, which is not
+committed. Gold prices and festivity settings are in `GameEngine/Data/gold.php` and `GameEngine/Data/festivities.php`.
+
+---
+
 # TravianZ
 
 [![Maintenance](https://img.shields.io/maintenance/yes/2026.svg)](https://github.com/Shadowss/TravianZ)
