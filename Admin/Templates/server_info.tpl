@@ -44,7 +44,8 @@ $pop = (int)(q1("SELECT SUM(pop) s FROM ".TB_PREFIX."vdata")['s'] ?? 0);
 $tribes = [1=>0,2=>0,3=>0,6=>0,7=>0,8=>0,9=>0];
 foreach([1,2,3,6,7,8,9] as $t){ $tribes[$t] = (int)(q1("SELECT COUNT(*) c FROM ".TB_PREFIX."users WHERE tribe=$t")['c'] ?? 0); }
 
-$gold = (int)(q1("SELECT SUM(gold) s FROM ".TB_PREFIX."users")['s'] ?? 0);
+// local redesign: gold lives in the villages (plus any not yet moved to a capital)
+$gold = (int)(q1("SELECT SUM(gold) s FROM ".TB_PREFIX."vdata WHERE owner > 3")['s'] ?? 0) + (int)(q1("SELECT SUM(gold) s FROM ".TB_PREFIX."users")['s'] ?? 0);
 
 // ---- TRUPE ----
 $cells = ['SUM(hero) as hero'];

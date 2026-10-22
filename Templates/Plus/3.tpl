@@ -290,14 +290,15 @@ if (class_exists('GoldShop')):
     <thead><tr><th colspan="5">Redeem a gold code</th></tr></thead>
     <tbody>
         <tr>
-            <td style="padding:10px 14px;">
+            <td class="tz-redeem">
                 <?php if ($__promoMsg !== ''): ?>
-                    <div style="margin-bottom:8px;font-weight:bold;color:<?php echo $__promoOk ? '#2e7d32' : '#b3261e'; ?>;"><?php echo htmlspecialchars($__promoMsg, ENT_QUOTES, 'UTF-8'); ?></div>
+                    <div class="<?php echo $__promoOk ? 'tz-redeem-ok' : 'tz-redeem-err'; ?>"><?php echo htmlspecialchars($__promoMsg, ENT_QUOTES, 'UTF-8'); ?></div>
                 <?php endif; ?>
-                <form method="post" action="<?php echo $__action; ?>" style="display:flex;gap:8px;align-items:center;max-width:460px;">
-                    <input type="text" name="redeem_code" maxlength="64" placeholder="Enter code" style="flex:1;padding:6px 8px;border:1px solid #b89968;border-radius:4px;text-transform:uppercase;" required>
-                    <input type="submit" value="Redeem" style="padding:6px 18px;background:#8a6d3b;color:#fff;border:0;border-radius:4px;cursor:pointer;font-weight:bold;">
+                <form method="post" action="<?php echo $__action; ?>" class="tz-redeem-form">
+                    <input type="text" name="redeem_code" maxlength="64" placeholder="Enter code" class="text" required>
+                    <button type="submit" class="tz-btn tz-btn-sm">Redeem</button>
                 </form>
+                <p class="tz-redeem-note">Gold from codes is paid into your capital.</p>
             </td>
         </tr>
     </tbody>

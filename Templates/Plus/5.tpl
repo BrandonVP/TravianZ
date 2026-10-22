@@ -24,7 +24,7 @@ $refLink = rtrim(HOMEPAGE, '/') . '/anmelden.php?uid=ref_' . $session->uid;
 $invited = $database->getInvitedUser($session->uid);
 ?>
 <h2><?php echo INVITE_FRIENDS_GOLD; ?></h2>
-<p><?php echo TZ_IF_YOU_GET_NEW_PLAYERS_TO_OPEN_AN; ?> <b><?php echo TZ_N_50_GOLD; ?></b><?php echo TZ_YOU_CAN_USE_THIS_GOLD_FOR_PLUS_OR; ?><br><br>
+<p><?php echo TZ_IF_YOU_GET_NEW_PLAYERS_TO_OPEN_AN; ?> <b><?php echo number_format(TZ_GOLD_INVITE_REWARD); ?> gold</b>, paid into your capital. Spend it on Plus, the production bonuses or any of the village gold services.<br><br>
 <?php echo TZ_TO_BRING_IN_NEW_PLAYERS_INVITE_THE; ?></p>
 
 <h2><?php echo TZ_HOW_IS_IT_DONE; ?></h2>
@@ -36,7 +36,7 @@ $invited = $database->getInvitedUser($session->uid);
 <span class="link" onclick="navigator.clipboard.writeText('<?= $refLink ?>'); this.style.color='#0a0';" title="<?php echo TZ_CLICK_TO_COPY; ?>"><?= $refLink ?></span>
 
 <h3><?php echo TZ_PROGRESS_OF_YOUR_INVITED_FRIENDS; ?></h3>
-<p><?php echo TZ_AS_SOON_AS_A_PLAYER_YOU_INVITED_FO; ?> <b>2nd</b> <?php echo TZ_VILLAGE_YOU_WILL_BE_CREDITED_WITH; ?> <b>50</b> <?php echo TZ_GOLD; ?></p>
+<p><?php echo TZ_AS_SOON_AS_A_PLAYER_YOU_INVITED_FO; ?> <b>2nd</b> <?php echo TZ_VILLAGE_YOU_WILL_BE_CREDITED_WITH; ?> <b><?php echo number_format(TZ_GOLD_INVITE_REWARD); ?></b> gold in your capital</p>
 
 <table id="brought_in" cellpadding="1" cellspacing="1">
     <thead>

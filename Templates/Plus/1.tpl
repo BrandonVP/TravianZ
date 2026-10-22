@@ -42,6 +42,7 @@ $payEmail = defined('PAYPAL_EMAIL') ? PAYPAL_EMAIL : 'novgorodschi@icloud.com';
 				<a href="mailto:<?= $payEmail ?>"><?php echo TZ_PAYMENT_ACCOUNT; ?></a>.<br><br>
 				<b><?php echo TZ_USERNAME; ?><br><?php echo PAYMENT_METHOD; ?><br><?php echo TZ_ORDERED_PACKAGE; ?><br><?php echo TZ_DATE_AND_TIME; ?></b><br><br>
 				<?php echo TZ_WE_STRIVE_TO_ENSURE_SPEEDY_PROCESS; ?>
+				<br><br><b>Purchased gold is paid into your capital</b> (even above its gold limit), and is spent like any other village gold.
 			</td>
 		</tr>
 	</tbody>

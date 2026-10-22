@@ -19,16 +19,32 @@
 #################################################################################
 
 include("Templates/Plus/pmenu.tpl");
+// local redesign: FAQ for village gold
+$tzFaq = [
+    ['Where does gold come from?',
+     'Every village produces gold over time: a little by itself, more with Main Building and Marketplace levels, and some from the hero in its home village. '
+     . 'Quests, inviting friends (' . number_format(TZ_GOLD_INVITE_REWARD) . ' gold each), gold codes and gold packages from the <a href="plus.php">gold shop</a> add more; those always go to your capital.'],
+    ['Is gold per village?',
+     'Yes. Each village has its own gold, shown in the gold card at the top. Merchants can carry gold between villages (one gold takes the room of ' . TZ_GOLD_MERCHANT_SPACE . ' resources), and trade routes can move it automatically.'],
+    ['How much gold can a village hold?',
+     'Up to 8,000 without a Treasury. A Treasury raises that limit to a tenth of what a Warehouse of the same level holds (80,000 at level 20). Gold above the limit stops growing.'],
+    ['Can gold be stolen?',
+     'Raiders can carry off gold that is not protected by a Treasury, and a Treasury takes only a quarter of catapult damage. Gold inside the Treasury is safe.'],
+    ['Where do I buy Plus and the production bonuses?',
+     'In your capital\'s Main Building, with the capital\'s gold. Each can be set to renew automatically when it runs out.'],
+    ['What else can I spend gold on?',
+     'Finish now, the Master Builder, resource contracts and express caravans in the Trade Office, trade routes, hero services, war games, festivities in the Residence, rented storage, '
+     . 'and the gold part of the Treasury and of Warehouse/Granary levels 21-25. The <a href="plus.php?id=2">Advantages</a> page lists them all with prices.'],
+    ['Why can\'t I finish some buildings?',
+     'A Residence, Palace or World Wonder cannot be finished early, and jobs waiting in the queue (not yet started) cannot be finished either.'],
+    ['Where can I see what I spent?',
+     'In the <a href="a2b2.php">Account Statement</a>: every gold movement, with the village it happened in.'],
+];
 ?>
-<p class="f10 b"><?php echo TZ_HOW_DO_I_GET_GOLD; ?></p>
-<p><a href="plus.php?id=1"><?php echo TZ_BUY_IT_IN_THE_GOLD_SHOP; ?></a> <?php echo TZ_OR_ASK_THE_SERVER_OWNER; ?></p>
-
-<p class="f10 b"><?php echo TZ_WHY_CAN_T_I_FINISH_SOME_BUILDINGS; ?></p>
-<p><?php echo TZ_RESIDENCE_PALACE_AND_WORLD_WONDER; ?></p>
-
-<p class="f10 b"><?php echo TZ_I_ACTIVATED_PLUS_BUT_PRODUCTION_DI; ?></p>
-<p><?php echo TZ_PLUS_DOES_NOT_INCLUDE_PRODUCTION_B; ?> <a href="plus.php?id=3"><?php echo TZ_PLUS_FUNCTIONS; ?></a>.</p>
-
-<p class="f10 b"><?php echo TZ_DO_I_NEED_PLUS_TO_USE_OTHER_FEATUR; ?></p>
-<p><?php echo TZ_NO_EVERY_GOLD_FEATURE_WORKS_STANDA; ?></p>
+<div class="tz-faq">
+<?php foreach ($tzFaq as $tzQ): ?>
+    <p class="tz-faq-q"><?php echo $tzQ[0]; ?></p>
+    <p class="tz-faq-a"><?php echo $tzQ[1]; ?></p>
+<?php endforeach; ?>
+</div>
 </div>

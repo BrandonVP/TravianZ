@@ -68,7 +68,7 @@ if(isset($id)) {
 <div class="editAdd-wrap">
     <div class="editAdd-head">
         <h2><?php echo ADM_EDIT_ADDITIONAL; ?><a href="admin.php?p=player&uid=<?php echo $user['id']; ?>"><?php echo htmlspecialchars($user['username']); ?></a></h2>
-        <div class="uid">UID: <?php echo $id; ?> | Gold: <?php echo $user['gold']; ?> <img src="../img/admin/gold.gif" style="vertical-align:-2px;"></div>
+        <div class="uid">UID: <?php echo $id; ?> | Gold: <?php echo VillageGold::playerGold($GLOBALS['database'], (int) $id); ?> <img src="../img/admin/gold.gif" style="vertical-align:-2px;"></div>
     </div>
 
     <form action="../GameEngine/Admin/Mods/additional.php" method="POST">

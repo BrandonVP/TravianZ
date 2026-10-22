@@ -82,9 +82,9 @@ if (isset($packages[$amount]) && $amount > 0) {
                 <tr><th colspan="5" height="20">Record of <?php echo date('d.m.Y'); ?></th></tr>
                 <tr>
                     <td align="center">Description</td>
-                    <td align="center"><img src="img/x.gif" class="gold" alt="Gold" title="Gold" /></td>
+                    <td align="center"><svg class="tz-coin-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg></td>
                     <td align="center">Action</td>
-                    <td align="center"><img src="img/x.gif" class="gold" alt="Gold" title="Gold" /></td>
+                    <td align="center"><svg class="tz-coin-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg></td>
                     <td align="center">Date</td>
                 </tr>
                 </thead>
@@ -148,37 +148,21 @@ $golds['gold'] = VillageGold::playerGold($database, $uid);
                 $totalRows = (int)mysqli_fetch_assoc($countRes)['c'];
                 $totalPages = max(1, ceil($totalRows / $perPage));
             ?>
-                <p>Here you can see your current account statement.</p>
-                <p>Current balance: <img src="img/x.gif" class="gold" alt="Gold" /> <b><?php echo (int)$golds['gold']; ?></b>
-                &nbsp; | &nbsp; Total received: <b style="color:#71D000;">+<?php echo $received; ?></b>
-                &nbsp; | &nbsp; Total spent: <b style="color:#FF6F0F;">-<?php echo $spent; ?></b></p>
-
-                <!-- BARA CU ICONITE -->
-                <div style="background:#f0f0f0; border:1px solid #d0d0d0; padding:6px 8px; margin:10px 0; border-radius:3px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;">
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <a href="a2b2.php?f=all" style="text-decoration:none; padding:3px 8px; <?php if($f=='all') echo 'background:#fff; border:1px solid #aaa; border-radius:3px; font-weight:bold;'; ?>">
-                            <img src="img/x.gif" class="gold" style="vertical-align:-2px;"> All
-                        </a>
-                        <a href="a2b2.php?f=in" style="text-decoration:none; padding:3px 8px; color:#228B22; <?php if($f=='in') echo 'background:#fff; border:1px solid #aaa; border-radius:3px; font-weight:bold;'; ?>">
-                            <b style="font-size:15px;">+</b> Incoming
-                        </a>
-                        <a href="a2b2.php?f=out" style="text-decoration:none; padding:3px 8px; color:#D00000; <?php if($f=='out') echo 'background:#fff; border:1px solid #aaa; border-radius:3px; font-weight:bold;'; ?>">
-                            <b style="font-size:15px;">−</b> Outgoing
-                        </a>
-                        <a href="a2b2.php?f=gift" style="text-decoration:none; padding:3px 8px; color:#0066cc; <?php if($f=='gift') echo 'background:#fff; border:1px solid #aaa; border-radius:3px; font-weight:bold;'; ?>">
-                            🎁 Gifts
-                        </a>
+                <!-- local redesign: filters and pages in the theme; gold now lives in the villages, so no account balance here -->
+                <div class="tz-statement-bar">
+                    <div class="tz-statement-filters">
+                        <a href="a2b2.php?f=all" class="<?php echo $f=='all' ? 'is-on' : ''; ?>">All</a>
+                        <a href="a2b2.php?f=in" class="tz-in <?php echo $f=='in' ? 'is-on' : ''; ?>">+ Incoming</a>
+                        <a href="a2b2.php?f=out" class="tz-out <?php echo $f=='out' ? 'is-on' : ''; ?>">&minus; Outgoing</a>
+                        <a href="a2b2.php?f=gift" class="tz-gift <?php echo $f=='gift' ? 'is-on' : ''; ?>">Gifts</a>
                     </div>
-                    <div>
-                        <form method="get" style="margin:0;">
-                            <input type="hidden" name="f" value="<?php echo htmlspecialchars($f); ?>">
-                            <select name="p" onchange="this.form.submit()" style="font-size:11px; padding:2px;">
-                                <?php for($i=1;$i<=$totalPages;$i++){ echo '<option value="'.$i.'"'.($i==$page?' selected':'').'>Page '.$i.' / '.$totalPages.'</option>'; } ?>
-                            </select>
-                        </form>
-                    </div>
+                    <form method="get" class="tz-statement-page">
+                        <input type="hidden" name="f" value="<?php echo htmlspecialchars($f); ?>">
+                        <select name="p" onchange="this.form.submit()">
+                            <?php for($i=1;$i<=$totalPages;$i++){ echo '<option value="'.$i.'"'.($i==$page?' selected':'').'>Page '.$i.' / '.$totalPages.'</option>'; } ?>
+                        </select>
+                    </form>
                 </div>
-
                 <table class="plusFunctions" cellpadding="1" cellspacing="1">
                 <thead>
                 <tr><th colspan="5" height="20">Gold history (<?php echo $totalRows; ?>)</th></tr>
@@ -187,7 +171,7 @@ $golds['gold'] = VillageGold::playerGold($database, $uid);
                     <td align="center">Village</td>
                     <td align="center">Action</td>
                     <td align="center">Details</td>
-                    <td align="center"><img src="img/x.gif" class="gold" alt="Gold" /></td>
+                    <td align="center"><svg class="tz-coin-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e3b427" stroke="#9a7512" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9a7512" stroke-width="1"/></svg></td>
                 </tr>
                 </thead>
                 <tbody>
@@ -221,15 +205,15 @@ $golds['gold'] = VillageGold::playerGold($database, $uid);
                         if(stripos($details,'Mass gift')!==false){ $action='Admin Gift (All)'; $details=str_replace('Mass gift by ','by ',$details); }
                         elseif(stripos($details,'gift by')!==false){ $action='Admin Gift'; }
 
-                        $color = $gold < 0 ? '#FF6F0F' : '#71D000';
+                        $cls = $gold < 0 ? 'tz-st-out' : 'tz-st-in';
                         $sign = $gold > 0 ? '+' : '';
 
                         echo '<tr>';
                         echo '<td class="desc"><div style="text-align:center">'.$date.'</div></td>';
                         echo '<td class="desc"><div style="text-align:center">'.$villageName.'</div></td>';
                         echo '<td class="desc"><div style="text-align:center"><b>'.$action.'</b></div></td>';
-                        echo '<td class="desc"><div style="text-align:center"><span style="color:#666;font-size:11px">'.$details.'</span></div></td>';
-                        echo '<td class="desc"><div style="text-align:center"><font color="'.$color.'"><b>'.$sign.$gold.'</b></font></div></td>';
+                        echo '<td class="desc tz-st-details">'.$details.'</td>';
+                        echo '<td class="desc '.$cls.'"><b>'.$sign.$gold.'</b></td>';
                         echo '</tr>';
                         $balance -= $gold;
                     }
@@ -240,9 +224,7 @@ $golds['gold'] = VillageGold::playerGold($database, $uid);
                 </tbody>
                 </table>
 
-                <p>Please verify the information.<br>It will let us know if the data is incorrect.</p>
-                <p>Please mail your username, package, order time and email used to 
-                <a href="mailto:<?php echo defined('PAYPAL_EMAIL') ? PAYPAL_EMAIL : 'cata7007@gmail.com'; ?>">our billing address</a>.</p>
+
             <?php } ?>
         </div>
     </div>

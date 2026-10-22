@@ -1583,6 +1583,30 @@ h3.tz-fest-group { margin: 16px 0 8px; font-family: "Cinzel", Georgia, serif; fo
 .tz-boost-form { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .tz-boost-cost img, .tz-boost-cost svg { vertical-align: middle; }
 
+/* Plus pages: account statement, FAQ, redeem box, gold features */
+.tz-statement-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;
+    margin: 10px 0; padding: 8px 10px; background: var(--tz-cream); border: 1px solid var(--tz-line); border-radius: 10px; }
+.tz-statement-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.tz-statement-filters a { padding: 4px 12px; border: 1px solid transparent; border-radius: 999px; font-weight: 700; text-decoration: none; color: var(--tz-ink); }
+.tz-statement-filters a:hover { background: var(--tz-cream-2); }
+.tz-statement-filters a.is-on { background: var(--tz-panel); border-color: #8a6a22; }
+.tz-statement-filters a.tz-in { color: #2e7d32; }
+.tz-statement-filters a.tz-out { color: #a3361c; }
+.tz-statement-filters a.tz-gift { color: #8a5a12; }
+.tz-statement-page select { padding: 3px 6px; border: 1px solid var(--tz-line); border-radius: 6px; background: var(--tz-panel); }
+td.tz-st-details { font-size: 12px; color: #6b5a45; }
+td.tz-st-in { color: #2e7d32; text-align: center; }
+td.tz-st-out { color: #a3361c; text-align: center; }
+.tz-faq-q { margin: 14px 0 4px; font-weight: 700; color: var(--tz-ink); }
+.tz-faq-a { margin: 0 0 8px; padding-left: 12px; border-left: 3px solid var(--tz-cream-2); }
+td.tz-redeem { padding: 10px 14px; }
+.tz-redeem-form { display: flex; gap: 8px; align-items: center; max-width: 460px; }
+.tz-redeem-form input.text { flex: 1; padding: 6px 8px; border: 1px solid var(--tz-line); border-radius: 6px; background: #fffdf7; text-transform: uppercase; }
+.tz-redeem-ok { margin-bottom: 8px; font-weight: 700; color: #2e7d32; }
+.tz-redeem-err { margin-bottom: 8px; font-weight: 700; color: #a3361c; }
+.tz-redeem-note { margin: 6px 0 0; font-size: 12px; color: #6b5a45; }
+.tz-plus-coin svg { width: 40px; height: 40px; }
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the
