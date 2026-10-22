@@ -142,7 +142,7 @@ if($mainbuilding == 0 && $mainbuilding1 == 0 && $id != 39 && $id != 40) {
 if((($cranny == 0 && $cranny1 == 0) || $cranny == 10) && $mainbuilding >= 1 && $id != 39 && $id != 40) {
     include("avaliable/cranny.tpl");
 }
-if((($granary == 0 && $granary1 == 0) || $granary == 20) && $mainbuilding >= 1 && $id != 39 && $id != 40 ) {
+if((($granary == 0 && $granary1 == 0) || $granary >= 20) && $mainbuilding >= 1 && $id != 39 && $id != 40 ) {
     include("avaliable/granary.tpl");
 }
 if($wall == 0 && $wall1 == 0) {
@@ -174,7 +174,7 @@ if($wall == 0 && $wall1 == 0) {
         include("avaliable/barricade.tpl");
     }
 }
-if((($warehouse == 0 && $warehouse1 == 0) || $warehouse == 20) && $mainbuilding >= 1 && $id != 39 && $id != 40) {
+if((($warehouse == 0 && $warehouse1 == 0) || $warehouse >= 20) && $mainbuilding >= 1 && $id != 39 && $id != 40) {
     include("avaliable/warehouse.tpl");
 }
 if((($greatwarehouse == 0 && $greatwarehouse1 == 0) || $greatwarehouse == 20) && $mainbuilding >= 10 && ($GreatGranaryWarehouseBuildable || $village->natar == 1) && ($id != 39 && $id != 40)) {
@@ -258,7 +258,7 @@ if($tradeoffice == 0 && $tradeoffice1 == 0 && $market == 20 && $stable >= 10 && 
 if($session->tribe == 1 && $horsedrinkingtrough == 0 && $horsedrinkingtrough1 == 0 && $rallypoint >= 10 && $stable == 20 && $id != 39 && $id != 40) {
     include("avaliable/horsedrinking.tpl");
 }
-if($session->tribe == 2 && $village->capital == 1 && $brewery == 0 && $brewery1 == 0 && $rallypoint >= 10 && $granary == 20 && $id != 39 && $id != 40) {
+if($session->tribe == 2 && $village->capital == 1 && $brewery == 0 && $brewery1 == 0 && $rallypoint >= 10 && $granary >= 20 && $id != 39 && $id != 40) {
     include("avaliable/brewery.tpl");
 }
 if($session->tribe == 6 && $commandcenter == 0 && $commandcenter1 == 0 && $mainbuilding >= 5 && $residence == 0 && $residence1 == 0 && $palace == 0 && $palace1 == 0 && $id != 39 && $id != 40) {

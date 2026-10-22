@@ -36,6 +36,11 @@ if ($bindicate == 11) {
     echo '<p><span class="none">'.BUILDING_BEING_DEMOLISHED.'</span></p>';
     return;
 }
+if ($bindicate == 13) {
+    // local redesign: Warehouse/Granary levels 21-25
+    echo '<p><span class="none">Levels above 20 need the Main Building at level 20 in this village.</span></p>';
+    return;
+}
 if ($bindicate == 12) {
     // local redesign: raid balance
     echo '<p><span class="none">Cranny levels above 10 need a level 20 Warehouse (or Great Warehouse) and a level 20 Granary (or Great Granary) in this village.</span></p>';

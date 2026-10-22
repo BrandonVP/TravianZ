@@ -114,7 +114,7 @@ class Building {
         31 => array('tribe' => array(1), 'unique' => false),
         32 => array('tribe' => array(2), 'unique' => false),
         33 => array('tribe' => array(3), 'unique' => false),
-        35 => array('levels' => array(array(16, 10)), 'exact' => array(array(11, 20)), 'tribe' => array(2), 'capitalOnly' => true),
+        35 => array('levels' => array(array(16, 10), array(11, 20)), 'tribe' => array(2), 'capitalOnly' => true), // Granary 20+ (it goes to 25 now)
         36 => array('levels' => array(array(16, 1)), 'tribe' => array(3), 'rebuildAtLevel' => 20),
         37 => array('levels' => array(array(15, 3), array(16, 1))),
         41 => array('levels' => array(array(16, 10)), 'exact' => array(array(20, 20)), 'tribe' => array(1)),
@@ -244,6 +244,17 @@ class Building {
 	    return $next > 10 && ($warehouse < 20 || $granary < 20);
 	}
 
+	/**
+	 * Local redesign: Warehouse and Granary levels 21-25 need Main Building 20.
+	 */
+	public function storageLocked($gid, $fieldId) {
+	    if (!in_array((int) $gid, array(10, 11), true)) {
+	        return false;
+	    }
+	    $next = (int) ($this->vil->resarray['f' . $fieldId] ?? 0) + 1 + $this->queuedOnField($fieldId);
+	    return $next > 20 && $this->getTypeLevel(15) < 20;
+	}
+
 	public function canProcess($gid, $fieldId) {
 
     // WW restriction early exit
@@ -299,6 +310,10 @@ class Building {
 
     // local redesign: Cranny above level 10 (also blocks the Master Builder)
     if ($this->crannyLocked($gid, $fieldId)) {
+        $this->redirect($fieldId);
+    }
+    // local redesign: Warehouse/Granary above level 20 need Main Building 20
+    if ($this->storageLocked($gid, $fieldId)) {
         $this->redirect($fieldId);
     }
 
@@ -477,6 +492,11 @@ class Building {
     // Local redesign: Cranny above level 10 needs Warehouse 20 + Granary 20
     if ($this->crannyLocked($gid, $fieldId)) {
         return 12;
+    }
+
+    // Local redesign: Warehouse/Granary levels 21-25 need Main Building 20
+    if ($this->storageLocked($gid, $fieldId)) {
+        return 13;
     }
 
     // FIX B4 (B-D1): '>=' in loc de '>' - la allocated == maxConcurrent coada e
@@ -1112,7 +1132,8 @@ class Building {
         $isBuilt = $this->getTypeField($gid);
 
         if (isset($req['rebuildAtLevel'])) {
-            return !$isBuilt || $this->getTypeLevel($gid) == $req['rebuildAtLevel'];
+            // local redesign: ">=" - Warehouse/Granary now go past 20 (to 25)
+            return !$isBuilt || $this->getTypeLevel($gid) >= $req['rebuildAtLevel'];
         }
 
         return !$isBuilt;

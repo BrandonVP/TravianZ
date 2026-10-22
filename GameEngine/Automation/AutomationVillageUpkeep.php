@@ -446,6 +446,10 @@ trait AutomationVillageUpkeep {
         // (ferestre de lock scurte), (2) reincercare de maximum 3 ori la deadlock / lock
         // timeout. Rutina e idempotenta (recalculeaza maxstore/maxcrop de la zero), deci
         // o rulare partiala e inofensiva - urmatorul tick o completeaza.
+        // local redesign: rented carts / grain lofts (GameEngine/StorageBoost.php)
+        include_once __DIR__ . '/../StorageBoost.php';
+        $tzBoosts = StorageBoost::activeMap($database);
+
         for ($attempt = 1; $attempt <= 3; $attempt++) {
             try {
                 $result = mysqli_query($database->dblink, 'SELECT * FROM `' . TB_PREFIX . 'fdata`');
@@ -489,6 +493,8 @@ trait AutomationVillageUpkeep {
                     // maxstore nor maxcrop can go below the minimum threshold
                     if ($ress < STORAGE_BASE) $ress = STORAGE_BASE;
                     if ($crop < STORAGE_BASE) $crop = STORAGE_BASE;
+                    $ress *= $tzBoosts[(int) $row['vref']]['store'] ?? 1;
+                    $crop *= $tzBoosts[(int) $row['vref']]['crop'] ?? 1;
 
                     mysqli_query($database->dblink,'UPDATE `' . TB_PREFIX . 'vdata` SET `maxstore` = ' . (int) $ress . ', `maxcrop` = ' . (int) $crop . ' WHERE `wref` = ' . (int) $row['vref']);
 

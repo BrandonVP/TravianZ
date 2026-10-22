@@ -1785,6 +1785,11 @@ trait DatabaseVillageQueries {
         if ($store < $base) { $store = $base; }
         if ($crop  < $base) { $crop  = $base; }
 
+        // local redesign: rented carts / grain lofts (GameEngine/StorageBoost.php)
+        include_once __DIR__ . '/../StorageBoost.php';
+        $store *= StorageBoost::factor($this, $wid, 'store');
+        $crop  *= StorageBoost::factor($this, $wid, 'crop');
+
         $result = mysqli_query(
             $this->dblink,
             "UPDATE " . TB_PREFIX . "vdata

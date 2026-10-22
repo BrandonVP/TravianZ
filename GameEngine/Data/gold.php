@@ -113,3 +113,7 @@ if (!defined('TZ_CONTRACT_MIN_LEVEL')) define('TZ_CONTRACT_MIN_LEVEL', 10);
 
 // Gold Club evasion (Rally Point): paid by the village whose troops evade
 if (!defined('TZ_GOLD_PRICE_EVASION')) define('TZ_GOLD_PRICE_EVASION', 50);
+
+// Warehouse/Granary levels 21-25 also cost gold: base + per level above 20 (21: 100 ... 25: 300)
+if (!defined('TZ_STORAGE_GOLD_BASE'))      define('TZ_STORAGE_GOLD_BASE', 50);
+if (!defined('TZ_STORAGE_GOLD_PER_LEVEL')) define('TZ_STORAGE_GOLD_PER_LEVEL', 50);

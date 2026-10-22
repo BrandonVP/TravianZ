@@ -1572,6 +1572,17 @@ h3.tz-fest-group { margin: 16px 0 8px; font-family: "Cinzel", Georgia, serif; fo
 .tz-fest-cost img, .tz-fest-cost svg { vertical-align: middle; }
 .tz-fest-state { font-weight: 700; color: #2e7d32; }
 .tz-fest-blocked { font-size: 12px; font-weight: 700; color: #8a6a3a; }
+/* rented storage (Warehouse / Granary pages, GameEngine/StorageBoost.php) */
+.tz-boost { margin: 14px 0 6px; padding: 12px 14px; background: var(--tz-cream); border: 1px solid var(--tz-line); border-radius: 10px; }
+.tz-boost.is-on { border-color: #6f9a3a; box-shadow: inset 3px 0 0 #6f9a3a; }
+.tz-boost h4 { margin: 0 0 6px; font-family: "Cinzel", Georgia, serif; font-size: 15px; color: var(--tz-ink); }
+.tz-boost p { margin: 0 0 6px; }
+.tz-boost-story { font-style: italic; color: #6b5a45; }
+.tz-boost-on { font-weight: 700; color: #2e7d32; }
+.tz-boost-msg { font-weight: 700; color: #8a5a12; }
+.tz-boost-form { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.tz-boost-cost img, .tz-boost-cost svg { vertical-align: middle; }
+
 /* ===================== smaller screens ===================== */
 
 /* below 1100px: one column - page content, then the status cards, then the
