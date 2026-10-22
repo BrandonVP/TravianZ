@@ -121,28 +121,39 @@ $abGpack   = defined('GP_LOCATE') ? GP_LOCATE : 'gpack/travian_default/';
 ?>
 
 <style>
-/* Prefix "ab-" ca stilurile sa nu atinga restul paginilor de alianta. */
-.ab-wrap{font-size:12px}
-.ab-msg{padding:6px 9px;margin-bottom:9px;border:1px solid #b7d78a;background:#eaf6da;color:#33691e}
-.ab-msg.err{border-color:#e0b4b4;background:#fdeaea;color:#a33}
-.ab-grid{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:10px}
-.ab-card{flex:1 1 250px;border:1px solid #c9c9c9;background:#f2f2f2;padding:8px}
-.ab-head{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px}
+/* Prefix "ab-" ca stilurile sa nu atinga restul paginilor de alianta.
+   local redesign: theme colours (css/layout.css variables) */
+.ab-wrap{font-size:12px;color:var(--tz-ink)}
+.ab-msg{padding:7px 10px;margin-bottom:10px;border:1px solid #b9cf8f;border-radius:8px;background:#eef5dd;color:#2f5220}
+.ab-msg.err{border-color:#d9a99a;background:#f8e3dc;color:#8a2f1c}
+.ab-allow{margin:0 0 12px;color:#6b5a45}
+.ab-allow b{color:var(--tz-ink)}
+.ab-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.ab-card{flex:1 1 250px;border:1px solid var(--tz-line);border-radius:10px;background:var(--tz-panel);padding:10px;box-shadow:0 1px 2px rgba(60,40,10,.08)}
+.ab-head{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px}
 .ab-head img{width:44px;height:44px}
-.ab-name{font-weight:bold;color:#333}
-.ab-lvl{color:#666;font-size:11px}
+.ab-name{font-family:"Cinzel",Georgia,serif;font-weight:700;font-size:14px;color:var(--tz-ink)}
+.ab-lvl{color:#6b5a45;font-size:11px}
 /* descrierea sta in dreapta numelui si ocupa spatiul ramas */
-.ab-desc{flex:1;color:#666;font-size:11px;line-height:1.35;padding-left:4px}
-.ab-eff{color:#1f7a1f;font-weight:bold}
-.ab-wait{color:#a60;font-size:10px}
-.ab-bar{background:#fff;border:1px solid #c9c9c9;height:13px;overflow:hidden;margin:4px 0}
-.ab-bar i{display:block;height:100%;background:#7db72f}
-.ab-num{font-size:11px;color:#555}
-.ab-form input[type=text]{width:74px}
-.ab-status{font-size:11px;color:#a60;font-weight:bold}
-.ab-tbl{width:100%;border-collapse:collapse;font-size:12px}
-.ab-tbl td,.ab-tbl th{border:1px solid #dcdcdc;padding:3px 5px}
-.ab-note{color:#777;font-size:11px;margin-top:4px}
+.ab-desc{flex:1;color:#6b5a45;font-size:11px;line-height:1.35;padding-left:4px}
+.ab-eff{color:#3f7a2a;font-weight:bold}
+.ab-wait{color:#9a5a12;font-size:10px}
+.ab-bar{background:var(--tz-cream);border:1px solid var(--tz-line);border-radius:999px;height:10px;overflow:hidden;margin:4px 0}
+.ab-bar i{display:block;height:100%;background:linear-gradient(#e3b84a,#b8861f)}
+.ab-num{font-size:11px;color:#6b5a45}
+.ab-form{margin-top:8px}
+.ab-res{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 10px;margin-bottom:6px}
+.ab-res label{display:flex;align-items:center;gap:5px}
+.ab-form input.ab-in{width:100%;min-width:0;box-sizing:border-box;padding:3px 6px;border:1px solid var(--tz-line);border-radius:6px;background:#fffdf7;color:var(--tz-ink);font:inherit}
+.ab-form input.ab-in:focus{outline:none;border-color:var(--tz-gold);box-shadow:0 0 0 2px rgba(201,151,46,.25)}
+.ab-triple{display:flex;align-items:center;gap:5px;font-size:11px;color:#6b5a45;margin-bottom:6px}
+.ab-status{font-size:11px;color:#9a5a12;font-weight:bold}
+.ab-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;border:1px solid var(--tz-line);border-radius:8px;overflow:hidden;background:var(--tz-panel)}
+.ab-wrap table.ab-tbl th{background:var(--tz-cream);color:var(--tz-ink);text-align:left;padding:5px 8px;border:0;border-bottom:1px solid var(--tz-line)}
+.ab-wrap table.ab-tbl td{background:transparent;padding:5px 8px;border:0;border-top:1px solid var(--tz-cream-2);text-align:left}
+.ab-wrap table.ab-tbl th.ab-r,.ab-wrap table.ab-tbl td.ab-r{text-align:right}
+.ab-note{color:#6b5a45;font-size:11px;margin-top:4px}
+.ab-wrap h4{font-family:"Cinzel",Georgia,serif;margin:14px 0 6px}
 </style>
 
 <div class="ab-wrap">
@@ -151,7 +162,7 @@ $abGpack   = defined('GP_LOCATE') ? GP_LOCATE : 'gpack/travian_default/';
     <div class="ab-msg<?php echo $abError ? ' err' : ''; ?>"><?php echo $abMessage; ?></div>
 <?php } ?>
 
-<p class="ab-num">
+<p class="ab-allow">
     <?php echo defined('ALLYBONUS_DAILY_LEFT') ? ALLYBONUS_DAILY_LEFT : 'Your donation allowance left today'; ?>:
     <b><?php echo number_format($abLeft); ?></b>
     / <?php echo number_format($abLimit); ?>
@@ -223,14 +234,16 @@ $abGpack   = defined('GP_LOCATE') ? GP_LOCATE : 'gpack/travian_default/';
                 +<?php echo (int) AllianceBonus::percentFor($abT, $abNext); ?>%)
             </div>
 
-            <form class="ab-form" action="allianz.php?s=7" method="POST" style="margin-top:5px;">
+            <form class="ab-form" action="allianz.php?s=7" method="POST">
                 <input type="hidden" name="ab_donate" value="1">
                 <input type="hidden" name="ab_type" value="<?php echo $abT; ?>">
-                <img class="r1" src="img/x.gif" alt="" /> <input type="text" name="ab_wood" value="0" size="7">
-                <img class="r2" src="img/x.gif" alt="" /> <input type="text" name="ab_clay" value="0" size="7"><br>
-                <img class="r3" src="img/x.gif" alt="" /> <input type="text" name="ab_iron" value="0" size="7">
-                <img class="r4" src="img/x.gif" alt="" /> <input type="text" name="ab_crop" value="0" size="7"><br>
-                <label style="font-size:11px;">
+                <div class="ab-res">
+                    <label><img class="r1" src="img/x.gif" alt="" title="<?php echo LUMBER; ?>" /><input class="ab-in" type="text" name="ab_wood" value="0" size="7"></label>
+                    <label><img class="r2" src="img/x.gif" alt="" title="<?php echo CLAY; ?>" /><input class="ab-in" type="text" name="ab_clay" value="0" size="7"></label>
+                    <label><img class="r3" src="img/x.gif" alt="" title="<?php echo IRON; ?>" /><input class="ab-in" type="text" name="ab_iron" value="0" size="7"></label>
+                    <label><img class="r4" src="img/x.gif" alt="" title="<?php echo CROP; ?>" /><input class="ab-in" type="text" name="ab_crop" value="0" size="7"></label>
+                </div>
+                <label class="ab-triple">
                     <input type="checkbox" name="ab_triple" value="1">
                     <?php echo defined('ALLYBONUS_TRIPLE') ? ALLYBONUS_TRIPLE : 'Triple this donation'; ?>
                     <?php if (class_exists('VillageGold') && VillageGold::villageMode()) { ?>
@@ -239,8 +252,8 @@ $abGpack   = defined('GP_LOCATE') ? GP_LOCATE : 'gpack/travian_default/';
                     (<?php echo defined('ALLIANCE_BONUS_TRIPLE_GOLD') ? (int) ALLIANCE_BONUS_TRIPLE_GOLD : 3; ?>
                     <?php echo defined('GOLD') ? GOLD : 'gold'; ?>)
                     <?php } ?>
-                </label><br>
-                <input type="submit" value="<?php echo defined('ALLYBONUS_DONATE') ? ALLYBONUS_DONATE : 'Donate'; ?>">
+                </label>
+                <button type="submit" class="tz-btn"><?php echo defined('ALLYBONUS_DONATE') ? ALLYBONUS_DONATE : 'Donate'; ?></button>
             </form>
         <?php } ?>
     </div>
@@ -262,16 +275,16 @@ $abGpack   = defined('GP_LOCATE') ? GP_LOCATE : 'gpack/travian_default/';
 
     if ($abTop) {
 ?>
-<h4 style="margin-top:12px;"><?php echo defined('ALLYBONUS_CONTRIBUTORS') ? ALLYBONUS_CONTRIBUTORS : 'Contributions'; ?></h4>
+<h4><?php echo defined('ALLYBONUS_CONTRIBUTORS') ? ALLYBONUS_CONTRIBUTORS : 'Contributions'; ?></h4>
 <table class="ab-tbl">
     <tr>
         <th><?php echo defined('ALLYBONUS_MEMBER') ? ALLYBONUS_MEMBER : 'Member'; ?></th>
-        <th style="width:140px;text-align:right;"><?php echo defined('ALLYBONUS_TOTAL') ? ALLYBONUS_TOTAL : 'Donated'; ?></th>
+        <th class="ab-r" style="width:140px;"><?php echo defined('ALLYBONUS_TOTAL') ? ALLYBONUS_TOTAL : 'Donated'; ?></th>
     </tr>
     <?php foreach ($abTop as $abC) { ?>
     <tr>
         <td><a href="spieler.php?uid=<?php echo (int) $abC['uid']; ?>"><?php echo htmlspecialchars($abC['username'], ENT_QUOTES, 'UTF-8'); ?></a></td>
-        <td style="text-align:right;"><?php echo number_format($abC['total']); ?></td>
+        <td class="ab-r"><?php echo number_format($abC['total']); ?></td>
     </tr>
     <?php } ?>
 </table>
