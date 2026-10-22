@@ -1762,3 +1762,60 @@ td.tz-redeem { padding: 10px 14px; }
         display: none;
     }
 }
+/* quest and manual popups on phones: the 450px box was centred with a fixed
+   negative margin, so on narrow screens it started off the left edge */
+@media (max-width: 600px) {
+    div.popup3 {
+        left: 8px;
+        right: 8px;
+        margin-left: 0;
+        width: auto;
+        box-sizing: border-box;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    div.popup3 div#drag {
+        width: auto;
+        right: 11px;
+    }
+    div.popup3 iframe#Frame {
+        max-width: 100%;
+    }
+    /* the building-info popup's x is part of its background art, which gets
+       cropped here: show the same round button as the quest popup */
+    div.popup3 > a {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        z-index: 82;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--tz-wood);
+        border: 1px solid var(--tz-gold);
+        color: var(--tz-gold-2);
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 26px;
+        text-align: center;
+        text-decoration: none;
+    }
+    div.popup3 > a::after {
+        content: "\00d7";
+    }
+    div.popup3 > a img.popup4 {
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+    }
+    div.quest div#qstd {
+        width: auto;
+    }
+    div.quest div#qstbg {
+        width: auto;
+        right: 11px;
+        background-size: 100% auto;
+    }
+}
