@@ -386,7 +386,7 @@ div#side_navi .tz-quest-slot div#qge img {
 /* TravianGames footer logo: recoloured for the dark footer (transparent
    background, cream lettering, gold G) */
 div#footer div#mfoot {
-    background-image: url("images/footer_logo_tz.png");
+    background-image: url("images/footer_logo_tz.png?v=2");
 }
 
 /* footer version link: the template colours it bright red inline */
