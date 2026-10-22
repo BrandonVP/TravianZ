@@ -25,6 +25,9 @@ use App\Utils\AccessLogger;
 include('GameEngine/Account.php');
 AccessLogger::logRequest();
 
+$serverStartTimestamp = \App\Utils\DateTime::getServerStartTimestamp(START_DATE, START_TIME);
+$serverHasStarted = $serverStartTimestamp !== null && time() >= $serverStartTimestamp;
+
 ?>
 <?php
 // local redesign: logged-out frame (Templates/layout/outgame_*.tpl, css/outgame.css)
@@ -37,7 +40,7 @@ include("Templates/layout/outgame_top.tpl");
 <h1>Account activation</h1>
 <?php
 
-	if(isset($_GET['e']) && (START_DATE < date('d.m.y') || START_DATE == date('d.m.y') && START_TIME <= date('H:i')))
+	if(isset($_GET['e']) && $serverHasStarted)
 	{
 		switch($_GET['e'])
 		{
