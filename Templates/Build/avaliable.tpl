@@ -225,7 +225,7 @@ if($blacksmith == 0 && $blacksmith1 == 0 && $academy >= 3 && $mainbuilding >= 3 
 if($stonemasonslodge == 0 && $stonemasonslodge1 == 0 && $palaceEquiv >= 3 && $mainbuilding >= 5 && $id != 39 && $id != 40 && $village->capital == 1) {
     include("avaliable/stonemason.tpl");
 }
-if($stable == 0 && $stable1 == 0 && $blacksmith >= 3 && $academy >= 5 && $id != 39 && $id != 40) {
+if($stable == 0 && $stable1 == 0 && $academy >= 5 && $id != 39 && $id != 40) {
     include("avaliable/stable.tpl");
 }
 if($treasury == 0 && $treasury1 == 0 && $village->natar == 0 && $mainbuilding >= 10 && $id != 39 && $id != 40) {
@@ -327,7 +327,7 @@ if($blacksmith == 0 && ($academy <= 2 || $mainbuilding <= 2)) {
 if($stonemasonslodge == 0 && $palaceEquiv <= 2 && $palaceEquiv != 0 && $mainbuilding >= 2 && $mainbuilding <= 4 && $residence == 0 && $village->capital == 1) {
     include("soon/stonemason.tpl");
 }
-if($stable == 0 && (($blacksmith <= 2 && $blacksmith != 0) || ($academy >= 2 && $academy <= 4))) {
+if($stable == 0 && $academy >= 2 && $academy <= 4) {
     include("soon/stable.tpl");
 }
 if($treasury == 0 && $mainbuilding <= 9 && $mainbuilding >= 5 && $village->natar == 0) {
@@ -401,7 +401,7 @@ if($blacksmith == 0 && ($academy == 0 || $mainbuilding == 1)) {
 if($stonemasonslodge == 0 && ($palaceEquiv == 0 || $mainbuilding <= 2) && $residence == 0) {
     include_once("soon/stonemason.tpl");
 }
-if($stable == 0 && ($blacksmith == 0 || $academy <= 2)) {
+if($stable == 0 && $academy <= 1) {
     include_once("soon/stable.tpl");
 }
 if($treasury == 0 && $mainbuilding <= 5) {

@@ -417,7 +417,7 @@ Velocity: 24 fields/hour.    <br>
 
     <br>
 
-    <?php echo ANL_REQ_BLACKSMITH3_ACADEMY5; ?></p>
+    <?php echo ACADEMY; ?> Level 5</p>
 
 <h2><?php echo WORKSHOP; ?></h2>
 

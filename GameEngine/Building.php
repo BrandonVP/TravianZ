@@ -102,7 +102,7 @@ class Building {
         17 => array('levels' => array(array(15, 3), array(10, 1), array(11, 1))),
         18 => array('levels' => array(array(15, 1))),
         19 => array('levels' => array(array(15, 3), array(16, 1))),
-        20 => array('levels' => array(array(12, 3), array(22, 5))),
+        20 => array('levels' => array(array(22, 5))), // local redesign: no Blacksmith needed (upgrades are account-wide)
         21 => array('levels' => array(array(22, 10), array(15, 5))),
         22 => array('levels' => array(array(15, 3), array(19, 3))),
         23 => array('rebuildAtLevel' => 20), // local redesign: Cranny goes to level 20
