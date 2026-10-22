@@ -261,6 +261,10 @@ body.og a.og-btn.og-btn-gold:visited { background: var(--og-gold); border-color:
 .og-doc p.submenu a { font-weight: 700; }
 .og-doc strong[style], .og-doc b[style], .og-doc span[style*="color"] { color: var(--og-link) !important; }
 .og-doc img { max-width: 100%; height: auto; vertical-align: middle; }
+/* the manual/tutorial art is drawn on white: blend it onto the card (as the village map does in game) */
+.og-doc img { mix-blend-mode: multiply; }
+.og-doc img[align="left"] { margin: 0 16px 8px 0; }
+.og-doc img[align="right"] { margin: 0 0 8px 16px; }
 .og-doc table { border-collapse: collapse; margin: 8px 0 14px; max-width: 100%; }
 .og-doc table td, .og-doc table th { padding: 4px 6px; border-bottom: 1px solid var(--og-cream-2); vertical-align: top; }
 .og-doc table thead th, .og-doc table thead td, .og-doc table tr.top th, .og-doc table th[colspan] { background: var(--og-cream-2); font-weight: 700; }
@@ -275,7 +279,7 @@ body.og a.og-btn.og-btn-gold:visited { background: var(--og-gold); border-color:
 .og-doc table#tutorial_nav a { display: inline-block; padding: 6px 16px; border: 1px solid #8a6a22; border-radius: 999px; text-decoration: none; font-weight: 700; color: var(--og-wood); background: var(--og-cream); }
 .og-doc table#tutorial_nav a:hover { background: var(--og-gold-2); }
 .og-doc p.question { margin: 16px 0 4px; font-weight: 700; color: var(--og-ink); }
-.og-doc p.answer { margin: 0 0 10px; padding-left: 12px; border-left: 3px solid var(--og-cream-2); }
+.og-doc p.answer { margin: 0 0 10px; padding-left: 12px; border-left: 3px solid var(--og-cream-2); overflow: hidden; }
 .og-doc ul.rules, .og-doc ul.rules ul { padding-left: 20px; }
 .og-doc ul.rules li { margin: 6px 0; }
 .og-doc .terms-box { line-height: 1.55; }
