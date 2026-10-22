@@ -47,207 +47,78 @@ $key                = sha1( microtime() );
 $_SESSION[ 'csrf' ] = $key;
 
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
-	<head>
-	<title><?php echo SERVER_NAME; ?> - Login</title>
-		<link rel="shortcut icon" href="favicon.ico"/>
-	<meta name="content-language" content="en" />
-	<meta http-equiv="cache-control" content="max-age=0" />
-	<meta http-equiv="imagetoolbar" content="no" />
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-	<script src="mt-core.js?0faab" type="text/javascript"></script>
-	<script src="mt-more.js?0faab" type="text/javascript"></script>
-	<script src="unx.js?f4b7m" type="text/javascript"></script>
-	<script src="new.js?0faab" type="text/javascript"></script>
-	<link href="<?php echo GP_LOCATE; ?>lang/en/compact.css?f4b7i" rel="stylesheet" type="text/css" />
-	<link href="<?php echo GP_LOCATE; ?>lang/en/lang.css?f4b7d" rel="stylesheet" type="text/css" />
-	<link href="<?php echo GP_LOCATE ?>travian.css?f4b7d" rel="stylesheet" type="text/css" />
-		<link href="<?php echo GP_LOCATE ?>lang/en/lang.css" rel="stylesheet" type="text/css" />
-	   </head>
-
-<body class="v35 ie ie7" onload="initCounter()">
-
-<div class="wrapper">
-<div id="dynamic_header">
-</div>
-<div id="header"></div>
-<div id="mid">
-<?php include("Templates/menu.tpl"); ?>
-
-<div id="content"  class="login">
-
-<h1><img class="img_login" src="img/x.gif" alt="log in the game" /></h1>
-
 <?php
+// local redesign: logged-out frame (Templates/layout/outgame_*.tpl, css/outgame.css)
+$ogTitle  = defined('LOGIN') ? LOGIN : 'Login';
+$ogActive = 'login';
+include("Templates/layout/outgame_top.tpl");
 $time = time();
-if( COMMENCE > $time )
-{
-echo '<p><font color="red" size="6">'.NOT_OPENED_YET.'</font></p>' ;
-}
-else
-{
+$stime = strtotime(date('m/d/Y H:i', strtotime(START_DATE . ' ' . START_TIME)));
 ?>
-<h5><img class="img_u04" src="img/x.gif" alt="login" /></h5>
-<p><?php echo COOKIES; ?></p>
+<div class="og-grid">
+	<section class="og-card og-login">
+		<h1><?php echo defined('LOGIN') ? LOGIN : 'Login'; ?></h1>
+<?php if (COMMENCE > $time): ?>
+		<p class="og-error"><?php echo NOT_OPENED_YET; ?></p>
+<?php elseif ($stime > $time): ?>
+		<p>The server starts in:</p>
+		<div class="og-countdown" id="cntdwn" data-start="<?php echo (int) $stime; ?>"></div>
+		<script>
+		(function () {
+			var el = document.getElementById('cntdwn'), end = +el.getAttribute('data-start') * 1000;
+			function pad(n) { return (n < 10 ? '0' : '') + n; }
+			function tick() {
+				var s = Math.max(0, Math.floor((end - Date.now()) / 1000));
+				if (s <= 0) { el.textContent = 'START NOW'; return; }
+				el.textContent = pad(Math.floor(s / 3600)) + ':' + pad(Math.floor(s / 60) % 60) + ':' + pad(s % 60);
+				setTimeout(tick, 1000);
+			}
+			tick();
+		})();
+		</script>
+<?php else: ?>
+		<p class="og-muted"><?php echo COOKIES; ?></p>
 <?php
-$stime = strtotime( date( 'm/d/Y H:i', strtotime(START_DATE . ' ' . START_TIME ) ) );
-
-// check whether the server has started or is yet to start
-if ( $stime > $time ){
-?>
-<br/><div style="text-align: center"><big>Server will start in: </big></div>
-<script language="JavaScript">
-TargetDate = "<?php echo date( 'm/d/Y H:i', strtotime(START_DATE . ' ' . START_TIME ) ); ?>";
-CountActive = true;
-CountStepper = -1;
-LeadingZero = true;
-DisplayFormat = "%%H%%:%%M%%:%%S%%";
-FinishMessage = "START NOW";
-
-function calcage(secs, num1, num2) {
-  s = ((Math.floor(secs/num1))%num2).toString();
-  if (LeadingZero && s.length < 2)
-	s = "0" + s;
-  return "" + s + "";
-}
-
-function CountBack(secs) {
-  if (secs < 0) {
-	document.getElementById("cntdwn").innerHTML = FinishMessage;
-	return;
-  }
-  DisplayStr = DisplayFormat.replace(/%%D%%/g, calcage(secs,86400,100000));
-  DisplayStr = DisplayStr.replace(/%%H%%/g, calcage(secs,3600,100000));
-  DisplayStr = DisplayStr.replace(/%%M%%/g, calcage(secs,60,60));
-  DisplayStr = DisplayStr.replace(/%%S%%/g, calcage(secs,1,60));
-
-  document.getElementById("cntdwn").innerHTML = DisplayStr;
-  if (CountActive)
-	setTimeout("CountBack(" + (secs+CountStepper) + ")", SetTimeOutPeriod);
-}
-
-function putspan(backcolor, forecolor) {
-  document.write("<div class='activation_time' id='cntdwn'></div>");
-}
-
-if (typeof(BackColor)=="undefined")
-  BackColor = "white";
-if (typeof(ForeColor)=="undefined")
-  ForeColor= "black";
-if (typeof(TargetDate)=="undefined")
-  TargetDate = "12/31/2020 5:00 AM";
-if (typeof(DisplayFormat)=="undefined")
-  DisplayFormat = "%%H%%:%%M%%:%%S%%";
-if (typeof(CountActive)=="undefined")
-  CountActive = true;
-if (typeof(FinishMessage)=="undefined")
-  FinishMessage = "";
-if (typeof(CountStepper)!="number")
-  CountStepper = -1;
-if (typeof(LeadingZero)=="undefined")
-  LeadingZero = true;
-
-
-CountStepper = Math.ceil(CountStepper);
-if (CountStepper == 0)
-  CountActive = false;
-var SetTimeOutPeriod = (Math.abs(CountStepper)-1)*1000 + 990;
-putspan(BackColor, ForeColor);
-var dthen = new Date(TargetDate);
-var dnow = new Date();
-if(CountStepper>0)
-  ddiff = new Date(dnow-dthen);
-else
-  ddiff = new Date(dthen-dnow);
-gsecs = Math.floor(ddiff.valueOf()/1000);
-CountBack(gsecs);
-
-</script>
-<?php
-}else{ ?>
-<form method="post" name="snd" action="login.php">
-<input type="hidden" name="ft" value="a4" />
-<script type="text/javascript">
-Element.implement({
-	 //imgid: if an arrow belongs to the link this can be "opened"
-	 showOrHide: function(imgid) {
-		 //insert
-		 if (this.getStyle('display') == 'none')
-		 {
-			 if (imgid != '')
-			 {
-				 $(imgid).className = 'open';
-			 }
-		 }
-		 //hide
-		 else
-		 {
-			 if (imgid != '')
-			 {
-				 $(imgid).className = 'close';
-			 }
-		 }
-		 this.toggleClass('hide');
-	}
-});
-</script>
-<table cellpadding="1" cellspacing="1" id="login_form">
-	<tbody>
-		<tr class="top">
-			<th><?php echo NAME; ?></th>
-			<td><input class="text" type="text" name="user" value="<?php echo htmlspecialchars($form->getDiff("user",$_COOKIE['COOKUSR'])); ?>" maxlength="30" autocomplete='off' /> <span class="error"> <?php echo $form->getError("user"); ?></span></td>
-		</tr>
-		<tr class="btm">
-			<th><?php echo PASSWORD; ?></th>
-			<td><input class="text" type="password" name="pw" value="<?php echo htmlspecialchars($form->getValue("pw"), ENT_QUOTES, 'UTF-8');?>" maxlength="100" autocomplete='off' /> <span class="error"><?php echo $form->getError("pw"); ?></span></td>
-		</tr>
-	</tbody>
-</table>
-
-<p class="btn">
-	<!--<input type="hidden" name="e1d9d0c" value="" />-->
-		<button value="login" name="s1"	onclick="xy();" id="btn_login" class="trav_buttons" alt="login button"	/> Login </button>
-</p>
-
-</form>
-<?php }
-}
 if ($form->getError("pw") == LOGIN_PW_ERROR) {
-echo "<p class=\"error_box\">
-	<span class=\"error\">".PW_FORGOTTEN."</span><br>
-	".PW_REQUEST."<br>
-	<a href=\"password.php?npw=".$database->getUserField($form->getValue('user'), 'id', 1)."\">".PW_GENERATE."</a>
-</p>";
+	echo '<div class="og-error"><b>' . PW_FORGOTTEN . '</b><br>' . PW_REQUEST . '<br>'
+		. '<a href="password.php?npw=' . $database->getUserField($form->getValue('user'), 'id', 1) . '">' . PW_GENERATE . '</a></div>';
 }
-if($form->getError("activate") != "") {
-	echo "<p class=\"error_box\">
-	<span class=\"error\">".EMAIL_NOT_VERIFIED."</span><br>
-	".EMAIL_FOLLOW."<br>
-	<a href=\"activate.php?usr=".urlencode($form->getError("activate"))."\">".VERIFY_EMAIL."</a>
-	</p>";
+if ($form->getError("activate") != "") {
+	echo '<div class="og-error"><b>' . EMAIL_NOT_VERIFIED . '</b><br>' . EMAIL_FOLLOW . '<br>'
+		. '<a href="activate.php?usr=' . urlencode($form->getError("activate")) . '">' . VERIFY_EMAIL . '</a></div>';
 }
-if($form->getError("vacation") != "") {
-echo "<p class=\"error_box\">
-<span class=\"error\">".$form->getError("vacation")."</span></p>";
+if ($form->getError("vacation") != "") {
+	echo '<div class="og-error">' . $form->getError("vacation") . '</div>';
 }
 ?>
+		<form method="post" name="snd" action="login.php">
+			<input type="hidden" name="ft" value="a4" />
+			<div class="og-form">
+				<label for="og-user"><?php echo NAME; ?></label>
+				<input id="og-user" class="text" type="text" name="user" value="<?php echo htmlspecialchars($form->getDiff("user", $_COOKIE['COOKUSR'])); ?>" maxlength="30" autocomplete="username" autofocus />
+				<span class="error"><?php echo $form->getError("user"); ?></span>
+				<label for="og-pw"><?php echo PASSWORD; ?></label>
+				<input id="og-pw" class="text" type="password" name="pw" value="<?php echo htmlspecialchars($form->getValue("pw"), ENT_QUOTES, 'UTF-8'); ?>" maxlength="100" autocomplete="current-password" />
+				<span class="error"><?php echo $form->getError("pw"); ?></span>
+			</div>
+			<div class="og-btn-row">
+				<button type="submit" value="login" name="s1" id="btn_login" class="og-btn og-btn-gold"><?php echo defined('LOGIN') ? LOGIN : 'Login'; ?></button>
+				<a class="og-btn" href="anmelden.php">No account yet? Register</a>
+			</div>
+		</form>
+<?php endif; ?>
+	</section>
+	<aside class="og-stack">
+		<section class="og-card og-serverinfo">
+			<h2>Server info</h2>
+			<?php if (NEWSBOX1) { include("Templates/News/newsbox1.tpl"); } ?>
+		</section>
+		<?php if (NEWSBOX2 || NEWSBOX3): ?>
+		<section class="og-card og-serverinfo">
+			<?php if (NEWSBOX2) { include("Templates/News/newsbox2.tpl"); } ?>
+			<?php if (NEWSBOX3) { include("Templates/News/newsbox3.tpl"); } ?>
+		</section>
+		<?php endif; ?>
+	</aside>
 </div>
-<div id="side_info" class="outgame">
-<?php
-if(NEWSBOX1) { include("Templates/News/newsbox1.tpl"); }
-if(NEWSBOX2) { include("Templates/News/newsbox2.tpl"); }
-if(NEWSBOX3) { include("Templates/News/newsbox3.tpl"); }
-?>
-			</div>
-
-<div class="clear"></div>
-			</div>
-
-			<div class="footer-stopper outgame"></div>
-			<div class="clear"></div>
-
-<?php include("Templates/footer.tpl"); ?>
-<div id="ce"></div>
-</body>
-</html>
+<?php include("Templates/layout/outgame_bottom.tpl"); ?>
