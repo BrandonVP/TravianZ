@@ -77,6 +77,8 @@ echo "<h1>". htmlspecialchars($allianceinfo['tag'], ENT_QUOTES, 'UTF-8').
      "</h1>";
 
 include("alli_menu.tpl");
+echo '<p class="tz-opts-back"><a href="allianz.php?s=5">&lsaquo; All alliance options</a></p>';
+
 ?>
 
 <form method="post" action="allianz.php">

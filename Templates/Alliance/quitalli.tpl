@@ -59,6 +59,8 @@ if ($aid) {
 echo "<h1>" . htmlspecialchars($allianceinfo['tag']) . " - " . htmlspecialchars($allianceinfo['name']) . "</h1>";
 
 include("alli_menu.tpl");
+echo '<p class="tz-opts-back"><a href="allianz.php?s=5">&lsaquo; All alliance options</a></p>';
+
 
 /* Preload members only once */
 $memberlist = $database->getAllMember($aid);

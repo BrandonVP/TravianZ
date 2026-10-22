@@ -109,167 +109,95 @@ if (!isset($profiel[1])) { $profiel[1] = ''; }
 include("alli_menu.tpl");
 ?>
 
-<!-- ========================= PROFILE ========================= -->
-<table cellpadding="1" cellspacing="1" id="profile">
-<thead>
-<tr>
-    <th colspan="2"><?php echo ALLIANCE; ?></th>
-</tr>
-<tr>
-    <td><?php echo DETAIL; ?></td>
-    <td><?php echo DESCRIPTION; ?></td>
-</tr>
-</thead>
-
-<tbody>
-<tr><td class="empty"></td><td class="empty"></td></tr>
-
-<tr>
-<td class="details">
-
-<table cellpadding="0" cellspacing="0">
-
-<tr>
-    <th><?php echo TAG; ?></th>
-    <td><?php echo htmlspecialchars($allianceinfo['tag']); ?></td>
-</tr>
-
-<tr>
-    <th><?php echo NAME; ?></th>
-    <td><?php echo htmlspecialchars($allianceinfo['name']); ?></td>
-</tr>
-
-<tr><td colspan="2" class="empty"></td></tr>
-
-<!-- ========================= RANK FIX ========================= -->
-<tr>
-    <th><?php echo RANK; ?></th>
-    <td>
 <?php
-// FORCE ranking initialization (TravianZ safe trigger)
-if (!isset($ranking) || !is_object($ranking)) {
-    global $ranking;
-}
+/* =========================
+   local redesign: stat tiles, leadership, description cards and member
+   cards instead of the old nested tables
+========================= */
+if (!isset($ranking) || !is_object($ranking)) { global $ranking; }
+$ranking->getAllianceRank(1); // warm the ranking cache (same as before)
+$tzRankValue = (int) $ranking->getAllianceRank((int) $aid);
+if ($tzRankValue < 1) $tzRankValue = 1;
 
-// IMPORTANT: sometimes rank needs a "warm call"
-$dummy = $ranking->getAllianceRank(1); // trigger internal load (safe, read-only)
-
-$rankValue = (int)$ranking->getAllianceRank((int)$aid);
-
-if ($rankValue < 1) {
-    $rankValue = 1;
-}
-
-echo $rankValue . ".";
-?>
-    </td>
-</tr>
-
-<tr>
-    <th><?php echo POINTS; ?></th>
-    <td><?php echo (int)$totalpop; ?></td>
-</tr>
-
-<tr>
-    <th><?php echo TZ_MEMBERS; ?></th>
-    <td><?php echo count($memberlist); ?></td>
-</tr>
-
-<tr><td colspan="2" class="empty"></td></tr>
-
-<?php
+$tzLeaders = [];
+$tzMembers = [];
+$tzVillTotal = 0;
 foreach ($memberlist as $member) {
-
-    $uid  = (int)$member['id'];
-    $name = $database->getUserField($uid, "username", 0);
-    $rank = $database->getAlliancePermission($uid, "rank", $aid);
-
-    if ($rank != '') {
-        echo "<tr>";
-        echo "<th>" . htmlspecialchars(stripslashes($rank)) . "</th>";
-        echo "<td><a href='spieler.php?uid=" . $uid . "'>" . htmlspecialchars($name) . "</a></td>";
-        echo "</tr>";
-    }
+    $muid = (int) $member['id'];
+    $mrank = $database->getAlliancePermission($muid, "rank", $aid);
+    if ($mrank != '') $tzLeaders[] = [$muid, stripslashes($mrank), $member['username']];
+    $popData = $database->getVSumField($muid, "pop");
+    $mpop = is_array($popData) ? (isset($popData[0]['Total']) ? (int) $popData[0]['Total'] : 0) : (int) $popData;
+    $mvil = count((array) $database->getProfileVillages($muid));
+    $tzVillTotal += $mvil;
+    $tzMembers[] = ['uid' => $muid, 'name' => $member['username'], 'pop' => $mpop, 'vil' => $mvil,
+                    'ts' => (int) $member['timestamp'], 'title' => $mrank != '' ? stripslashes($mrank) : ''];
 }
-
-if (!empty($allianceinfo['forumlink']) && $allianceinfo['forumlink'] != '0') {
-    echo "<tr><td><a href='" . htmlspecialchars($allianceinfo['forumlink']) . "'>» to the forum</a></td></tr>";
-}
+usort($tzMembers, function ($a, $b) { return $b['pop'] <=> $a['pop']; });
+$tzOwnAlly = ($aid == $session->alliance);
+$tzOnline = function ($ts) {
+    $d = time() - $ts;
+    if ($d < 600)    return ['on', 'Online now'];
+    if ($d < 86400)  return ['day', 'Active today'];
+    if ($d < 259200) return ['days3', 'Active in the last 3 days'];
+    if ($d < 604800) return ['week', 'Active this week'];
+    return ['off', 'Inactive for over a week'];
+};
+$tzNotice = trim(strip_tags($profiel[0])) !== '' || strpos($profiel[0], '<img') !== false;
+$tzDesc   = trim(strip_tags($profiel[1])) !== '' || strpos($profiel[1], '<img') !== false;
 ?>
 
-<tr>
-<td class="desc2" colspan="2">
-<div class="desc2div"><?php echo stripslashes(nl2br($profiel[0])); ?></div>
-</td>
-</tr>
+<div class="tz-ally">
+    <div class="tz-ally-stats">
+        <div class="tz-ally-stat"><span class="tz-ally-k"><?php echo RANK; ?></span><span class="tz-ally-v"><?php echo $tzRankValue; ?>.</span></div>
+        <div class="tz-ally-stat"><span class="tz-ally-k">Population</span><span class="tz-ally-v"><?php echo number_format((int) $totalpop); ?></span></div>
+        <div class="tz-ally-stat"><span class="tz-ally-k"><?php echo TZ_MEMBERS; ?></span><span class="tz-ally-v"><?php echo count($memberlist); ?></span></div>
+        <div class="tz-ally-stat"><span class="tz-ally-k"><?php echo VILLAGES; ?></span><span class="tz-ally-v"><?php echo number_format($tzVillTotal); ?></span></div>
+    </div>
 
-</table>
-</td>
+    <?php if ($tzLeaders || (!empty($allianceinfo['forumlink']) && $allianceinfo['forumlink'] != '0')) { ?>
+    <div class="tz-ally-leaders">
+        <?php foreach ($tzLeaders as $l) { ?>
+            <span class="tz-ally-chip"><span class="tz-ally-chip-k"><?php echo htmlspecialchars($l[1]); ?></span> <a href="spieler.php?uid=<?php echo $l[0]; ?>"><?php echo htmlspecialchars($l[2]); ?></a></span>
+        <?php } ?>
+        <?php if (!empty($allianceinfo['forumlink']) && $allianceinfo['forumlink'] != '0') { ?>
+            <a class="tz-btn tz-btn-sm" href="<?php echo htmlspecialchars($allianceinfo['forumlink']); ?>">External forum &rsaquo;</a>
+        <?php } ?>
+    </div>
+    <?php } ?>
 
-<td class="desc1">
-<div class="desc1div"><?php echo stripslashes(nl2br($profiel[1])); ?></div>
-</td>
+    <div class="tz-ally-texts">
+        <?php if ($tzDesc) { ?>
+        <div class="tz-ally-text">
+            <h3><?php echo DESCRIPTION; ?></h3>
+            <div class="tz-ally-body"><?php echo stripslashes(nl2br($profiel[1])); ?></div>
+        </div>
+        <?php } ?>
+        <?php if ($tzNotice) { ?>
+        <div class="tz-ally-text">
+            <h3>Notice board</h3>
+            <div class="tz-ally-body"><?php echo stripslashes(nl2br($profiel[0])); ?></div>
+        </div>
+        <?php } ?>
+        <?php if (!$tzDesc && !$tzNotice) { ?>
+        <div class="tz-ally-text tz-ally-empty">
+            No description yet.<?php if ($tzOwnAlly && !empty($alliance->userPermArray['opt3'])) { ?> Leaders can add one under <a href="allianz.php?s=5">Options</a> &rsaquo; Change alliance description.<?php } ?>
+        </div>
+        <?php } ?>
+    </div>
 
-</tr>
-</tbody>
-</table>
-
-<!-- ========================= MEMBERS ========================= -->
-<table cellpadding="1" cellspacing="1" id="member">
-<thead>
-<tr>
-    <th>&nbsp;</th>
-    <th><?php echo PLAYER; ?></th>
-    <th><?php echo POP; ?></th>
-    <th><?php echo VILLAGES; ?></th>
-    <?php if ($aid == $session->alliance) echo "<th>&nbsp;</th>"; ?>
-</tr>
-</thead>
-
-<tbody>
-
-<?php
-$rank = 0;
-
-foreach ($memberlist as $member) {
-
-    $uid = (int)$member['id'];
-    $rank++;
-
-    $popData = $database->getVSumField($uid, "pop");
-
-    $pop = is_array($popData)
-        ? (isset($popData[0]['Total']) ? (int)$popData[0]['Total'] : 0)
-        : (int)$popData;
-
-    $villages = $database->getProfileVillages($uid);
-
-    echo "<tr>";
-    echo "<td class='ra'>" . $rank . ".</td>";
-    echo "<td class='pla'><a href='spieler.php?uid=" . $uid . "'>" . htmlspecialchars($member['username']) . "</a></td>";
-    echo "<td class='hab'>" . $pop . "</td>";
-    echo "<td class='vil'>" . count($villages) . "</td>";
-
-    if ($aid == $session->alliance) {
-
-        $diff = time() - $member['timestamp'];
-
-        if ($diff < 600) {
-            echo "<td class='on'><img class='online1' src='img/x.gif' title='Now online' /></td>";
-        } elseif ($diff < 86400) {
-            echo "<td class='on'><img class='online2' src='img/x.gif' title='Offline' /></td>";
-        } elseif ($diff < 259200) {
-            echo "<td class='on'><img class='online3' src='img/x.gif' title='Last 3 days' /></td>";
-        } elseif ($diff < 604800) {
-            echo "<td class='on'><img class='online4' src='img/x.gif' title='Last 7 days' /></td>";
-        } else {
-            echo "<td class='on'><img class='online5' src='img/x.gif' title='inactive' /></td>";
-        }
-    }
-
-    echo "</tr>";
-}
-?>
-
-</tbody>
-</table>
+    <h2 class="tz-ally-h2"><?php echo TZ_MEMBERS; ?> <span><?php echo count($tzMembers); ?></span></h2>
+    <div class="tz-ally-members">
+        <?php $n = 0; foreach ($tzMembers as $m) { $n++; $st = $tzOnline($m['ts']); ?>
+        <div class="tz-ally-member">
+            <span class="tz-ally-pos"><?php echo $n; ?></span>
+            <div class="tz-ally-mname">
+                <?php if ($tzOwnAlly) { ?><span class="tz-ally-dot tz-ally-<?php echo $st[0]; ?>" title="<?php echo $st[1]; ?>"></span><?php } ?>
+                <a href="spieler.php?uid=<?php echo $m['uid']; ?>"><?php echo htmlspecialchars($m['name']); ?></a>
+                <?php if ($m['title'] !== '') { ?><span class="tz-ally-role"><?php echo htmlspecialchars($m['title']); ?></span><?php } ?>
+            </div>
+            <div class="tz-ally-mstats"><?php echo number_format($m['pop']); ?> pop &middot; <?php echo $m['vil']; ?> <?php echo $m['vil'] == 1 ? 'village' : 'villages'; ?></div>
+        </div>
+        <?php } ?>
+    </div>
+</div>

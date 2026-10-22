@@ -42,6 +42,8 @@ echo "<h1>" .
     "</h1>";
 
 include("alli_menu.tpl");
+echo '<p class="tz-opts-back"><a href="allianz.php?s=5">&lsaquo; All alliance options</a></p>';
+
 ?>
 
 <!-- KICK FORM -->

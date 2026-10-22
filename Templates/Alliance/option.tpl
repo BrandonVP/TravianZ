@@ -48,108 +48,46 @@ include_once("alli_menu.tpl");
     <?php echo $form->getError("perm"); ?>
 </p>
 
-<form method="POST" action="allianz.php">
-
-<input type="hidden" name="s" value="5">
-
-<table cellpadding="1" cellspacing="1" id="options" class="small_option">
-
-<thead>
-<tr>
-    <th colspan="2"><?php echo OPTION; ?></th>
-</tr>
-</thead>
-
-<tbody>
-
 <?php
-// -------------------------------------------------
-// PERMISSION SHORTCUT
-// -------------------------------------------------
-
+// local redesign: grouped action tiles instead of a radio list + OK.
+// Each tile posts o=<option> exactly like the old form did.
 $perm = $alliance->userPermArray;
-
-// -------------------------------------------------
-// OPTIONS MAP (reduces duplication)
-// -------------------------------------------------
-
-$options = [
-
-    1 => [
-        'perm' => 'opt1',
-        'label' => 'Assign to position'
+$tzOptGroups = [
+    'Members' => [
+        4 => ['opt4', 'Invite a player', 'Send an invitation to join the alliance.'],
+        1 => ['opt1', 'Positions & rights', 'Give members a title and choose what they may do.'],
+        2 => ['opt2', 'Kick a player', 'Remove a member from the alliance.'],
     ],
-
-    100 => [
-        'perm' => 'opt3',
-        'label' => 'Change name'
+    'Alliance profile' => [
+        3 => ['opt3', 'Description', 'Edit the description and notice board on the overview.'],
+        100 => ['opt3', 'Name & tag', 'Rename the alliance or change its tag.'],
+        5 => ['opt5', 'Forum link', 'Link an external forum from the overview.'],
     ],
-
-    2 => [
-        'perm' => 'opt2',
-        'label' => 'Kick player'
+    'Diplomacy' => [
+        6 => ['opt6', 'Diplomacy', 'Offer or answer alliances, non-aggression pacts and wars.'],
     ],
-
-    3 => [
-        'perm' => 'opt3',
-        'label' => 'Change alliance description'
-    ],
-
-    6 => [
-        'perm' => 'opt6',
-        'label' => 'Alliance diplomacy'
-    ],
-
-    4 => [
-        'perm' => 'opt4',
-        'label' => 'Invite a player into the alliance'
-    ],
-
-    5 => [
-        'perm' => 'opt5',
-        'label' => 'Link to the forum'
-    ]
 ];
-
-// -------------------------------------------------
-// DYNAMIC OPTIONS RENDER
-// -------------------------------------------------
-
-foreach ($options as $value => $optData) {
-
-    if (!empty($perm[$optData['perm']]) && $perm[$optData['perm']] == 1) {
-
-        echo "<tr>
-            <td class=\"sel\">
-                <input class=\"radio\" type=\"radio\" name=\"o\" value=\"" . (int)$value . "\">
-            </td>
-            <td class=\"val\">" . $optData['label'] . "</td>
-        </tr>";
-    }
-}
 ?>
-
-<!-- ALWAYS AVAILABLE OPTION -->
-<tr>
-    <td class="sel">
-        <input class="radio" type="radio" name="o" value="11">
-    </td>
-    <td class="val"><?php echo TZ_QUIT_ALLIANCE; ?></td>
-</tr>
-
-</tbody>
-</table>
-
-<!-- SUBMIT -->
-<p>
-    <button
-        type="submit"
-        name="s1"
-        id="btn_ok"
-        class="trav_buttons"
-        onclick="this.disabled=true;this.form.submit();">
-        <?php echo TZ_OK_2; ?>
-    </button>
-</p>
-
+<form method="POST" action="allianz.php" class="tz-opts">
+<input type="hidden" name="s" value="5">
+<?php foreach ($tzOptGroups as $tzGroup => $tzItems) {
+    $tzShown = array_filter($tzItems, function ($it) use ($perm) { return !empty($perm[$it[0]]) && $perm[$it[0]] == 1; });
+    if (!$tzShown) continue; ?>
+    <h3 class="tz-opts-h"><?php echo $tzGroup; ?></h3>
+    <div class="tz-opts-grid">
+    <?php foreach ($tzShown as $tzVal => $it) { ?>
+        <button type="submit" name="o" value="<?php echo (int) $tzVal; ?>" class="tz-opt">
+            <span class="tz-opt-t"><?php echo $it[1]; ?></span>
+            <span class="tz-opt-d"><?php echo $it[2]; ?></span>
+        </button>
+    <?php } ?>
+    </div>
+<?php } ?>
+    <h3 class="tz-opts-h">Leave</h3>
+    <div class="tz-opts-grid">
+        <button type="submit" name="o" value="11" class="tz-opt tz-opt-danger">
+            <span class="tz-opt-t"><?php echo TZ_QUIT_ALLIANCE; ?></span>
+            <span class="tz-opt-d">Leave this alliance. You confirm it with your password.</span>
+        </button>
+    </div>
 </form>

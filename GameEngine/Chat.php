@@ -383,17 +383,31 @@ if (!isset($SAJAX_INCLUDED)) {
 	function get_data() {
 		global $session,$database;
 
-		// FIX: $data initializat inainte de concatenare - fara asta, PHP 8+
-		// arunca "Warning: Undefined variable $data" la fiecare refresh de chat
-		// (umple error log-ul; pe PHP 9 devine mai strict).
+		// local redesign: last 50 messages, oldest first (reads like a chat),
+		// one line each with time, name and text; your own lines marked
 		$data = '';
 
 		$alliance = $database->escape($session->alliance);
-		$query = mysqli_query($database->dblink,"select id_user, name, date, msg from ".TB_PREFIX."chat where alli='$alliance' order by id desc limit 0,13");
-			while ($r = mysqli_fetch_array($query)) {
-			$dates = date("g:i",$r['date']);
-			$data .= "[{$dates}] <a href='spieler.php?uid={$r['id_user']}'>{$r['name']}</a>: {$r['msg']} <br>";
-			}
+		$query = mysqli_query($database->dblink,"select id_user, name, date, msg from ".TB_PREFIX."chat where alli='$alliance' order by id desc limit 0,50");
+		$rows = array();
+		while ($r = mysqli_fetch_array($query)) {
+			$rows[] = $r;
+		}
+		$rows = array_reverse($rows);
+		$today = date('Y-m-d');
+		foreach ($rows as $r) {
+			$ts   = (int) $r['date'];
+			$when = (date('Y-m-d', $ts) === $today) ? date('H:i', $ts) : date('M j, H:i', $ts);
+			$mine = ((int) $r['id_user'] === (int) $session->uid) ? ' tz-chat-mine' : '';
+			$name = htmlspecialchars(stripslashes($r['name']), ENT_QUOTES, 'UTF-8');
+			// msg was escaped with htmlspecialchars when it was saved
+			$data .= "<div class='tz-chat-line{$mine}'><span class='tz-chat-time'>{$when}</span>"
+			       . "<a class='tz-chat-name' href='spieler.php?uid=" . (int) $r['id_user'] . "'>{$name}</a>"
+			       . "<span class='tz-chat-msg'>{$r['msg']}</span></div>";
+		}
+		if ($data === '') {
+			$data = "<div class='tz-chat-empty'>No messages yet - say hello to your alliance.</div>";
+		}
 		return $data;
 	}
 
