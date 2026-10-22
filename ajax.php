@@ -56,7 +56,7 @@ switch(isset($_GET['f']) ? $_GET['f'] : '') {
 		$xx = preg_replace("/[^a-zA-Z0-9_-]/","",$_GET['xx']);
 		$yy = preg_replace("/[^a-zA-Z0-9_-]/","",$_GET['yy']);
 		$howmany = $x - $xx;
-		if($howmany == 12 || $howmany == -12) {
+		if(abs($howmany) >= 12) { // large map: 13, 15 or 17 tiles a side
 			include("Templates/Ajax/mapscroll2.tpl");
 		}
 		else {

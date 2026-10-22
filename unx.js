@@ -182,19 +182,50 @@ function Popup(i,j,sc){
 	if(!is_ie6&&!wc)return false;
 	else return true;
 }
+// local redesign: the large map is 17, 15 or 13 tiles a side - the biggest
+// that fits the window (karte2.php?n=); below 13 x 13 there is no large map
+function tzBigMapN(w,h){
+	if(w>=1312&&h>=755){return 17;}
+	if(w>=1166&&h>=675){return 15;}
+	if(w>=1000){return 13;}
+	return 0;
+}
+function tzBigMapDim(n){return{'w':73*(n-1)+124,'h':40*(n-1)+95};}
+function tzViewport(){return{'w':document.documentElement.clientWidth,'h':window.innerHeight||document.documentElement.clientHeight};}
+// centre the popup in the visible part of the page
+function tzBigMapPlace(f){
+	var v=tzViewport();
+	// left/top are relative to the popup wrapper, which is not at the page origin
+	var o=f.offsetParent?f.offsetParent.getBoundingClientRect():{'left':0,'top':0};
+	f.style.left=(Math.max(0,Math.round((v.w-f.width)/2))-Math.round(o.left))+'px';
+	f.style.top=(Math.max(0,Math.round((v.h-f.height)/2))-Math.round(o.top))+'px';
+}
+// "show the large map in an extra window" preference
+function tzBigMapWindow(a){
+	var n=tzBigMapN(screen.availWidth-40,screen.availHeight-90)||13;
+	var d=tzBigMapDim(n);
+	var w=window.open(a.href+'&n='+n,'bigmap','width='+(d.w+16)+',height='+(d.h+16)+',scrollbars=yes,resizable=yes');
+	if(w){w.focus();}
+	return false;
+}
 function PopupMap(i){
 	if(typeof sc=='undefined'){sc='s';}
+	var v=tzViewport();
+	var n=tzBigMapN(v.w,v.h);
+	if(!n){return false;}
 	pb=document.getElementById("ce");
-    if(pb!=null){
-    	var
-			iframeHeight = 575,
-			iframeWidth  = 1000;
-	if(window.dlang== 'ar'){
-	    var tc='<div class="popup_map">'+'<div id="drag2"><a href="#" style="position: absolute;right: 968px;margin-top: 10px;" id="map_popclose" onClick="Close(); return false;"><img src="img/x.gif" border="0" width="20px" height="20px"  alt="Move"></a>'+'<iframe frameborder="0" id="Frame" src="karte2.php?z='+i+'" style="position: absolute; left: ' + Math.round((documentWidth() - iframeWidth) / 2) + 'px; top: ' + Math.round((documentHeight() - iframeHeight) / 2) + 'px" width="1000" height="575" border="0" scrolling="no"></iframe>'+'</div></div>';
-	}else{
-	    var tc='<div class="popup_map">'+'<div id="drag2"><a href="#" id="map_popclose" onClick="Close(); return false;"><img src="img/x.gif" border="0" width="20px" height="20px"  alt="Move"></a>'+'<iframe frameborder="0" id="Frame" src="karte2.php?z='+i+'" style="position: absolute; left: ' + Math.round((documentWidth() - iframeWidth) / 2) + 'px; top: ' + Math.round((documentHeight() - iframeHeight) / 2) + 'px" width="1000" height="575" border="0" scrolling="no"></iframe>'+'</div></div>';
-	}
+	if(pb!=null){
+		var d=tzBigMapDim(n),
+			iframeHeight = d.h,
+			iframeWidth  = d.w;
+		var frame='<iframe frameborder="0" id="Frame" src="karte2.php?z='+i+'&n='+n+'" style="position: absolute; left: 0px; top: 0px" width="'+iframeWidth+'" height="'+iframeHeight+'" border="0" scrolling="no"></iframe>';
+		if(window.dlang== 'ar'){
+			var tc='<div class="popup_map">'+'<div id="drag2"><a href="#" style="position: absolute;right: '+(iframeWidth-32)+'px;margin-top: 10px;" id="map_popclose" onClick="Close(); return false;"><img src="img/x.gif" border="0" width="20px" height="20px"  alt="Move"></a>'+frame+'</div></div>';
+		}else{
+			var tc='<div class="popup_map">'+'<div id="drag2"><a href="#" id="map_popclose" onClick="Close(); return false;"><img src="img/x.gif" border="0" width="20px" height="20px"  alt="Move"></a>'+frame+'</div></div>';
+		}
 		pb.innerHTML=tc;uc2();
+		tzBigMapPlace(document.getElementById('Frame'));
 	}
 	vc();
 	if(!is_ie6&&!wc)return false;
@@ -234,7 +265,9 @@ function vc(){
 window.addEvent('resize', function(){
 	$f = $$('#Frame');
 
-	if (typeof($f) != 'undefined' && typeof($f[0]) != 'undefined' && $f[0].src.indexOf('manual.php') === -1) {
+	if (typeof($f) != 'undefined' && typeof($f[0]) != 'undefined' && $f[0].src.indexOf('karte2.php') !== -1) {
+		tzBigMapPlace($f[0]);
+	} else if (typeof($f) != 'undefined' && typeof($f[0]) != 'undefined' && $f[0].src.indexOf('manual.php') === -1) {
 		$f[0].style.left = (Math.round((documentWidth() - $f[0].width) / 2)) + 'px';
 		$f[0].style.top = (Math.round((documentHeight() - $f[0].height) / 2)) + 'px';
 	}
@@ -371,7 +404,7 @@ function map_init(){
 	}
 	//var ue=document.getElementById('map_makelarge');
 	//if(ue){ue.onclick=ve;}
-	if(mdim.x==13){
+	if(mdim.x>=13){
 		document.getElementById('map_popclose').onclick=we;
 	}
 }

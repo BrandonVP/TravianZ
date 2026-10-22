@@ -57,58 +57,41 @@ $y = ($y < -$W)? $y + $W * 2 + 1 : $y;
 $y = ($y > $W)? $y - $W * 2 - 1 : $y;
 
 /* =========================
-   MAP COORDINATES CALCULATION (13x13)
+   MAP COORDINATES CALCULATION
+   (local redesign: the large map is 13, 15 or 17 tiles a side; the
+   requested span x..xx tells which)
 ========================= */
-$xm6 = ($x - 6) < -$W? $x + $W + $W - 5 : $x - 6;
-$xm5 = ($x - 5) < -$W? $x + $W + $W - 4 : $x - 5;
-$xm4 = ($x - 4) < -$W? $x + $W + $W - 3 : $x - 4;
-$xm3 = ($x - 3) < -$W? $x + $W + $W - 2 : $x - 3;
-$xm2 = ($x - 2) < -$W? $x + $W + $W - 1 : $x - 2;
-$xm1 = ($x - 1) < -$W? $x + $W + $W : $x - 1;
+$N = abs($howmany) + 1;
+if (!in_array($N, array(13, 15, 17))) {
+    $N = 13;
+}
+$R = ($N - 1) / 2;
 
-$xp1 = ($x + 1) > $W? $x - $W - $W : $x + 1;
-$xp2 = ($x + 2) > $W? $x - $W - $W + 1 : $x + 2;
-$xp3 = ($x + 3) > $W? $x - $W - $W + 2 : $x + 3;
-$xp4 = ($x + 4) > $W? $x - $W - $W + 3 : $x + 4;
-$xp5 = ($x + 5) > $W? $x - $W - $W + 4 : $x + 5;
-$xp6 = ($x + 6) > $W? $x - $W - $W + 5 : $x + 6;
-
-$ym6 = ($y - 6) < -$W? $y + $W + $W - 5 : $y - 6;
-$ym5 = ($y - 5) < -$W? $y + $W + $W - 4 : $y - 5;
-$ym4 = ($y - 4) < -$W? $y + $W + $W - 3 : $y - 4;
-$ym3 = ($y - 3) < -$W? $y + $W + $W - 2 : $y - 3;
-$ym2 = ($y - 2) < -$W? $y + $W + $W - 1 : $y - 2;
-$ym1 = ($y - 1) < -$W? $y + $W + $W : $y - 1;
-
-$yp1 = ($y + 1) > $W? $y - $W - $W : $y + 1;
-$yp2 = ($y + 2) > $W? $y - $W - $W + 1 : $y + 2;
-$yp3 = ($y + 3) > $W? $y - $W - $W + 2 : $y + 3;
-$yp4 = ($y + 4) > $W? $y - $W - $W + 3 : $y + 4;
-$yp5 = ($y + 5) > $W? $y - $W - $W + 4 : $y + 5;
-$yp6 = ($y + 6) > $W? $y - $W - $W + 5 : $y + 6;
+$wrap = function ($v) use ($W) {
+    if ($v < -$W) $v += 2 * $W + 1;
+    if ($v > $W) $v -= 2 * $W + 1;
+    return $v;
+};
 
 /* =========================
    MAP GRID ARRAYS
 ========================= */
-$xarray = array($xm6, $xm5, $xm4, $xm3, $xm2, $xm1, $x, $xp1, $xp2, $xp3, $xp4, $xp5, $xp6);
-$yarray = array($ym6, $ym5, $ym4, $ym3, $ym2, $ym1, $y, $yp1, $yp2, $yp3, $yp4, $yp5, $yp6);
+$xarray = array();
+$yarray = array();
+for ($k = -$R; $k <= $R; $k++) {
+    $xarray[] = $wrap($x + $k);
+    $yarray[] = $wrap($y + $k);
+}
 
 $maparray = '';
 $maparray2 = '';
 
-$xcount = 0;
-
-for ($i = 0; $i <= 12; $i++) {
-    if ($xcount!= 13) {
+for ($xcount = 0; $xcount < $N; $xcount++) {
+    for ($i = 0; $i < $N; $i++) {
         $id = $generator->getBaseID($xarray[$xcount], $yarray[$i]);
 
         $maparray.= "'". $id. "',";
         $maparray2.= $id. ",";
-
-        if ($i == 12) {
-            $i = -1;
-            $xcount++;
-        }
     }
 }
 
@@ -249,7 +232,7 @@ while ($donnees = mysqli_fetch_assoc($result2)) {
     }
 
     /* JS MAP DATA */
-    if ($yrow!= 13) {
+    if ($yrow!= $N) {
         $map_js.= "[". $donnees['map_x']. ",". $donnees['map_y']. ",". $donnees['map_fieldtype']. ",". ((!empty($donnees['map_oasis']))? $donnees['map_oasis'] : 0). ",\"d=". $donnees['map_id']. "&c=". $generator->getMapCheck($donnees['map_id']). "\",\"". $image. "\",\"". $att. "\"";
 
         if ($donnees['map_occupied']) {
@@ -266,12 +249,12 @@ while ($donnees = mysqli_fetch_assoc($result2)) {
             $map_js.= "]";
         }
 
-        if ($i == 12 && $yrow!= 12) {
+        if ($i == $N - 1 && $yrow!= $N - 1) {
             $i = -1;
             $yrow++;
             $map_js.= "],[";
         } else {
-            $map_js.= ($yrow == 12 && $i == 12)? "]" : ",";
+            $map_js.= ($yrow == $N - 1 && $i == $N - 1)? "]" : ",";
         }
     } else {
         $map_js.= "]";

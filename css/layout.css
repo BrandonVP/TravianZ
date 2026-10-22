@@ -1754,3 +1754,11 @@ td.tz-redeem { padding: 10px 14px; }
         padding: 8px 12px;
     }
 }
+
+/* large map popup: needs at least a 13 x 13 map (1000 px); on phones and small
+   windows the button is hidden instead of opening a frame that can't be closed */
+@media (max-width: 999px) {
+    div#map a#map_makelarge {
+        display: none;
+    }
+}
