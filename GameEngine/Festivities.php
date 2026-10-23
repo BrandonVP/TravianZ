@@ -263,7 +263,7 @@ class Festivities
     {
         $f = $db->getResourceLevel($wid);
         $best = 0;
-        for ($i = 19; $i <= 40; $i++) {
+        for ($i = 19; $i <= 44; $i++) {
             if ((int) ($f['f' . $i . 't'] ?? 0) === $gid) $best = max($best, (int) $f['f' . $i]);
         }
         return $best;

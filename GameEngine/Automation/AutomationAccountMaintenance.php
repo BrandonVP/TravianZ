@@ -322,7 +322,7 @@ trait AutomationAccountMaintenance {
             foreach($villages as $village){
                 $attri = 0;
                 $field = $database->getResourceLevel($village['wref'], false);
-                for($i = 19; $i <= 40; $i++){
+                for($i = 19; $i <= 44; $i++){
                     if($field['f'.$i.'t'] == 18){
                         $level = $field['f'.$i];
                         $attri = $bid18[$level]['attri'];

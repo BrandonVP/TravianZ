@@ -518,7 +518,7 @@ trait DatabaseArtefactQueries {
 			$DefenderFields = $this->getResourceLevel( $vref );
             $defcanclaim    = true;
 
-            for ($i = 19; $i <= 38; $i++) {
+            for ($i = 19; $i <= 44; $i++) {
                 if ($DefenderFields['f'.$i.'t'] == 27) {
                     $defTresuaryLevel = $DefenderFields['f'.$i];
                     if ($defTresuaryLevel > 0) {
@@ -531,7 +531,7 @@ trait DatabaseArtefactQueries {
 
             $AttackerFields = $this->getResourceLevel( $from, 2 );
 
-            for($i = 19; $i <= 38; $i++) {
+            for($i = 19; $i <= 44; $i++) {
                 if($AttackerFields['f'.$i.'t'] == 27) {
                     $attTresuaryLevel = $AttackerFields['f'.$i];
                     $villageartifact = $attTresuaryLevel >= 10;

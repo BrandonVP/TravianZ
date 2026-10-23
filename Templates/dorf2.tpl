@@ -148,7 +148,12 @@ if ($tzV3) {
         36 => "301,322,340,300,379,322,340,344",
         37 => "137,359,176,337,215,359,176,381",
         38 => "287,372,326,350,365,372,326,394",
-        39 => "336,201,370,176,384,198,386,222,371,257,354,274,328,286,315,262"
+        39 => "336,201,370,176,384,198,386,222,371,257,354,274,328,286,315,262",
+        // local redesign: the 4 spare pads of the v9 art are building slots 41-44
+        41 => "309,142,348,120,387,142,348,164",
+        42 => "240,217,279,195,318,217,279,239",
+        43 => "168,261,207,239,246,261,207,283",
+        44 => "200,340,239,318,278,340,239,362"
     );
 }
 /**
@@ -159,7 +164,7 @@ $natarBlocked = array(25, 26, 29, 30, 33);
 /**
  * Generare areas pentru clădiri
  */
-for ($t = 19; $t <= 39; $t++) {
+foreach (array_merge(range(19, 39), range(41, 44)) as $t) {
 
     // Skip sloturi speciale Natar
     if ($village->natar == 1 && in_array($t, $natarBlocked)) {
@@ -272,9 +277,10 @@ $natarVillageSkip = array(25, 26, 29, 30, 33);
 /**
  * Clădiri sat
  */
-for ($i = 1; $i <= 20; $i++) {
+for ($i = 1; $i <= 24; $i++) {
 
-    $fieldId = $i + 18;
+    // d1-d20 = slots 19-38, d21-d24 = slots 41-44 (local redesign)
+    $fieldId = ($i <= 20) ? $i + 18 : $i + 20;
 
     // Skip sloturi Natar
     if ($village->natar == 1 && in_array($fieldId, $natarVillageSkip)) {
@@ -450,11 +456,11 @@ if (
 /**
  * Level numbers
  */
-for ($i = 1; $i <= 20; $i++) {
+for ($i = 1; $i <= 24; $i++) {
 
-    $fieldId = $i + 18;
+    $fieldId = ($i <= 20) ? $i + 18 : $i + 20;
 
-    if ((int)$village->resarray['f'.$fieldId.'t'] != 0) {
+    if ((int)($village->resarray['f'.$fieldId.'t'] ?? 0) != 0) {
 
         echo '<div class="d' . $i . '">'
             . (int)$village->resarray['f'.$fieldId]

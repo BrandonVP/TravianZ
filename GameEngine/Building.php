@@ -429,7 +429,7 @@ class Building {
         // f99 pentru WW), NU gid-ul cladirii ($get['a'] e gid-ul). Gate-ul de mai
         // jos valideaza sloturile din dorf2, deci NU blocheaza cladirile cu gid
         // 41-50 (noile triburi).
-        if ($get['id'] > 18 && ($get['id'] < 41 || $get['id'] == 99)) {
+        if ($get['id'] > 18 && ($get['id'] <= 44 || $get['id'] == 99)) {
 
             $this->sess->changeChecker();
 
@@ -1014,7 +1014,7 @@ class Building {
         // (f19t..f40t == 26). Vechiul in_array(26, $row) cauta loose in TOT
         // randul fdata - matchuia si vref == 26, si orice nivel == 26 (WW la
         // nivelul 26) -> fals pozitiv "are Palace" care bloca Palace-ul peste tot.
-        for ($i = 19; $i <= 40; $i++) {
+        for ($i = 19; $i <= 44; $i++) {
 
             if (isset($row['f'.$i.'t']) && (int) $row['f'.$i.'t'] == 26) {
                 return true;
@@ -1890,7 +1890,7 @@ class Building {
 
     $cpTot = 0;
 
-    for ($i = 1; $i <= 40; $i++) {
+    for ($i = 1; $i <= 44; $i++) {
 
         $building = (int) $fdata['f'.$i.'t'];
 
@@ -2032,7 +2032,7 @@ class Building {
         return $this->typeFieldCache[$cacheKey];
     }
 
-    for ($i = 19; $i <= 40; $i++) {
+    for ($i = 19; $i <= 44; $i++) {
 
         if ($this->vil->resarray['f'.$i.'t'] == $type) {
             return $this->typeFieldCache[$cacheKey] = $i;

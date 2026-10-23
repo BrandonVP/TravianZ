@@ -59,7 +59,7 @@ if ($id <= 0) {
 // Construiește SET dinamic f1-f40
 // ---------------------------------------------------------------------------
 $sets = [];
-for ($i = 1; $i <= 40; $i++) {
+for ($i = 1; $i <= 44; $i++) {
     $lvl = (int)($_POST["id{$i}level"] ?? 0);
     $gid = (int)($_POST["id{$i}gid"] ?? 0);
     $sets[] = "f$i = $lvl, f{$i}t = $gid";

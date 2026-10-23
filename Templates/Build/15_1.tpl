@@ -36,7 +36,7 @@ if (!empty($_REQUEST['demolish']) && $_REQUEST['c'] == $session->mchecker) {
     $type = (int)($_REQUEST['type']?? 0);
     $instant = isset($_POST['instant']) && $_POST['instant'] == '1';
 
-    if ($type >= 19 && $type <= 40 || $type == 99) {
+    if ($type >= 19 && $type <= 44 || $type == 99) {
         $field = 'f'.$type;
         $buildType = $VillageLevels[$field.'t'];
         $currentLvl = $VillageLevels[$field];
@@ -170,7 +170,7 @@ $inProgress =!empty($Demolition)? $Demolition[0] : null;
 
     <form action="build.php?gid=15&amp;demolish=1&amp;cancel=0&amp;c=<?= $session->mchecker?>" method="POST" style="display:inline">
         <select id="demolition_type" name="type" class="dropdown">
-            <?php for ($i = 19; $i <= 41; $i++):
+            <?php for ($i = 19; $i <= 44; $i++):
                 if (!isset($VillageLevels['f'.$i]) || $VillageLevels['f'.$i] < 1) continue;
                 if ($building->isCurrent($i) || $building->isLoop($i)) continue;
                 $selected = ($i == $ty)? ' selected' : '';

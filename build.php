@@ -68,7 +68,8 @@ if(isset($_GET['newdid'])){
     header("Location: " . $_SERVER['PHP_SELF'] . $tzRedirect);
     exit;
 }
-if(isset($_GET['id']) && ($_GET['id'] < 1 || $_GET['id'] > 40 && ($_GET['id'] == 99 && $village->natar == 0 || $_GET['id'] != 99))){
+// local redesign: building slots go up to 44 (41-44 = the four extra pads)
+if(isset($_GET['id']) && ($_GET['id'] < 1 || $_GET['id'] > 44 && ($_GET['id'] == 99 && $village->natar == 0 || $_GET['id'] != 99))){
     header("Location: dorf2.php");
     exit;
 }

@@ -236,9 +236,9 @@ trait AutomationBattleResolution {
                     					
                     					// calculate targets for 1st rows of catapults
                     					$j = 0;
-                    					for ($i = 1; $i <= 41; $i++)
+                    					for ($i = 1; $i <= 45; $i++)
                     					{
-                    						if ($i == 41) $i = 99;
+                    						if ($i == 45) $i = 99;
                     						
                     						// 1st row of catapults pre-selected target calculations, if needed
                     						if (!$catapults1TargetRandom && $bdo['f'.$i.'t'] == $catapultTarget && $bdo['f'.$i] > 0 && $i != 40)
@@ -269,9 +269,9 @@ trait AutomationBattleResolution {
                     				if ($catapults1TargetRandom)
                     				{
                     					$list = [];
-                    					for ($i = 1; $i <= 41; $i++)
+                    					for ($i = 1; $i <= 45; $i++)
                     					{
-                    						if ($i == 41) $i = 99;
+                    						if ($i == 45) $i = 99;
                     						if ($bdo['f'.$i] > 0 && $i != 40) $list[] = $i;
                     					}
                     					$catapultTarget = $list[rand(0, count($list) - 1)];
@@ -295,9 +295,9 @@ trait AutomationBattleResolution {
                     					
                     					// calculate targets for 2nd rows of catapults
                     					$j = 0;
-                    					for ($i = 1; $i <= 41; $i++)
+                    					for ($i = 1; $i <= 45; $i++)
                     					{
-                    						if ($i == 41) $i = 99;
+                    						if ($i == 45) $i = 99;
                     						
                     						// 2nd row of catapults pre-selected target calculations, if needed
                     						if (!$catapults2TargetRandom && !$catapults2WillNotShoot && $bdo['f'.$i.'t'] == $catapultTarget2 && $bdo['f'.$i] > 0 && $i != 40)
@@ -327,9 +327,9 @@ trait AutomationBattleResolution {
                     				if ($catapults2TargetRandom && !$catapults2WillNotShoot)
                     				{
                     					$list = [];
-                    					for ($i = 1; $i <= 41; $i++)
+                    					for ($i = 1; $i <= 45; $i++)
                     					{
-                    						if ($i == 41) $i = 99;
+                    						if ($i == 45) $i = 99;
                     						if ($bdo['f'.$i] > 0 && $i != 40) $list[] = $i;
                     					}
                     					// FIX (PHP log): daca $list e gol (niciun target alternativ
@@ -632,7 +632,7 @@ trait AutomationBattleResolution {
         $palacelevel = $database->getResourceLevel($from['wref']);
         $plevel      = 0;
 
-        for ($i = 1; $i <= 40; $i++) {
+        for ($i = 1; $i <= 44; $i++) {
             if ($palacelevel['f' . $i . 't'] == 26) $plevel = $i;
             elseif ($palacelevel['f' . $i . 't'] == 25) $plevel = $i;
             elseif ($palacelevel['f' . $i . 't'] == 44) $plevel = $i; // Command Center (Huni)
@@ -790,7 +790,7 @@ trait AutomationBattleResolution {
 
         if ($pop1 > $pop2 && $targettribe != 5) {
             $buildlevel = $database->getResourceLevel($data['to']);
-            for ($i = 1; $i <= 39; $i++) {
+            for ($i = 1; $i <= 44; $i++) { if ($i == 40) continue; // slots 41-44 too; the wall is handled by rams
                 if ($buildlevel['f' . $i] != 0) {
                     if ($buildlevel['f' . $i . 't'] != 35 && $buildlevel['f' . $i . 't'] != 36 && $buildlevel['f' . $i . 't'] != 41) {
                         // Main Building (gid 15) nu poate cobori sub nivel 1: satul trebuie
@@ -2278,7 +2278,7 @@ trait AutomationBattleResolution {
             // get total cranny value:
             $buildarray = $database->getResourceLevel($data['to']);
             $cranny = 0;
-            for($i = 19; $i < 39;$i++){
+            for($i = 19; $i <= 44;$i++){
                 if($buildarray['f'.$i.'t'] == 23){
                     $cranny += $bid23[$buildarray['f'.$i]]['attri'] * CRANNY_CAPACITY;
                 }
@@ -3383,7 +3383,7 @@ trait AutomationBattleResolution {
         $prod = 0;
         $holders = [];
         $boosterLevels = array_fill_keys($boosterTypes, 0);
-        for($i = 1; $i <= 38; $i++) {
+        for($i = 1; $i <= 44; $i++) {
             $fieldType = $resArray['f'.$i.'t'] ?? null;
             if($fieldType == $resourceType) $holders[] = 'f'.$i;
             if($fieldType !== null && isset($boosterLevels[$fieldType])) $boosterLevels[$fieldType] = $resArray['f'.$i] ?? 0;

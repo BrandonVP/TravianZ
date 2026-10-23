@@ -26,7 +26,7 @@
 	global $bid45;
 	$wwLevel = 0;
 	$wwFactor = 0.25;
-	for ($wwi = 19; $wwi <= 40; $wwi++) {
+	for ($wwi = 19; $wwi <= 44; $wwi++) {
 		if (isset($village->resarray['f'.$wwi.'t']) && (int)$village->resarray['f'.$wwi.'t'] == 45) {
 			$wwLevel = max($wwLevel, (int)$village->resarray['f'.$wwi]);
 		}

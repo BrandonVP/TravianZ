@@ -60,7 +60,7 @@ $currentCap = $level > 0? (int)$bid36[$level]['attri'] * TRAPPER_CAPACITY : 0;
 
         $max = $technology->maxUnit(99, false);
         $max1 = 0;
-        for ($i = 19; $i < 41; $i++) {
+        for ($i = 19; $i <= 44; $i++) {
             if ((int)$village->resarray['f'.$i.'t'] == 36) {
                 $max1 += (int)$bid36[(int)$village->resarray['f'.$i]]['attri'] * TRAPPER_CAPACITY;
             }

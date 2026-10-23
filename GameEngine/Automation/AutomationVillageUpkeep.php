@@ -37,7 +37,7 @@ trait AutomationVillageUpkeep {
         $fdata = $database->getResourceLevel($vid, $use_cache);
         $popTot = 0;
 
-        for ($i = 1; $i <= 40; $i++) {
+        for ($i = 1; $i <= 44; $i++) {
             $lvl = $fdata["f".$i];
             $building = $fdata["f".$i."t"];
 			if($building) $popTot += $this->buildingPOP($building, $lvl);
@@ -459,7 +459,7 @@ trait AutomationVillageUpkeep {
                 while ($row = mysqli_fetch_assoc($result))
                 {
                     $ress = $crop = 0;
-                    for ($i = 19; $i < 40; ++$i)
+                    for ($i = 19; $i <= 44; ++$i)
                     {
                         //Warehouse
                         if ($row['f' . $i . 't'] == 10)

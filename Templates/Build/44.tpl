@@ -64,7 +64,7 @@ if($_POST && isset($_GET['action']) && $_GET['action'] == 'change_capital' && !$
 				}
 			}
 			// 2. sterge Stonemason's Lodge (34) din vechea capitala
-			for($i = 19; $i <= 40; ++$i){
+			for($i = 19; $i <= 44; ++$i){
 				if($data2['f'.$i.'t'] == 34){
 					mysqli_query($database->dblink, 'UPDATE `'.TB_PREFIX.'fdata` SET `f'.$i.'t` = 0, `f'.$i.'` = 0 WHERE `vref` = '.$oldWid);
 				}
@@ -72,7 +72,7 @@ if($_POST && isset($_GET['action']) && $_GET['action'] == 'change_capital' && !$
 			// 3. sterge cladirile capital-only din noua capitala
 			//    (Great Barracks 29, Great Stable 30, Great Granary 38, Great Warehouse 39, Great Workshop 49)
 			$capitalOnly = [29,30,38,39,49];
-			for($i = 19; $i <= 40; ++$i){
+			for($i = 19; $i <= 44; ++$i){
 				if(in_array((int)$data3['f'.$i.'t'], $capitalOnly)){
 					mysqli_query($database->dblink, 'UPDATE `'.TB_PREFIX.'fdata` SET `f'.$i.'t` = 0, `f'.$i.'` = 0 WHERE `vref` = '.$newWid);
 				}

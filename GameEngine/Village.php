@@ -478,7 +478,7 @@ class Village {
 
 		$levels = [];
 		$last = [];
-		for ($i = 1; $i <= 38; $i++) {
+		for ($i = 1; $i <= 44; $i++) {
 			$t = (int) $this->resarray['f'.$i.'t'];
 			$lvl = $this->resarray['f'.$i];
 			$levels[$t][] = $lvl;
@@ -499,7 +499,7 @@ class Village {
 	 */
 	private function getOasisBonusFactor(): float {
 		$wwLevel = 0;
-		for ($i = 19; $i <= 40; $i++) {
+		for ($i = 19; $i <= 44; $i++) {
 			if (isset($this->resarray['f'.$i.'t']) && (int)$this->resarray['f'.$i.'t'] == 45) {
 				$wwLevel = max($wwLevel, (int)$this->resarray['f'.$i]);
 			}

@@ -291,7 +291,7 @@ class PushProtection
         $wood = $clay = $iron = $crop = 0;
         $saw = $brick = $found = $mill = $bake = 0;
 
-        for ($i = 1; $i <= 38; $i++) {
+        for ($i = 1; $i <= 44; $i++) {
             $t  = (int) ($f["f{$i}t"] ?? 0);
             $lv = (int) ($f["f{$i}"] ?? 0);
             if     ($t === 1) { $wood += $bid1[$lv]['prod'] ?? 0; }

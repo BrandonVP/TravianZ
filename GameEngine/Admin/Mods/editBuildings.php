@@ -54,7 +54,7 @@ if ($id <= 0) {
 // Construim SET-ul dinamic pentru f1-f40 și f99
 // ---------------------------------------------------------------------------
 $sets = [];
-for ($i = 1; $i <= 40; $i++) {
+for ($i = 1; $i <= 44; $i++) {
     $level = (int)($_POST["id{$i}level"] ?? 0);
     $gid   = (int)($_POST["id{$i}gid"] ?? 0);
     // limităm la valori rezonabile Travian

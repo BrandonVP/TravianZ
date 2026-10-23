@@ -1016,7 +1016,7 @@ class Technology {
 		        foreach($trainlist as $train) $train_amt += $train['amt'];
 		        
 		        $max = 0;
-		        for($i = 19; $i < 41; $i++){
+		        for($i = 19; $i <= 44; $i++){
 		            if($village->resarray['f'.$i.'t'] == 36){
 		                $max += $bid36[$village->resarray['f'.$i]]['attri']*TRAPPER_CAPACITY;
 		            }

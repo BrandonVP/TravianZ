@@ -263,7 +263,7 @@ class VillageGold
     public static function treasuryLevel($resArray)
     {
         $level = 0;
-        for ($i = 19; $i <= 40; $i++) {
+        for ($i = 19; $i <= 44; $i++) {
             if (isset($resArray['f' . $i . 't']) && (int) $resArray['f' . $i . 't'] == 27) {
                 $level = max($level, (int) $resArray['f' . $i]);
             }
@@ -449,7 +449,7 @@ class VillageGold
     {
         $mb = 0;
         $market = 0;
-        for ($i = 19; $i <= 40; $i++) {
+        for ($i = 19; $i <= 44; $i++) {
             $type = isset($resArray['f' . $i . 't']) ? (int) $resArray['f' . $i . 't'] : 0;
             $level = isset($resArray['f' . $i]) ? (int) $resArray['f' . $i] : 0;
             if ($type == 15) $mb = max($mb, $level);

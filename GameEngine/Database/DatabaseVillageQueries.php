@@ -466,7 +466,7 @@ trait DatabaseVillageQueries {
         }
 
         $AttackerFields = $this->getResourceLevel( $vref, $use_cache );
-        for ( $i = 19; $i <= 38; $i ++ ) {
+        for ( $i = 19; $i <= 44; $i ++ ) {
             if ( $AttackerFields[ 'f' . $i . 't' ] == 37 ) {
                 $HeroMansionLevel = $AttackerFields[ 'f' . $i ];
             }
@@ -1759,7 +1759,7 @@ trait DatabaseVillageQueries {
             39 => array('crop',  $bid39),
         );
 
-        for ($i = 19; $i < 40; $i++) {
+        for ($i = 19; $i <= 44; $i++) {
             $type  = isset($fdata['f' . $i . 't']) ? (int) $fdata['f' . $i . 't'] : 0;
             $level = isset($fdata['f' . $i])       ? (int) $fdata['f' . $i]       : 0;
 
@@ -2375,7 +2375,7 @@ trait DatabaseVillageQueries {
 
 		$buildarray = $this->getResourceLevel($wref);
 		$cropholder = [];
-		for($i = 1; $i <= 38; $i++){
+		for($i = 1; $i <= 44; $i++){
 			if($buildarray['f'.$i.'t'] == 4) array_push($cropholder, 'f'.$i);
 			if($buildarray['f'.$i.'t'] == 8) $grainmill = $buildarray['f'.$i];
 			if($buildarray['f'.$i.'t'] == 9) $bakery = $buildarray['f'.$i];
