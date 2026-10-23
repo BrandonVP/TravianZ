@@ -104,7 +104,7 @@ if (!is_file(__DIR__ . '/../img/fieldmap/f' . $mapType . '.webp')) {
 }
 ?>
 <div id="village_map" class="fieldmap">
-    <img class="fm-art" src="img/fieldmap/f<?php echo $mapType; ?>.webp?v=1" alt="" />
+    <img class="fm-art" src="img/fieldmap/f<?php echo $mapType; ?>.webp?v=<?php echo @filemtime(__DIR__ . '/../img/fieldmap/f' . $mapType . '.webp'); ?>" alt="" />
 <?php
 for ($i = 1; $i <= 18; $i++) {
 

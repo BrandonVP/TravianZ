@@ -49,7 +49,7 @@ else $building->procBuild($_GET);
 <head>
 	<title><?php echo SERVER_NAME . ' - Village overview &raquo; ' . $village->vname; ?></title>
 	<?php include("Templates/layout/assets.tpl"); ?>
-	<link href="css/fieldmap.css?v=1" rel="stylesheet" type="text/css" />
+	<link href="css/fieldmap.css?v=<?php echo @filemtime(__DIR__ . '/css/fieldmap.css'); ?>" rel="stylesheet" type="text/css" />
 	<script type="text/javascript">
 	window.addEvent('domready', start);
 	</script>

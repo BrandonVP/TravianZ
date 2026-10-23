@@ -25,22 +25,22 @@ div#village_map.fieldmap img.fm-art {
 div#village_map.fieldmap a.fm-field {
     position: absolute;
     z-index: 2;
-    width: 8.2%;
-    height: 9.32%;               /* 8.2% of the width, as % of the 300:264 height */
+    width: 6.56%;
+    height: 7.456%;              /* 6.56% of the width, as % of the 300:264 height (0.8x) */
     transform: translate(-50%, -50%);
     box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 3px solid #8a5a2b;
-    border-width: 0.9cqw;
+    border: 2.4px solid #8a5a2b;
+    border-width: 0.72cqw;
     border-radius: 50%;
     background: #fbf3df;
     color: #2a2118;
     font-family: Georgia, "Times New Roman", serif;
     font-weight: bold;
-    font-size: 17px;
-    font-size: 3.4cqw;
+    font-size: 13.6px;
+    font-size: 2.72cqw;
     line-height: 1;
     text-decoration: none;
     box-shadow: 0 0.4cqw 1.2cqw rgba(43, 29, 18, 0.45);
@@ -65,8 +65,8 @@ div#village_map.fieldmap a.fm-field.fm-active:hover {
     background: #2b1d12;
     border-color: #d9a441;
     color: #f0d9a0;
-    font-size: 12px;
-    font-size: 2.3cqw;
+    font-size: 9.6px;
+    font-size: 1.84cqw;
 }
 
 div#village_map.fieldmap a.fm-center {
