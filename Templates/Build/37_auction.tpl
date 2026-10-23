@@ -503,7 +503,7 @@ $t4LblPrice = defined('HERO_AUC_PRICE_SHORT') ? HERO_AUC_PRICE_SHORT : HERO_AUC_
         <?php
             $t4ItemId  = (int) $t4A['itemid'];
             $t4Tier    = t4AucItemTier($t4ItemId);
-            $t4Ability = heroItemBonusText($t4ItemId);
+            $t4Ability = heroItemBonusText($t4ItemId, (int) ($t4A['stat_value'] ?? 0));
         ?>
         <tr>
             <td class="t4auc-col-item" title="<?php echo htmlspecialchars($t4Ability); ?>">
@@ -554,7 +554,7 @@ $t4LblPrice = defined('HERO_AUC_PRICE_SHORT') ? HERO_AUC_PRICE_SHORT : HERO_AUC_
     <tbody>
     <?php foreach ($t4MyBids as $t4A) { ?>
         <tr>
-            <td class="t4auc-col-item" title="<?php echo htmlspecialchars(heroItemBonusText((int) $t4A['itemid'])); ?>">
+            <td class="t4auc-col-item" title="<?php echo htmlspecialchars(heroItemBonusText((int) $t4A['itemid'], (int) ($t4A['stat_value'] ?? 0))); ?>">
                 <span class="heroT4Item item<?php echo (int) $t4A['itemid']; ?>"></span>
                 <span class="t4auc-itemname">
                     <?php echo $t4A['name']; ?> (<?php echo (int) $t4A['quantity']; ?>x)
@@ -583,7 +583,7 @@ $t4LblPrice = defined('HERO_AUC_PRICE_SHORT') ? HERO_AUC_PRICE_SHORT : HERO_AUC_
     <tbody>
     <?php foreach ($t4MySales as $t4A) { ?>
         <tr>
-            <td class="t4auc-col-item" title="<?php echo htmlspecialchars(heroItemBonusText((int) $t4A['itemid'])); ?>">
+            <td class="t4auc-col-item" title="<?php echo htmlspecialchars(heroItemBonusText((int) $t4A['itemid'], (int) ($t4A['stat_value'] ?? 0))); ?>">
                 <span class="heroT4Item item<?php echo (int) $t4A['itemid']; ?>"></span>
                 <span class="t4auc-itemname">
                     <?php echo $t4A['name']; ?> (<?php echo (int) $t4A['quantity']; ?>x)
@@ -621,7 +621,7 @@ $t4LblPrice = defined('HERO_AUC_PRICE_SHORT') ? HERO_AUC_PRICE_SHORT : HERO_AUC_
                 <span class="t4auc-lbl"><?php echo HERO_AUC_ITEM; ?></span>
                 <select name="rowid">
                 <?php foreach ($t4Sellable as $t4Row) { ?>
-                    <option value="<?php echo (int) $t4Row['id']; ?>" title="<?php echo htmlspecialchars(heroItemBonusText((int) $t4Row['itemid'])); ?>">
+                    <option value="<?php echo (int) $t4Row['id']; ?>" title="<?php echo htmlspecialchars(heroItemBonusText((int) $t4Row['itemid'], (int) $t4Row['stat_value'])); ?>">
                         <?php echo $t4Row['name']; ?><?php if ((int) $t4Row['quantity'] > 1) echo ' (' . (int) $t4Row['quantity'] . 'x)'; ?>
                     </option>
                 <?php } ?>

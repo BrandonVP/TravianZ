@@ -38,6 +38,7 @@ $iron       = (int)($adv['iron']   ?? 0);
 $crop       = (int)($adv['crop']   ?? 0);
 $itemId     = (int)($adv['itemid'] ?? 0);
 $itemQty    = (int)($adv['itemqty'] ?? 0);
+$itemQual   = (int)($adv['itemq'] ?? 0);   // local redesign: quality roll
 // local redesign: site type, story line and healing (hermit's shrine)
 $advType    = (int)($adv['type']   ?? 0);
 $advStory   = isset($adv['story']) ? (int) $adv['story'] : -1;
@@ -119,7 +120,7 @@ $advStoryText = ($advDef && $advStory >= 0 && isset($advDef['story'][$advStory])
         <?php if ($itemId > 0 && $itemQty > 0) { ?>
         <tr>
             <td><?php echo tz_hero_adv('HERO_ADV_ITEM_FOUND', 'Item found'); ?></td>
-            <td style="text-align:right;"><?php echo $itemQty; ?>&times; <?php echo heroItemName($itemId); ?></td>
+            <td style="text-align:right;"><?php echo $itemQty; ?>&times; <?php echo heroItemName($itemId); ?><?php if ($itemQual !== 0) echo ' <small>(' . ($itemQual > 0 ? '+' : '') . $itemQual . '% quality)</small>'; ?></td>
         </tr>
         <?php } ?>
         <?php if ($heal > 0) { ?>

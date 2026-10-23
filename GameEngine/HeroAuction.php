@@ -160,7 +160,7 @@ class HeroAuction
     {
         $uid = (int) $uid; $now = time();
         $stmt = $this->db->prepare(
-            "SELECT id, seller, itemid, quantity, silver_current, bid_max, time_end
+            "SELECT id, seller, itemid, stat_value, quantity, silver_current, bid_max, time_end
                FROM " . TB_PREFIX . "auction
               WHERE bidder = ? AND status = " . self::ST_OPEN . " AND time_end > ?
               ORDER BY time_end ASC"
@@ -182,7 +182,7 @@ class HeroAuction
     {
         $uid = (int) $uid;
         $stmt = $this->db->prepare(
-            "SELECT id, itemid, quantity, silver_start, silver_current, bidder, time_end, status
+            "SELECT id, itemid, stat_value, quantity, silver_start, silver_current, bidder, time_end, status
                FROM " . TB_PREFIX . "auction
               WHERE seller = ? AND status = " . self::ST_OPEN . "
               ORDER BY time_end ASC"
@@ -553,25 +553,42 @@ class HeroAuction
             return 0;
         }
 
-        $ids = array_keys($heroItemCatalog);
+        // local redesign: gear only (consumables are in the Hero's Mansion shop),
+        // tier odds and prices from $heroAdventureConfig, weapons only for hero
+        // units that someone actually has, a quality roll on every piece
+        global $heroAdventureConfig;
+        $weights = $heroAdventureConfig['merchant_tier_weights'] ?? array(1 => 60, 2 => 30, 3 => 10);
+        $prices  = $heroAdventureConfig['merchant_prices'] ?? array(1 => array(50, 100), 2 => array(200, 400), 3 => array(800, 1500));
+        $units = array();
+        $ur = mysqli_query($this->db, "SELECT DISTINCT unit FROM " . TB_PREFIX . "hero");
+        while ($ur && ($u = mysqli_fetch_row($ur))) $units[(int) $u[0]] = true;
+        $pools = array();
+        foreach ($heroItemCatalog as $iid => $def) {
+            if ((int) $def['slot'] === HSLOT_BAG) continue;
+            if (!empty($def['unit']) && !isset($units[(int) $def['unit']])) continue;
+            $pools[(int) $def['tier']][] = (int) $iid;
+        }
         $created = 0;
         for ($i = 0; $i < $need; $i++) {
-            $itemid = (int) $ids[array_rand($ids)];
-            $def    = $heroItemCatalog[$itemid];
-            $isBag  = ((int) $def['slot'] === HSLOT_BAG);
-            $qty    = $isBag ? mt_rand(3, 15) : 1;
-            // Start price: tier-scaled for gear, per-piece for consumables.
-            $start  = $isBag ? $qty * mt_rand(2, 5) : (int) $def['tier'] * mt_rand(40, 80);
-            $end    = $now + self::NPC_DURATION;
-            $slot   = (int) $def['slot'];
+            $roll = mt_rand(1, max(1, array_sum($weights))); $acc = 0; $tier = 1;
+            foreach ($weights as $tw => $w) { $acc += (int) $w; if ($roll <= $acc) { $tier = (int) $tw; break; } }
+            if (empty($pools[$tier])) continue;
+            $itemid  = $pools[$tier][array_rand($pools[$tier])];
+            $def     = $heroItemCatalog[$itemid];
+            $qty     = 1;
+            $quality = heroRollQuality();
+            $range   = $prices[$tier] ?? array(50, 100);
+            $start   = heroItemQuality(mt_rand((int) $range[0], (int) $range[1]), $quality);
+            $end     = $now + self::NPC_DURATION;
+            $slot    = (int) $def['slot'];
 
             $stmt = $this->db->prepare(
                 "INSERT INTO " . TB_PREFIX . "auction
                         (seller, itemid, slot, stat_value, quantity,
                          silver_start, silver_current, bidder, bid_max, created, time_end, status)
-                 VALUES (0, ?, ?, 0, ?, ?, ?, 0, 0, ?, ?, " . self::ST_OPEN . ")"
+                 VALUES (0, ?, ?, ?, ?, ?, ?, 0, 0, ?, ?, " . self::ST_OPEN . ")"
             );
-            $stmt->bind_param('iiiiiii', $itemid, $slot, $qty, $start, $start, $now, $end);
+            $stmt->bind_param('iiiiiiii', $itemid, $slot, $quality, $qty, $start, $start, $now, $end);
             $stmt->execute();
             $stmt->close();
             $created++;

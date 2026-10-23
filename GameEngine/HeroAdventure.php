@@ -394,7 +394,7 @@ class HeroAdventure
             $o = $this->rollOutcome($uid, $hero, $data);
             $exp = $o['exp']; $silver = $o['silver']; $hpLoss = $o['hp']; $heal = $o['heal'];
             $wood = $o['wood']; $clay = $o['clay']; $iron = $o['iron']; $crop = $o['crop'];
-            $itemId = $o['itemId']; $itemQty = $o['itemQty']; $story = $o['story'];
+            $itemId = $o['itemId']; $itemQty = $o['itemQty']; $story = $o['story']; $quality = $o['quality'];
 
             $health    = (float) $hero['health'];
             $newHealth = min(100, $health - $hpLoss + $heal);
@@ -482,7 +482,7 @@ class HeroAdventure
                 $heroItems->addSilver($uid, $silver);
             }
             if ($itemId > 0) {
-                $heroItems->addItem($uid, $itemId, $itemQty);
+                $heroItems->addItem($uid, $itemId, $itemQty, $quality);
             }
 
             /* ---- Return movement carries the resource loot home ---- */
@@ -507,7 +507,7 @@ class HeroAdventure
                      . '&exp=' . $xpGain . '&silver=' . $silver . '&hp=' . $hpLoss
                      . '&wood=' . $wood . '&clay=' . $clay . '&iron=' . $iron . '&crop=' . $crop;
             if ($itemId > 0) {
-                $payload .= '&itemid=' . $itemId . '&itemqty=' . $itemQty;
+                $payload .= '&itemid=' . $itemId . '&itemqty=' . $itemQty . '&itemq=' . (int) $quality;
             }
             $database->addNotice($uid, $toHome, 0, NTYPE_ADVENTURE_REPORT,
                 'Hero returned from an adventure', $payload, $now);
@@ -576,6 +576,13 @@ class HeroAdventure
         global $database, $heroItemCatalog, $heroAdventureConfig;
 
         $tribe = ((int) $uid > 0) ? (int) $database->getUserField((int) $uid, 'tribe', 0) : 0;
+        // local redesign: weapons only for the hero's own unit (a weapon only
+        // works for the unit it was made for - other ones were wasted drops)
+        $heroUnit = 0;
+        if ((int) $uid > 0) {
+            $hr = mysqli_query($this->db, "SELECT unit FROM " . TB_PREFIX . "hero WHERE uid = " . (int) $uid . " AND dead = 0 ORDER BY heroid DESC LIMIT 1");
+            $heroUnit = ($hr && ($hu = mysqli_fetch_row($hr))) ? (int) $hu[0] : 0;
+        }
 
         if (!is_array($weights) || !$weights) {
             $weights = $heroAdventureConfig['equip_tier_weights'];
@@ -591,9 +598,8 @@ class HeroAdventure
             if ((int) $def['slot'] === HSLOT_BAG || (int) $def['tier'] !== $tier) {
                 continue;
             }
-            $itemTribe = heroItemTribe($iid);
-            if ($itemTribe !== 0 && $tribe > 0 && $itemTribe !== $tribe) {
-                continue; // foreign-tribe weapon
+            if (!empty($def['unit']) && (int) $def['unit'] !== $heroUnit) {
+                continue; // weapon for another unit (or no hero yet)
             }
             $pool[] = $iid;
         }
@@ -778,9 +784,11 @@ class HeroAdventure
         // Item drop: gear first (rarer, tier-weighted toward T1), and only
         // if no gear dropped, roll the consumable pool. One item max.
         $itemId = 0; $itemQty = 0;
+        $quality = 0;
         if (mt_rand(1, 100) <= $prof['gear']) {
             $itemId  = $this->rollEquipment($uid, $prof['tiers']);
             $itemQty = ($itemId > 0) ? 1 : 0;
+            $quality = ($itemId > 0) ? heroRollQuality() : 0;
         }
         if ($itemId === 0 && mt_rand(1, 100) <= $prof['cons']) {
             $pool    = $prof['pool'];
@@ -791,7 +799,7 @@ class HeroAdventure
 
         return array('exp' => $exp, 'silver' => $silver, 'hp' => $hpLoss, 'heal' => $heal,
                      'wood' => $wood, 'clay' => $clay, 'iron' => $iron, 'crop' => $crop,
-                     'itemId' => $itemId, 'itemQty' => $itemQty, 'story' => $story);
+                     'itemId' => $itemId, 'itemQty' => $itemQty, 'story' => $story, 'quality' => $quality);
     }
 
     /** Hero row for the offer list (same columns the arrival roll uses). */

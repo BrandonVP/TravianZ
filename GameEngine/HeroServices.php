@@ -50,6 +50,25 @@ class HeroServices
         return (int) TZ_HERO_REROLL_GOLD;
     }
 
+    /**
+     * Sell an unequipped piece of gear to the merchant for a fixed amount of
+     * gold (heroItemSellPrice: by tier and quality), paid to the capital.
+     * Returns the gold paid, 0 if not possible.
+     */
+    public static function sellToMerchant($db, $uid, $rowId)
+    {
+        $items = new HeroItems();
+        foreach ($items->getInventory($uid) as $row) {
+            if ((int) $row['id'] !== (int) $rowId) continue;
+            if ($row['orphan'] || (int) $row['equipped'] === 1 || (int) $row['def']['slot'] === HSLOT_BAG) return 0;
+            $price = heroItemSellPrice((int) $row['itemid'], (int) $row['stat_value']);
+            if ($price <= 0 || !$items->removeItem($uid, (int) $row['id'], 1)) return 0;
+            VillageGold::grant($db, $uid, $price, 'Hero item sold', 'Sold ' . $row['name'] . ' to the merchant');
+            return $price;
+        }
+        return 0;
+    }
+
     /** Valid request: gold is on here, the sitter may spend gold, the form token matches. */
     public static function allowed($village, $session, $token)
     {

@@ -2153,3 +2153,6 @@ div#build.gid37 input.t4auc-bidnum, div#build.gid37 input.t4auc-qty, div#build.g
 div#build.gid37 .t4advRunning { background: #fbf1d6; border: 1px solid #e2c98a; border-radius: 8px; color: #6b4a12; }
 div#build.gid37 .t4advRunning b { color: #5a3d14; }
 .tz-hero .tz-btn.tz-btn-sm, .tz-hero .tz-btn.tz-btn-sm:visited { padding: 3px 11px; font-size: 12px; line-height: 1.4; }
+.tz-hero-ql { display: inline-block; margin-left: 3px; padding: 0 5px; border-radius: 999px; font-size: 10px; font-weight: 700; vertical-align: 1px; }
+.tz-hero-ql.up { background: #dfeccb; color: #2f5220; }
+.tz-hero-ql.down { background: #f3dcd3; color: #8a2f1c; }

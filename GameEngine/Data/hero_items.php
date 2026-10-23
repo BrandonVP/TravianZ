@@ -335,6 +335,9 @@ $heroAdventureConfig = array(
 
     // Tier weights for equipment drops (percent, must sum to 100).
     'equip_tier_weights' => array(1 => 70, 2 => 25, 3 => 5),
+    // local redesign: the auction-house merchant (gear only, priced by tier)
+    'merchant_tier_weights' => array(1 => 60, 2 => 30, 3 => 10),
+    'merchant_prices'       => array(1 => array(50, 100), 2 => array(200, 400), 3 => array(800, 1500)),
 
     /* local redesign: adventures scale with the hero and the trip.
      * XP x (1 + level_xp * level), resources x (1 + level_res * level);
@@ -483,8 +486,35 @@ if (!function_exists('heroItemTribe')) {
  * as HeroItems::scaledBonusValue). Uses HB_TXT_* lang constants with English
  * fallbacks, so it works before/without a translation pass.
  */
+/**
+ * local redesign: item quality. Gear carries a quality roll in hero_items /
+ * auction `stat_value` (-10..+10 = percent on all its numbers; 0 = standard,
+ * which is what every item from before this change has).
+ */
+if (!function_exists('heroItemQuality')) {
+    function heroItemQuality($value, $quality) {
+        $quality = max(-10, min(10, (int) $quality));
+        return $quality === 0 ? (int) $value : (int) round($value * (100 + $quality) / 100);
+    }
+}
+if (!function_exists('heroRollQuality')) {
+    /** Triangular roll -10..+10, most items close to standard. */
+    function heroRollQuality() {
+        return (int) round((mt_rand(0, 1000) - mt_rand(0, 1000)) / 100);
+    }
+}
+if (!function_exists('heroItemSellPrice')) {
+    /** Gold the merchant pays for a piece of gear (0 for consumables). */
+    function heroItemSellPrice($itemid, $quality = 0) {
+        global $heroItemCatalog;
+        if (!isset($heroItemCatalog[$itemid]) || (int) $heroItemCatalog[$itemid]['slot'] === HSLOT_BAG) return 0;
+        $base = array(1 => 15, 2 => 60, 3 => 230);
+        return max(1, heroItemQuality($base[(int) $heroItemCatalog[$itemid]['tier']] ?? 15, $quality));
+    }
+}
+
 if (!function_exists('heroItemBonusText')) {
-    function heroItemBonusText($itemid) {
+    function heroItemBonusText($itemid, $quality = 0) {
         global $heroItemCatalog;
         if (!isset($heroItemCatalog[$itemid])) {
             return '';
@@ -494,12 +524,13 @@ if (!function_exists('heroItemBonusText')) {
         $txt = function ($const, $fallback) {
             return defined($const) ? constant($const) : $fallback;
         };
-        // Effective value on this server (mirrors HeroItems::scaledBonusValue).
-        $scale = function ($value) use ($def) {
+        // Effective value on this server (mirrors HeroItems::scaledBonusValue),
+        // then the item's quality roll
+        $scale = function ($value) use ($def, $quality) {
             if (!array_key_exists('x2_on_speed', $def) || !defined('SPEED') || SPEED < 3) {
-                return (int) $value;
+                return heroItemQuality((int) $value, $quality);
             }
-            return $def['x2_on_speed'] ? (int) $value * 2 : (int) floor($value / 2);
+            return heroItemQuality($def['x2_on_speed'] ? (int) $value * 2 : (int) floor($value / 2), $quality);
         };
 
         $parts = array();
@@ -509,8 +540,9 @@ if (!function_exists('heroItemBonusText')) {
                 case HB_UNIT_BONUS:
                     $u = (int) $value['unit'];
                     $uname = defined('U' . $u) ? constant('U' . $u) : 'unit ' . $u;
-                    $parts[] = '+' . (int) $value['per_unit'] . ' ' . $txt('HB_TXT_UNIT_OFF', 'attack') . ' / +'
-                             . (int) $value['per_unit'] . ' ' . $txt('HB_TXT_UNIT_DEF', 'defense') . ' '
+                    $pu = heroItemQuality((int) $value['per_unit'], $quality);
+                    $parts[] = '+' . $pu . ' ' . $txt('HB_TXT_UNIT_OFF', 'attack') . ' / +'
+                             . $pu . ' ' . $txt('HB_TXT_UNIT_DEF', 'defense') . ' '
                              . $txt('HB_TXT_PER', 'per') . ' ' . $uname;
                     break;
                 case HB_VS_NATARS:      $parts[] = '+' . $scale($value) . '% ' . $txt('HB_TXT_VS_NATARS', 'strength vs Natars'); break;

@@ -79,6 +79,14 @@ if (isset($_POST['t4action'], $_POST['rowid'])) {
                 : HERO_AUC_SELL_FAIL;
             break;
 
+        case 'sellmerchant':
+            // local redesign: fixed-price sale of spare gear, paid to the capital
+            include_once __DIR__ . '/../../GameEngine/HeroServices.php';
+            $t4Paid = HeroServices::sellToMerchant($database, $session->uid, $t4RowId);
+            $t4Msg = $t4Paid > 0 ? 'Sold to the merchant for ' . number_format($t4Paid) . ' gold (paid to your capital).'
+                                 : 'That item could not be sold.';
+            break;
+
         case 'discard':
             // local redesign: throw away an unequipped item (or part of a stack)
             $t4Msg = 'That item could not be discarded.';
@@ -125,11 +133,11 @@ $t4Suggest = function ($row) use ($t4ShopPrices) {
     $t4Row = $t4Equipped[$t4Slot] ?? null; ?>
     <div class="tz-hero-card<?php echo $t4Row ? '' : ' tz-hero-empty'; ?>">
         <div class="tz-hero-slot"><?php echo constant('HERO_SLOT_' . $t4Slot); ?></div>
-        <?php if ($t4Row) { $t4Bonus = heroItemBonusText((int) $t4Row['itemid']); ?>
+        <?php if ($t4Row) { $t4Bonus = heroItemBonusText((int) $t4Row['itemid'], (int) $t4Row['stat_value']); ?>
         <div class="tz-hero-cardtop">
             <span class="heroT4Item item<?php echo (int) $t4Row['itemid']; ?>"></span>
             <div>
-                <div class="tz-hero-iname"><?php echo $t4Row['name']; ?> <span class="tz-hero-tier t<?php echo (int) $t4Row['def']['tier']; ?>">T<?php echo (int) $t4Row['def']['tier']; ?></span></div>
+                <div class="tz-hero-iname"><?php echo $t4Row['name']; ?> <span class="tz-hero-tier t<?php echo (int) $t4Row['def']['tier']; ?>">T<?php echo (int) $t4Row['def']['tier']; ?></span><?php $q = (int) ($t4Row['stat_value'] ?? 0); if ($q !== 0) { ?><span class="tz-hero-ql <?php echo $q > 0 ? 'up' : 'down'; ?>" title="Quality: all bonuses <?php echo $q > 0 ? '+' : ''; ?><?php echo $q; ?>%"><?php echo $q > 0 ? '+' : ''; ?><?php echo $q; ?>%</span><?php } ?></div>
                 <?php if ($t4Bonus !== '') { ?><div class="tz-hero-ibonus"><?php echo htmlspecialchars($t4Bonus, ENT_QUOTES, 'UTF-8'); ?></div><?php } ?>
             </div>
         </div>
@@ -157,7 +165,7 @@ foreach ($t4Inventory as $t4Row) {
     }
     $t4HasUnequipped = true;
     $t4IsBag = ((int) $t4Row['def']['slot'] === HSLOT_BAG);
-    $t4Bonus = heroItemBonusText((int) $t4Row['itemid']);
+    $t4Bonus = heroItemBonusText((int) $t4Row['itemid'], (int) $t4Row['stat_value']);
     $t4Qty   = (int) $t4Row['quantity'];
     $t4Name  = htmlspecialchars(addslashes(strip_tags($t4Row['name'])), ENT_QUOTES, 'UTF-8');
 ?>
@@ -168,7 +176,7 @@ foreach ($t4Inventory as $t4Row) {
             <div>
                 <div class="tz-hero-iname"><?php echo $t4Row['name']; ?>
                     <?php if ($t4IsBag) { ?><span class="tz-hero-qty"><?php echo $t4Qty; ?>x</span>
-                    <?php } else { ?><span class="tz-hero-tier t<?php echo (int) $t4Row['def']['tier']; ?>">T<?php echo (int) $t4Row['def']['tier']; ?></span><?php } ?>
+                    <?php } else { ?><span class="tz-hero-tier t<?php echo (int) $t4Row['def']['tier']; ?>">T<?php echo (int) $t4Row['def']['tier']; ?></span><?php $q = (int) ($t4Row['stat_value'] ?? 0); if ($q !== 0) { ?><span class="tz-hero-ql <?php echo $q > 0 ? 'up' : 'down'; ?>" title="Quality: all bonuses <?php echo $q > 0 ? '+' : ''; ?><?php echo $q; ?>%"><?php echo $q > 0 ? '+' : ''; ?><?php echo $q; ?>%</span><?php } ?><?php } ?>
                 </div>
                 <?php if ($t4Bonus !== '') { ?><div class="tz-hero-ibonus"><?php echo htmlspecialchars($t4Bonus, ENT_QUOTES, 'UTF-8'); ?></div><?php } ?>
             </div>
@@ -189,6 +197,14 @@ foreach ($t4Inventory as $t4Row) {
             </form>
             <?php } ?>
             <button type="button" class="tz-btn tz-btn-sm" onclick="var f=this.parentNode.parentNode.querySelector('.tz-hero-auc');f.style.display=f.style.display==='block'?'none':'block';">Auction</button>
+            <?php if (!$t4IsBag) { $t4Sell = heroItemSellPrice((int) $t4Row['itemid'], (int) $t4Row['stat_value']); ?>
+            <form action="" method="POST" class="tz-hero-inline"
+                  onsubmit="return confirm('Sell <?php echo $t4Name; ?> to the merchant for <?php echo $t4Sell; ?> gold?');">
+                <input type="hidden" name="rowid" value="<?php echo (int) $t4Row['id']; ?>">
+                <input type="hidden" name="t4action" value="sellmerchant">
+                <button type="submit" class="tz-btn tz-btn-sm" title="Fixed price, paid to your capital">Sell &middot; <?php echo $t4Sell; ?></button>
+            </form>
+            <?php } ?>
             <form action="" method="POST" class="tz-hero-inline"
                   onsubmit="return confirm('Discard <?php echo $t4Name; ?>? This cannot be undone.');">
                 <input type="hidden" name="rowid" value="<?php echo (int) $t4Row['id']; ?>">

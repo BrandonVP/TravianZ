@@ -156,6 +156,7 @@ class HeroItems
 
         foreach ($equipped as $row) {
             $def = $row['def'];
+            $quality = (int) ($row['stat_value'] ?? 0);   // local redesign: quality roll
 
             // Spurs count only while a horse is equipped.
             if (!empty($def['requires_horse']) && !$hasHorse) {
@@ -168,11 +169,11 @@ class HeroItems
                     if (!isset($bonuses[HB_UNIT_BONUS][$u])) {
                         $bonuses[HB_UNIT_BONUS][$u] = 0;
                     }
-                    $bonuses[HB_UNIT_BONUS][$u] += (int) $value['per_unit'];
+                    $bonuses[HB_UNIT_BONUS][$u] += heroItemQuality((int) $value['per_unit'], $quality);
                     continue;
                 }
                 if (isset($bonuses[$type])) {
-                    $bonuses[$type] += $this->scaledBonusValue($def, (int) $value);
+                    $bonuses[$type] += heroItemQuality($this->scaledBonusValue($def, (int) $value), $quality);
                 }
             }
         }
