@@ -34,7 +34,7 @@ $ogNav = [
 <body class="og">
 <header class="og-bar">
 	<div class="og-bar-inner">
-		<a class="og-logo" href="index.php"><span class="og-logo-name"><?php echo defined('TZ_TRAVIANZ') ? TZ_TRAVIANZ : 'TravianZ'; ?></span><span class="og-logo-tag"><?php echo defined('TZ_BRAND_TAGLINE') ? TZ_BRAND_TAGLINE : ''; ?></span></a>
+		<a class="og-logo" href="index.php"><?php echo defined('TZ_TRAVIANZ') ? TZ_TRAVIANZ : 'TravianZ'; ?></a>
 		<nav class="og-nav">
 			<?php foreach ($ogNav as $ogKey => $ogItem): ?>
 			<a href="<?php echo $ogItem[0]; ?>" class="<?php echo trim(($ogKey === $ogActive ? 'is-active ' : '') . ($ogKey === 'register' ? 'og-nav-cta' : '')); ?>"><?php echo $ogItem[1]; ?></a>

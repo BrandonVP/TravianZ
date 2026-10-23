@@ -60,7 +60,15 @@ $serverVersion = 'v.11 Full Refactor';
                 <!-- local rebrand: wordmark + credit instead of the TRAVIANGAMES logo -->
                 <div class="tz-foot-brand">
                     <span class="tz-foot-name"><?php echo defined('TZ_TRAVIANZ') ? TZ_TRAVIANZ : 'TravianZ'; ?></span>
-                    <span class="tz-foot-credit">built on <a href="https://github.com/BrandonVP/TravianZ">TravianZ</a> (GPLv3)</span>
+                    <span class="tz-foot-credit"><?php echo defined('TZ_BRAND_TAGLINE') ? TZ_BRAND_TAGLINE : ''; ?></span>
+                </div>
+
+                <div class="tz-foot-links">
+                    <a href="anleitung.php?s=3"><?php echo defined('FAQ') ? FAQ : 'FAQ'; ?></a>
+                    <a href="spielregeln.php"><?php echo defined('SPIELREGELN') ? SPIELREGELN : 'Game Rules'; ?></a>
+                    <a href="agb.php"><?php echo defined('AGB') ? AGB : 'Terms and Conditions'; ?></a>
+                    <a href="impressum.php"><?php echo defined('IMPRINT') ? IMPRINT : 'Imprint'; ?></a>
+                    <a href="https://github.com/BrandonVP/TravianZ">Built on TravianZ (GPLv3)</a>
                 </div>
 
                 <!-- Copyright -->

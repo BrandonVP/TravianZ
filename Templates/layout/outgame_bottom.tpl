@@ -11,8 +11,9 @@
 			<a href="spielregeln.php"><?php echo defined('SPIELREGELN') ? SPIELREGELN : 'Game Rules'; ?></a>
 			<a href="agb.php"><?php echo defined('AGB') ? AGB : 'Terms and Conditions'; ?></a>
 			<a href="impressum.php"><?php echo defined('IMPRINT') ? IMPRINT : 'Imprint'; ?></a>
+			<a href="https://github.com/BrandonVP/TravianZ">Built on TravianZ (GPLv3)</a>
 		</div>
-		<div>&copy; 2010-<?php echo date('Y'); ?> <?php echo defined('TZ_TRAVIANZ') ? TZ_TRAVIANZ : 'TravianZ'; ?> &middot; built on <a href="https://github.com/BrandonVP/TravianZ">TravianZ</a> (GPLv3)</div>
+		<div>&copy; 2010-<?php echo date('Y'); ?> <?php echo defined('TZ_TRAVIANZ') ? TZ_TRAVIANZ : 'TravianZ'; ?> &middot; <?php echo defined('TZ_BRAND_TAGLINE') ? TZ_BRAND_TAGLINE : ''; ?></div>
 	</div>
 </footer>
 </body>
