@@ -266,29 +266,6 @@ if (!function_exists('admin_config_template_path')) {
             $text  = str_replace($ovPlaceholder, $value, $text);
         }
 
-        // Local change: build queue limits and the non-capital field cap are edited by hand in
-        // config.php; keep their current values instead of resetting them on every save.
-        $keepInts = array(
-            '%BASICMAX%'           => array('BASIC_MAX', 1, 1, 20),
-            '%INNERMAX%'           => array('INNER_MAX', 1, 1, 20),
-            '%PLUSMAX%'            => array('PLUS_MAX', 1, 0, 20),
-            '%FIELDMAXNONCAPITAL%' => array('FIELD_MAX_NONCAPITAL', 10, 1, 20),
-        );
-
-        foreach ($keepInts as $ovPlaceholder => [$constant, $default, $min, $max]) {
-            if (strpos($text, $ovPlaceholder) === false) {
-                continue;
-            }
-
-            $value = defined($constant) ? (int) constant($constant) : $default;
-            $text  = str_replace($ovPlaceholder, (string) max($min, min($max, $value)), $text);
-        }
-
-        if (strpos($text, '%ALLOWALLTRIBE%') !== false) {
-            $value = (defined('ALLOW_ALL_TRIBE') && ALLOW_ALL_TRIBE) ? 'true' : 'false';
-            $text  = str_replace('%ALLOWALLTRIBE%', $value, $text);
-        }
-
         // Setarile numerice ale statisticilor, tot ca rezerva.
         $numFallbacks = array(
             '%PLUSSTATSHOURS%' => array('PLUS_STATS_INTERVAL_HOURS', 6),
