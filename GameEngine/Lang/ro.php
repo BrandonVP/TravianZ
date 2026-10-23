@@ -2058,7 +2058,8 @@ tz_def('TZ_TOTAL', 'Total');
 tz_def('TZ_TOWNHALL', 'Primărie');
 tz_def('TZ_TRAVIAN', 'Travian');
 tz_def('TZ_TRAVIANX', 'TravianX');
-tz_def('TZ_TRAVIANZ', 'TravianZ');
+tz_def('TZ_TRAVIANZ', 'Empires of Rome'); // local rebrand (was TravianZ)
+tz_def('TZ_BRAND_TAGLINE', 'a TravianZ spin-off');
 tz_def('TZ_TRAVIAN_GAMES', 'Travian Games');
 tz_def('TZ_UNDERLINE', 'subliniere');
 tz_def('TZ_UNDERLINED', 'subliniat');

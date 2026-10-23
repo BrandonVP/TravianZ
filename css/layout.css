@@ -2085,3 +2085,17 @@ div#content.statistics table tr.hl th.lc, div#content.statistics table tr.hl td.
 div#content.statistics .tzms-wrap { max-width: none; background: var(--tz-panel); border: 1px solid var(--tz-line); border-radius: 12px; }
 div#content.statistics .tzms-title { font-family: "Cinzel", Georgia, serif; color: var(--tz-ink); }
 div#content.statistics .tzms-wrap ~ table#search_navi { display: none; }
+/* ===================== Brand: Empires of Rome (local rebrand) ===================== */
+a.tzbar-logo, a.tzbar-logo:visited { display: inline-flex; flex-direction: column; line-height: 1.05; font-size: 19px; }
+a.tzbar-logo .tzbar-logo-tag { font-family: "Source Sans 3", "Segoe UI", sans-serif; font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #b9a27a; margin-top: 2px; }
+/* footer: text credit instead of the TRAVIANGAMES logo */
+div#footer div#mfoot { background-image: none !important; position: relative; }
+.tz-foot-brand { position: absolute; left: 0; top: 18px; text-align: left; display: flex; flex-direction: column; }
+.tz-foot-name { font-family: "Cinzel", Georgia, serif; font-size: 18px; font-weight: 700; color: var(--tz-gold-2); letter-spacing: .03em; }
+.tz-foot-credit { font-size: 11px; color: #b9a27a; }
+div#footer div#mfoot .tz-foot-credit a, div#footer div#mfoot .tz-foot-credit a:visited { color: var(--tz-gold-2); font-weight: 700; text-decoration: none; }
+@media (max-width: 760px) {
+    a.tzbar-logo, a.tzbar-logo:visited { font-size: 16px; }
+    a.tzbar-logo .tzbar-logo-tag { display: none; }
+    .tz-foot-brand { position: static; align-items: center; margin-top: 10px; }
+}

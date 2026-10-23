@@ -87,7 +87,7 @@ $ogReg = $lang['register'] ?? 'Register';
 		<h1><?php echo defined('TZ_TRAVIANZ') ? TZ_TRAVIANZ : 'TravianZ'; ?></h1>
 		<p>Free browser strategy game - build, trade and conquer</p>
 	</div>
-	<a class="og-hero-sign" href="anmelden.php"><?php echo $ogReg; ?><small><?php echo PLAY_NOW; ?></small></a>
+	<a class="og-hero-sign" href="anmelden.php"><?php echo $ogReg; ?><small>Free to play</small></a>
 </div>
 
 <div class="og-grid">

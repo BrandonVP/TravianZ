@@ -57,13 +57,16 @@ $serverVersion = 'v.11 Full Refactor';
 
             <div style="text-align:center;">
 
-                <br />
+                <!-- local rebrand: wordmark + credit instead of the TRAVIANGAMES logo -->
+                <div class="tz-foot-brand">
+                    <span class="tz-foot-name"><?php echo defined('TZ_TRAVIANZ') ? TZ_TRAVIANZ : 'TravianZ'; ?></span>
+                    <span class="tz-foot-credit">built on <a href="https://github.com/BrandonVP/TravianZ">TravianZ</a> (GPLv3)</span>
+                </div>
 
                 <!-- Copyright -->
                 <div class="copyright">
                     &copy; 2010 - <?php echo (int)$currentYear; ?>
                     <?php echo safeHTML($serverName); ?>
-                    All rights reserved
                 </div>
 
                 <!-- Version -->

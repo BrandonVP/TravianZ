@@ -385,3 +385,7 @@ body.og .og-footer a:hover { color: #fff; }
     .og-hero a.og-hero-sign small, .og-hero-title p { display: none; }
     .og-hero a.og-hero-sign { font-size: 9px; }
 }
+
+/* local rebrand: wordmark with a small tagline */
+body.og a.og-logo, body.og a.og-logo:visited { display: inline-flex; flex-direction: column; line-height: 1.05; }
+body.og a.og-logo .og-logo-tag { font-family: "Source Sans 3", "Segoe UI", sans-serif; font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; opacity: .75; margin-top: 3px; }

@@ -78,7 +78,7 @@ if (!function_exists('tzCoinIcon')) {
 <div id="header" class="tzbar">
 <div class="tzbar-inner">
 
-    <a class="tzbar-logo" href="<?php echo $dorf1Link; ?>"><?php echo TZ_TRAVIANZ; ?></a>
+    <a class="tzbar-logo" href="<?php echo $dorf1Link; ?>"><span class="tzbar-logo-name"><?php echo TZ_TRAVIANZ; ?></span><span class="tzbar-logo-tag"><?php echo defined('TZ_BRAND_TAGLINE') ? TZ_BRAND_TAGLINE : ''; ?></span></a>
 
     <nav class="tzbar-nav" aria-label="Main">
 <?php foreach ($tzNav as $tzNavItem) {

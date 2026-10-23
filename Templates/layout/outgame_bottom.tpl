@@ -12,7 +12,7 @@
 			<a href="agb.php"><?php echo defined('AGB') ? AGB : 'Terms and Conditions'; ?></a>
 			<a href="impressum.php"><?php echo defined('IMPRINT') ? IMPRINT : 'Imprint'; ?></a>
 		</div>
-		<div>&copy; 2010-<?php echo date('Y'); ?> <?php echo defined('TZ_TRAVIANZ') ? TZ_TRAVIANZ : 'TravianZ'; ?></div>
+		<div>&copy; 2010-<?php echo date('Y'); ?> <?php echo defined('TZ_TRAVIANZ') ? TZ_TRAVIANZ : 'TravianZ'; ?> &middot; built on <a href="https://github.com/BrandonVP/TravianZ">TravianZ</a> (GPLv3)</div>
 	</div>
 </footer>
 </body>

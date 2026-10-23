@@ -1860,7 +1860,8 @@ tz_def('TZ_TOTAL', '总计');
 tz_def('TZ_TOWNHALL', '市政厅');
 tz_def('TZ_TRAVIAN', 'Travian');
 tz_def('TZ_TRAVIANX', 'TravianX');
-tz_def('TZ_TRAVIANZ', 'TravianZ');
+tz_def('TZ_TRAVIANZ', 'Empires of Rome'); // local rebrand (was TravianZ)
+tz_def('TZ_BRAND_TAGLINE', 'a TravianZ spin-off');
 tz_def('TZ_TRAVIAN_GAMES', 'Travian Games');
 tz_def('TZ_UNDERLINE', '下划线');
 tz_def('TZ_UNDERLINED', '下划线');
