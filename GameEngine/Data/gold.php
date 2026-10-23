@@ -91,6 +91,20 @@ if (!defined('TZ_HERO_REVIVE_GOLD_BASE'))      define('TZ_HERO_REVIVE_GOLD_BASE'
 if (!defined('TZ_HERO_REVIVE_GOLD_PER_LEVEL')) define('TZ_HERO_REVIVE_GOLD_PER_LEVEL', 10);
 if (!defined('TZ_HERO_HEAL_GOLD_PER_HP'))      define('TZ_HERO_HEAL_GOLD_PER_HP', 6);   // 600 gold from 0 % to 100 %
 if (!defined('TZ_HERO_REROLL_GOLD'))           define('TZ_HERO_REROLL_GOLD', 50);
+// Hero's Mansion shop: consumables for village gold (itemid => price per piece).
+// Ointment replaces the old "Heal now" service (5 gold per 1 % health vs 6).
+// Artwork stays an adventure-only find (ancient ruins).
+if (!defined('TZ_HERO_SHOP')) define('TZ_HERO_SHOP', [
+    200 => 5,    // Ointment: +1 % health
+    201 => 15,   // Scroll: +10 XP
+    206 => 10,   // Small Bandage: heals 25 % of the hero's army
+    207 => 20,   // Bandage: heals 33 % of the hero's army
+    208 => 15,   // Cage: traps 1 oasis animal
+    203 => 15,   // Law Tablet: +1 % loyalty
+    202 => 250,  // Bucket of Water: instant revive
+    204 => 500,  // Book of Wisdom: reset attribute points
+]);
+if (!defined('TZ_HERO_SHOP_MAX')) define('TZ_HERO_SHOP_MAX', 100);   // pieces per purchase
 
 // Building with gold: the Treasury also costs gold (on top of its resources),
 // TZ_TREASURY_GOLD_PER_LEVEL x the level being built (level 20: 500)

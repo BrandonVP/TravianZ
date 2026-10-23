@@ -70,41 +70,34 @@ $renderAddLink = function ($action) use ($hero_info, $id, $heroStatColumns) {
 ?>
 
 <style>
-/* Aspect in stilul T4 (vezi modelul cerut). Clasele au prefix "t4h-" ca sa nu
-   se amestece cu stilurile paginii; tabelul clasic "distribution" nu mai e
-   folosit AICI, dar restul paginilor raman neatinse. */
-.t4h-wrap{max-width:560px;font-size:12px}
-/* colturi drepte si chenar, ca la tabelele originale din joc; fundalul gri si
-   barile verzi raman cum erau */
-.t4h-panel{background:#f2f2f2;border:1px solid #c9c9c9;padding:6px 8px;margin-bottom:8px}
-.t4h-head{display:flex;justify-content:space-between;align-items:center;font-weight:bold;color:#333;margin-bottom:5px}
+/* local redesign: the Hero tab in the theme (cards, gold bars) */
+.t4h-wrap{max-width:none;font-size:13px}
+.t4h-panel{background:var(--tz-panel);border:1px solid var(--tz-line);border-radius:12px;padding:10px 12px;margin-bottom:10px;box-shadow:0 1px 2px rgba(60,40,10,.06)}
+.t4h-head{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--tz-ink);margin-bottom:6px;font-size:14px}
+.t4h-head a{font-family:"Cinzel",Georgia,serif;font-size:17px}
 .t4h-tbl{width:100%;border-collapse:collapse}
-/* forta adusa de echipament, langa valoarea de baza */
-.t4h-item{color:#c87f0a;font-weight:bold;font-size:11px}
-/* regenerarea totala: discreta, dar vizibila */
-.t4h-regen{margin:4px 0 8px 0;padding:4px 8px;border-left:3px solid #7db72f;
-    background:#f4faec;font-size:12px}
-.t4h-regen-detail{color:#777;font-size:11px}
-.t4h-tbl td{padding:3px 5px;vertical-align:middle;background:none;border:1px solid #dcdcdc}
-.t4h-name{width:112px;color:#333}
-.t4h-val{width:78px;color:#000}
+.t4h-item{color:#9a6a12;font-weight:bold;font-size:11px}
+.t4h-regen{margin:4px 0 10px 0;padding:6px 10px;border:1px solid var(--tz-line);border-left:4px solid var(--tz-gold);border-radius:8px;background:#fffdf7;font-size:12px}
+.t4h-regen-detail{color:#8a7a62;font-size:11px}
+.t4h-tbl td{padding:5px 6px;vertical-align:middle;background:none;border:0;border-top:1px solid var(--tz-cream-2)}
+.t4h-tbl tr:first-child td{border-top:0}
+.t4h-name{width:120px;color:#6b5a45;font-weight:600}
+.t4h-val{width:90px;color:var(--tz-ink);font-weight:700}
 .t4h-barcell{width:100%}
-.t4h-bar{background:#fff;border:1px solid #c9c9c9;height:13px;overflow:hidden}
-.t4h-bar i{display:block;height:100%;background:#7db72f}
-.t4h-bar.dark i{background:#3f7a12}
+.t4h-bar{background:var(--tz-cream);border:1px solid var(--tz-line);border-radius:999px;height:10px;overflow:hidden}
+.t4h-bar i{display:block;height:100%;background:linear-gradient(#e3b84a,#b8861f)}
+.t4h-bar.dark i{background:linear-gradient(#7fb24a,#4f7f22)}
 .t4h-up{width:34px;text-align:center;white-space:nowrap}
-/* plusul se pierdea pe fundalul gri - acum e verde inchis si ingrosat */
-.t4h-up a{color:#1f7a1f;font-weight:bold;text-decoration:none;font-size:13px}
-.t4h-up a:hover{color:#0f5c0f;text-decoration:underline}
-.t4h-up .none{color:#b0b0b0}
-.t4h-num{width:38px;text-align:right;font-weight:bold;color:#333}
-/* toate cele 5 optiuni pe acelasi rand, aliniate (inclusiv cerealele) */
-.t4h-res form{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
-.t4h-res label{display:inline-flex;align-items:center;gap:3px;white-space:nowrap;cursor:pointer}
+.t4h-up a{color:#3f7a2a;font-weight:bold;text-decoration:none;font-size:13px}
+.t4h-up a:hover{color:#2b5a1c;text-decoration:underline}
+.t4h-up .none{color:#c2b394}
+.t4h-num{width:38px;text-align:right;font-weight:bold;color:var(--tz-ink)}
+.t4h-res form{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.t4h-res label{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;cursor:pointer}
 .t4h-res .t4h-note{flex-basis:100%;margin-top:2px}
 .t4h-res img.mini{vertical-align:middle;margin:0 2px}
 .t4h-res img.t4h-resall{height:16px;width:auto}
-.t4h-note{color:#777;font-size:11px;margin-top:4px}
+.t4h-note{color:#8a7a62;font-size:11px;margin-top:4px}
 </style>
 
 <div class="t4h-wrap">
@@ -410,7 +403,6 @@ if (isset($_POST['tzhero']) && HeroServices::allowed($village, $session, $_POST[
     $tzOk = false;
     switch ($_POST['tzhero']) {
         case 'revive': $tzOk = HeroServices::finishRevive($database, $session->uid, $village); break;
-        case 'heal':   $tzOk = HeroServices::heal($database, $session->uid, $village); break;
         case 'reroll': $tzOk = HeroServices::reroll($database, $session->uid, $village); break;
     }
     $tzHeroMsg = $tzOk ? 'Done.' : 'That did not work - not enough gold in this village, or nothing to do.';
@@ -422,10 +414,9 @@ if ($tzHeroMsg !== '') {
 }
 ?>
 <p><?php echo YOUR_HERO_HAS; ?> <b><?php echo floor($hero_info['health']); ?></b>% <?php echo OF_HIT_POINTS; ?>.
-<?php if (VillageGold::pays($village) && (float) $hero_info['health'] < 100 && (int) ($hero_info['dead'] ?? 0) === 0) {
-    $tzHp = HeroServices::healPrice($hero_info['health']);
-    echo HeroServices::button('heal', 'Heal now', $tzHp, 'Heal your hero to 100% for ' . $tzHp . ' gold?');
-} ?><br/>
+<?php if ((float) $hero_info['health'] < 100 && (int) ($hero_info['dead'] ?? 0) === 0) { ?>
+    <a class="tz-hero-shoplink" href="build.php?id=<?php echo $id; ?>&amp;t4tab=shop">Buy Ointment to heal &rsaquo;</a>
+<?php } ?><br/>
     <?php echo YOUR_HERO_HAS; ?> <?php echo CONQUERED; ?> <b><?php echo $database->VillageOasisCount($village->wid); ?></b> <a href="build.php?id=<?php echo $id; ?>&land"><?php echo OASES; ?></a>.</p>
 
 <?php

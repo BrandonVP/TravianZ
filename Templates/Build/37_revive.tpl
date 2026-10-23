@@ -136,7 +136,6 @@ if (isset($_POST['tzhero']) && HeroServices::allowed($village, $session, $_POST[
     $tzOk = false;
     switch ($_POST['tzhero']) {
         case 'revive': $tzOk = HeroServices::finishRevive($database, $session->uid, $village); break;
-        case 'heal':   $tzOk = HeroServices::heal($database, $session->uid, $village); break;
         case 'reroll': $tzOk = HeroServices::reroll($database, $session->uid, $village); break;
     }
     $tzHeroMsg = $tzOk ? 'Done.' : 'That did not work - not enough gold in this village, or nothing to do.';

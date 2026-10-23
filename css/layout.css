@@ -2102,3 +2102,54 @@ div#footer div#mfoot .tz-foot-credit a, div#footer div#mfoot .tz-foot-credit a:v
 .tz-foot-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin: 14px 0 2px; font-size: 12px; }
 div#footer div#mfoot .tz-foot-links a, div#footer div#mfoot .tz-foot-links a:visited { color: #d9c49a; text-decoration: none; font-weight: 600; }
 div#footer div#mfoot .tz-foot-links a:hover { color: var(--tz-gold-2); }
+/* ===================== Hero's Mansion (local redesign) ===================== */
+.tz-hero-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 6px 0 12px; }
+.tz-hero-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tz-hero-tabs a { padding: 4px 13px; border: 1px solid var(--tz-line); border-radius: 999px; background: var(--tz-panel); font-size: 13px; font-weight: 700; color: #6b4a1f; text-decoration: none; }
+.tz-hero-tabs a:hover { border-color: var(--tz-gold); background: #fbf3df; }
+.tz-hero-tabs a.on { background: var(--tz-wood); border-color: var(--tz-wood); color: var(--tz-gold-2); }
+.tz-hero-gold { font-size: 12px; color: #6b5a45; padding: 3px 10px; border: 1px solid var(--tz-line); border-radius: 999px; background: var(--tz-cream); }
+.tz-hero-gold b { color: var(--tz-ink); }
+.tz-hero-flash { margin: 0 0 10px; padding: 7px 10px; border: 1px solid #b9cf8f; border-radius: 8px; background: #eef5dd; color: #2f5220; font-size: 12px; font-weight: 600; }
+.tz-hero-flash.err { border-color: #d9a99a; background: #f8e3dc; color: #8a2f1c; }
+.tz-hero-flash.warn { border-color: #e2c98a; background: #fbf1d6; color: #6b4a12; }
+.tz-hero-intro { margin: 0 0 10px; font-size: 12px; color: #6b5a45; }
+h3.tz-hero-h { margin: 12px 0 8px; font-family: "Cinzel", Georgia, serif; font-size: 15px; color: var(--tz-ink); }
+.tz-hero-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)); gap: 8px; }
+.tz-hero-card { position: relative; border: 1px solid var(--tz-line); border-radius: 10px; background: var(--tz-panel); padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 1px 2px rgba(60, 40, 10, .06); }
+.tz-hero-card.tz-hero-empty { background: #fbf6ea; border-style: dashed; }
+.tz-hero-slot { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #8a7a62; }
+.tz-hero-cardtop { display: flex; gap: 8px; align-items: flex-start; }
+.tz-hero-cardtop .heroT4Item { flex: none; }
+.tz-hero-iname { font-weight: 700; font-size: 13px; color: var(--tz-ink); line-height: 1.25; }
+.tz-hero-ibonus { font-size: 11px; color: #6b5a45; margin-top: 2px; line-height: 1.35; }
+.tz-hero-owned { font-size: 11px; color: #3f7a2a; font-weight: 600; margin-top: 2px; }
+.tz-hero-none { font-size: 12px; color: #a59576; padding: 6px 0; }
+.tz-hero-tier, .tz-hero-qty { display: inline-block; margin-left: 4px; padding: 0 6px; border-radius: 999px; font-size: 10px; font-weight: 700; vertical-align: 1px; }
+.tz-hero-tier.t1 { background: #ece4d2; color: #6b5a45; }
+.tz-hero-tier.t2 { background: #d6e2f0; color: #24476b; }
+.tz-hero-tier.t3 { background: linear-gradient(#f1cf5a, #c99a1f); color: #4a3405; }
+.tz-hero-qty { background: #dfeccb; color: #2f5220; }
+.tz-hero-actions { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: auto; }
+.tz-hero-inline { display: inline-flex; gap: 4px; align-items: center; margin: 0; }
+input.tz-hero-num { width: 54px; padding: 3px 6px; border: 1px solid var(--tz-line); border-radius: 6px; background: #fffdf7; font: inherit; font-size: 12px; }
+input.tz-hero-num.tz-hero-numw { width: 72px; }
+.tz-btn.tz-hero-danger { color: #8a2f1c; }
+.tz-btn.tz-hero-danger:hover { background: #b3261e; color: #fff; border-color: #8f1e18; }
+form.tz-hero-auc { display: none; margin: 2px 0 0; padding: 8px; border: 1px solid var(--tz-line); border-radius: 8px; background: #fffdf7; font-size: 12px; }
+form.tz-hero-auc label { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 5px; color: #6b5a45; font-weight: 600; }
+form.tz-hero-auc select { padding: 2px 4px; border: 1px solid var(--tz-line); border-radius: 6px; background: #fffdf7; }
+.tz-hero-hint { display: block; margin-top: 5px; font-size: 10px; color: #8a7a62; }
+.tz-shop-form { display: flex; align-items: center; gap: 6px; margin: auto 0 0; flex-wrap: wrap; }
+.tz-shop-price { font-weight: 700; font-size: 13px; color: var(--tz-ink); margin-right: auto; display: inline-flex; align-items: center; gap: 3px; }
+.tz-shop-price small { font-weight: 400; color: #8a7a62; }
+a.tz-hero-shoplink { margin-left: 8px; font-size: 12px; font-weight: 700; }
+/* auctions / adventures / oasis tables: theme colours over their old grey/green styles */
+div#build.gid37 table tr.t4cols th { background: var(--tz-cream); color: var(--tz-ink); border-bottom: 1px solid var(--tz-line); }
+div#build.gid37 .t4btn, div#build.gid37 .t4auc-btn { background: #fbf3df; color: #5a3d14; border: 1px solid #c9a35a; border-radius: 999px; padding: 3px 12px; font-weight: 700; }
+div#build.gid37 .t4btn:hover, div#build.gid37 .t4auc-btn:hover { background: #f0d9a0; border-color: #a8812e; }
+div#build.gid37 .t4auc-tier, div#build.gid37 .t4badge { background: var(--tz-cream); color: #5a4128; border: 1px solid var(--tz-line); border-radius: 999px; }
+div#build.gid37 input.t4auc-bidnum, div#build.gid37 input.t4auc-qty, div#build.gid37 input.t4auc-prc, div#build.gid37 .t4auc-sell select { border: 1px solid var(--tz-line); border-radius: 6px; background: #fffdf7; padding: 2px 6px; }
+div#build.gid37 .t4advRunning { background: #fbf1d6; border: 1px solid #e2c98a; border-radius: 8px; color: #6b4a12; }
+div#build.gid37 .t4advRunning b { color: #5a3d14; }
+.tz-hero .tz-btn.tz-btn-sm, .tz-hero .tz-btn.tz-btn-sm:visited { padding: 3px 11px; font-size: 12px; line-height: 1.4; }

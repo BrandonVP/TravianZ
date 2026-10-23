@@ -68,6 +68,17 @@ if (isset($_POST['t4action'], $_POST['rowid'])) {
             }
             break;
 
+        case 'auction':
+            // local redesign: list on the auction house without leaving the inventory
+            $t4AucId = (new HeroAuction())->createAuction(
+                $session->uid, $t4RowId, (int) ($_POST['qty'] ?? 1),
+                (int) ($_POST['price'] ?? 0), (int) ($_POST['duration'] ?? 0)
+            );
+            $t4Msg = ($t4AucId > 0)
+                ? 'Listed on the auction house. See it under <a href="build.php?id=' . (int) $id . '&amp;t4tab=auction">Auctions</a>.'
+                : HERO_AUC_SELL_FAIL;
+            break;
+
         case 'discard':
             // local redesign: throw away an unequipped item (or part of a stack)
             $t4Msg = 'That item could not be discarded.';
@@ -88,257 +99,121 @@ $t4Inventory = $t4HeroItems->getInventory($session->uid);
 $t4Equipped  = $t4HeroItems->getEquipped($session->uid);
 ?>
 
+<?php
+// local redesign: suggested auction start price (gear by tier, consumables by shop price)
+$t4ShopPrices = defined('TZ_HERO_SHOP') ? TZ_HERO_SHOP : array();
+$t4Suggest = function ($row) use ($t4ShopPrices) {
+    if ((int) $row['def']['slot'] === HSLOT_BAG) {
+        $each = isset($t4ShopPrices[(int) $row['itemid']]) ? (int) ceil($t4ShopPrices[(int) $row['itemid']] * 0.6) : 5;
+        return max(1, $each);
+    }
+    $byTier = array(1 => 30, 2 => 100, 3 => 300);
+    return $byTier[(int) $row['def']['tier']] ?? 30;
+};
+?>
+<div class="tz-hero">
 <?php if ($t4AwayText !== '') { ?>
-    <p class="message" style="font-weight:bold;color:#8a6d3b;background:#fcf8e3;border:1px solid #faebcc;padding:6px 9px;border-radius:4px;">
-        <?php echo $t4AwayText; ?>
-    </p>
+    <p class="tz-hero-flash warn"><?php echo $t4AwayText; ?></p>
 <?php } ?>
 <?php if ($t4Msg !== '') { ?>
-    <p class="message" style="font-weight:bold;"><?php echo $t4Msg; ?></p>
+    <p class="tz-hero-flash"><?php echo $t4Msg; ?></p>
 <?php } ?>
 
-<style type="text/css">
-/* ---------------------------------------------------------------------------
-   Acelasi limbaj vizual ca pagina de licitatii (37_auction.tpl): badge de tier,
-   bonus palid dedesubt, butoane verzi si latimi stranse. Toate clasele au
-   prefixul "t4items" / "t4it-" ca sa nu atinga nimic altceva din interfata.
-   Fara CSS grid si fara "gap": jocul e deschis si din browsere vechi.
-   --------------------------------------------------------------------------- */
+<h3 class="tz-hero-h"><?php echo HERO_ITEMS_EQUIPPED; ?></h3>
+<div class="tz-hero-grid">
+<?php for ($t4Slot = 1; $t4Slot <= 6; $t4Slot++) {
+    $t4Row = $t4Equipped[$t4Slot] ?? null; ?>
+    <div class="tz-hero-card<?php echo $t4Row ? '' : ' tz-hero-empty'; ?>">
+        <div class="tz-hero-slot"><?php echo constant('HERO_SLOT_' . $t4Slot); ?></div>
+        <?php if ($t4Row) { $t4Bonus = heroItemBonusText((int) $t4Row['itemid']); ?>
+        <div class="tz-hero-cardtop">
+            <span class="heroT4Item item<?php echo (int) $t4Row['itemid']; ?>"></span>
+            <div>
+                <div class="tz-hero-iname"><?php echo $t4Row['name']; ?> <span class="tz-hero-tier t<?php echo (int) $t4Row['def']['tier']; ?>">T<?php echo (int) $t4Row['def']['tier']; ?></span></div>
+                <?php if ($t4Bonus !== '') { ?><div class="tz-hero-ibonus"><?php echo htmlspecialchars($t4Bonus, ENT_QUOTES, 'UTF-8'); ?></div><?php } ?>
+            </div>
+        </div>
+        <?php if ($t4AwayReason === '') { ?>
+        <form action="" method="POST" class="tz-hero-actions">
+            <input type="hidden" name="t4action" value="unequip">
+            <input type="hidden" name="rowid" value="<?php echo (int) $t4Row['id']; ?>">
+            <button type="submit" class="tz-btn tz-btn-sm"><?php echo HERO_UNEQUIP; ?></button>
+        </form>
+        <?php } ?>
+        <?php } else { ?>
+        <div class="tz-hero-none">Nothing equipped</div>
+        <?php } ?>
+    </div>
+<?php } ?>
+</div>
 
-/* Cap de tabel pentru coloane: fara el nu se intelegea ce e fiecare valoare. */
-table.t4items tr.t4cols th {
-    background: #e8e8ea;
-    color: #444;
-    font-size: 11px;
-    font-weight: bold;
-    text-align: center;
-    padding: 3px 5px;
-    border-bottom: 1px solid #d0d0d4;
-}
-
-table.t4items td { padding: 5px 4px; vertical-align: middle; }
-
-/* Latimile, intr-un singur loc. Stranse ca sa incapa in zona de continut
-   (~505px) fara scroll orizontal: 78+40+150+96 = 364px fixi, restul ramane
-   coloanei cu numele. Inainte, 110+46+230+170 = 556px depaseau singuri
-   latimea paginii, iar numele se rupeau pe trei randuri. */
-table.t4items th.c-type { width: 78px; }
-table.t4items th.c-img  { width: 40px; }
-table.t4items th.c-name { width: auto; }
-table.t4items th.c-tier { width: 150px; }
-table.t4items th.c-act  { width: 96px; }
-
-/* Slotul (Coif, Arma, ...) */
-table.t4items td.t4slot { text-align: left; font-size: 11px; }
-
-/* Imaginea are coloana proprie, centrata. */
-table.t4items td.t4img { text-align: center; vertical-align: middle; }
-
-/* Numele obiectului */
-table.t4items td.t4name { text-align: left; font-size: 11px; }
-
-/* Tier + bonus, ca in tabelul de licitatii */
-table.t4items td.t4tier { text-align: center; white-space: normal; }
-
-table.t4items .t4badge {
-    display: inline-block;
-    min-width: 30px;
-    padding: 1px 6px;
-    font-size: 11px;
-    font-weight: bold;
-    color: #5c5850;
-    background: #eceae5;
-    border: 1px solid #cfccc5;
-    border-radius: 3px;
-}
-
-/* consumabilele n-au tier, arata cantitatea - alt accent, ca sa se distinga */
-table.t4items .t4badge.t4qty { color: #3f5f22; background: #e4f0d0; border-color: #a3bf7c; }
-
-/* Bonusul, discret, sub badge. */
-table.t4items .t4bonus {
-    display: block;
-    margin-top: 3px;
-    color: #9b978f;
-    font-size: 10px;
-    line-height: 1.35;
-    font-weight: normal;
-}
-
-/* Slot gol */
-table.t4items td.t4empty { color: #a5a19a; font-style: normal; }
-
-/* --- Actiuni --- */
-table.t4items td.t4act { text-align: center; }
-table.t4items .t4form { margin: 0; text-align: center; }
-
-table.t4items .t4btn {
-    display: inline-block;
-    padding: 4px 12px;
-    font-size: 11px;
-    font-weight: bold;
-    color: #3f5f22;
-    cursor: pointer;
-    white-space: nowrap;
-    background: #e4f0d0;
-    background: linear-gradient(#fbfdf6, #dcebc6);
-    border: 1px solid #a3bf7c;
-    border-radius: 4px;
-}
-
-table.t4items .t4btn:hover {
-    background: #d6e8bd;
-    background: linear-gradient(#ffffff, #cfe4b0);
-    border-color: #8bab61;
-}
-
-table.t4items .t4btn:active {
-    background: linear-gradient(#d5e6b8, #e9f3da);
-    border-color: #8bab61;
-}
-
-/* butonul de dezechipare: neutru, nu verde - e o actiune "de retragere" */
-table.t4items .t4btn.t4btn-off {
-    color: #6b6862;
-    background: linear-gradient(#fdfdfc, #e8e6e1);
-    border-color: #c3c0b9;
-}
-
-table.t4items .t4btn.t4btn-off:hover {
-    background: linear-gradient(#ffffff, #dedbd4);
-    border-color: #aeaba4;
-}
-
-/* casuta de cantitate stivuita peste buton, ca la licitatii */
-table.t4items .t4qtynum {
-    display: block;
-    width: 52px;
-    margin: 0 auto 4px auto;
-    padding: 2px 4px;
-    text-align: right;
-    border: 1px solid #b9b6b0;
-    border-radius: 3px;
-    font-size: 11px;
-}
-
-table.t4items .t4none { color: #a5a19a; }
-
-/* local redesign: discard button, quiet until hovered */
-.t4discard { margin-top: 4px; }
-.t4btn.t4btn-discard { background: #f6efe6; color: #8a3b2b; border-color: #d8b9a8; }
-.t4btn.t4btn-discard:hover { background: #b3261e; color: #fff; border-color: #8f1e18; }
-</style>
-<table id="distribution" class="t4items" cellpadding="1" cellspacing="1">
-    <thead>
-        <tr><th colspan="5"><?php echo HERO_ITEMS_EQUIPPED; ?></th></tr>
-        <tr class="t4cols">
-            <th class="c-type"><?php echo HERO_COL_TYPE; ?></th>
-            <th class="c-img"><?php echo HERO_COL_IMAGE; ?></th>
-            <th class="c-name"><?php echo HERO_COL_NAME; ?></th>
-            <th class="c-tier"><?php echo HERO_COL_TIER; ?></th>
-            <th class="c-act"><?php echo HERO_COL_ACTION; ?></th>
-        </tr>
-    </thead>
-    <tbody>
-    <?php for ($t4Slot = 1; $t4Slot <= 6; $t4Slot++) { ?>
-        <tr>
-            <td class="t4slot"><b><?php echo constant('HERO_SLOT_' . $t4Slot); ?></b></td>
-            <?php if (isset($t4Equipped[$t4Slot])) {
-                $t4Row   = $t4Equipped[$t4Slot];
-                $t4Bonus = heroItemBonusText((int) $t4Row['itemid']);
-            ?>
-            <td class="t4img"><span class="heroT4Item item<?php echo (int) $t4Row['itemid']; ?>"></span></td>
-            <td class="t4name"><?php echo $t4Row['name']; ?></td>
-            <td class="t4tier">
-                <span class="t4badge"><?php echo HERO_COL_TIER; ?> <?php echo (int) $t4Row['def']['tier']; ?></span>
-                <?php if ($t4Bonus !== '') { ?>
-                    <span class="t4bonus"><?php echo htmlspecialchars($t4Bonus, ENT_QUOTES, 'UTF-8'); ?></span>
-                <?php } ?>
-            </td>
-            <td class="t4act">
-                <?php if ($t4AwayReason === '') { ?>
-                <form action="" method="POST" class="t4form">
-                    <input type="hidden" name="t4action" value="unequip">
-                    <input type="hidden" name="rowid" value="<?php echo (int) $t4Row['id']; ?>">
-                    <button type="submit" class="t4btn t4btn-off"><?php echo HERO_UNEQUIP; ?></button>
-                </form>
-                <?php } else { ?>
-                <span class="t4none">&mdash;</span>
-                <?php } ?>
-            </td>
-            <?php } else { ?>
-            <td colspan="4" class="t4empty">&mdash;</td>
+<h3 class="tz-hero-h"><?php echo HERO_ITEMS_BAG; ?></h3>
+<div class="tz-hero-grid">
+<?php
+$t4HasUnequipped = false;
+foreach ($t4Inventory as $t4Row) {
+    if ($t4Row['equipped'] == 1 || $t4Row['orphan']) {
+        continue;
+    }
+    $t4HasUnequipped = true;
+    $t4IsBag = ((int) $t4Row['def']['slot'] === HSLOT_BAG);
+    $t4Bonus = heroItemBonusText((int) $t4Row['itemid']);
+    $t4Qty   = (int) $t4Row['quantity'];
+    $t4Name  = htmlspecialchars(addslashes(strip_tags($t4Row['name'])), ENT_QUOTES, 'UTF-8');
+?>
+    <div class="tz-hero-card">
+        <div class="tz-hero-slot"><?php echo constant('HERO_SLOT_' . (int) $t4Row['def']['slot']); ?></div>
+        <div class="tz-hero-cardtop">
+            <span class="heroT4Item item<?php echo (int) $t4Row['itemid']; ?>"></span>
+            <div>
+                <div class="tz-hero-iname"><?php echo $t4Row['name']; ?>
+                    <?php if ($t4IsBag) { ?><span class="tz-hero-qty"><?php echo $t4Qty; ?>x</span>
+                    <?php } else { ?><span class="tz-hero-tier t<?php echo (int) $t4Row['def']['tier']; ?>">T<?php echo (int) $t4Row['def']['tier']; ?></span><?php } ?>
+                </div>
+                <?php if ($t4Bonus !== '') { ?><div class="tz-hero-ibonus"><?php echo htmlspecialchars($t4Bonus, ENT_QUOTES, 'UTF-8'); ?></div><?php } ?>
+            </div>
+        </div>
+        <div class="tz-hero-actions">
+            <?php if ($t4IsBag) { ?>
+            <form action="" method="POST" class="tz-hero-inline">
+                <input type="hidden" name="rowid" value="<?php echo (int) $t4Row['id']; ?>">
+                <input type="hidden" name="t4action" value="useitem">
+                <input type="number" name="qty" value="1" min="1" max="<?php echo $t4Qty; ?>" class="tz-hero-num" title="How many to use">
+                <button type="submit" class="tz-btn tz-btn-sm"><?php echo HERO_USE_ITEM; ?></button>
+            </form>
+            <?php } elseif ($t4AwayReason === '') { ?>
+            <form action="" method="POST" class="tz-hero-inline">
+                <input type="hidden" name="t4action" value="equip">
+                <input type="hidden" name="rowid" value="<?php echo (int) $t4Row['id']; ?>">
+                <button type="submit" class="tz-btn tz-btn-sm"><?php echo HERO_EQUIP; ?></button>
+            </form>
             <?php } ?>
-        </tr>
-    <?php } ?>
-    </tbody>
-</table>
-
-<table id="distribution" class="t4items" cellpadding="1" cellspacing="1" style="margin-top:10px;">
-    <thead>
-        <tr><th colspan="5"><?php echo HERO_ITEMS_BAG; ?></th></tr>
-        <tr class="t4cols">
-            <th class="c-type"><?php echo HERO_COL_TYPE; ?></th>
-            <th class="c-img"><?php echo HERO_COL_IMAGE; ?></th>
-            <th class="c-name"><?php echo HERO_COL_NAME; ?></th>
-            <th class="c-tier"><?php echo HERO_COL_TIER; ?></th>
-            <th class="c-act"><?php echo HERO_COL_ACTION; ?></th>
-        </tr>
-    </thead>
-    <tbody>
-    <?php
-    $t4HasUnequipped = false;
-    foreach ($t4Inventory as $t4Row) {
-        if ($t4Row['equipped'] == 1 || $t4Row['orphan']) {
-            continue;
-        }
-        $t4HasUnequipped = true;
-        $t4IsBag = ((int) $t4Row['def']['slot'] === HSLOT_BAG);
-    ?>
-        <?php $t4Bonus = heroItemBonusText((int) $t4Row['itemid']); ?>
-        <tr>
-            <td class="t4slot"><b><?php echo constant('HERO_SLOT_' . (int) $t4Row['def']['slot']); ?></b></td>
-            <td class="t4img"><span class="heroT4Item item<?php echo (int) $t4Row['itemid']; ?>"></span></td>
-            <td class="t4name"><?php echo $t4Row['name']; ?></td>
-            <td class="t4tier">
-                <?php if ($t4IsBag) { ?>
-                    <?php // consumabilele n-au tier: afisam cate bucati sunt ?>
-                    <span class="t4badge t4qty"><?php echo (int) $t4Row['quantity']; ?>x</span>
-                <?php } else { ?>
-                    <span class="t4badge"><?php echo HERO_COL_TIER; ?> <?php echo (int) $t4Row['def']['tier']; ?></span>
-                <?php } ?>
-                <?php if ($t4Bonus !== '') { ?>
-                    <span class="t4bonus"><?php echo htmlspecialchars($t4Bonus, ENT_QUOTES, 'UTF-8'); ?></span>
-                <?php } ?>
-            </td>
-            <td class="t4act">
-                <form action="" method="POST" class="t4form">
-                    <input type="hidden" name="rowid" value="<?php echo (int) $t4Row['id']; ?>">
-                    <?php if ($t4IsBag) { ?>
-                        <input type="hidden" name="t4action" value="useitem">
-                        <input type="text" name="qty" value="1" class="t4qtynum">
-                        <button type="submit" class="t4btn"><?php echo HERO_USE_ITEM; ?></button>
-                    <?php } elseif ($t4AwayReason === '') { ?>
-                        <input type="hidden" name="t4action" value="equip">
-                        <button type="submit" class="t4btn"><?php echo HERO_EQUIP; ?></button>
-                    <?php } else { ?>
-                        <span class="t4none">&mdash;</span>
-                    <?php } ?>
-                </form>
-                <form action="" method="POST" class="t4form t4discard"
-                      onsubmit="return confirm('Discard <?php echo htmlspecialchars(addslashes(strip_tags($t4Row['name'])), ENT_QUOTES, 'UTF-8'); ?>? This cannot be undone.');">
-                    <input type="hidden" name="rowid" value="<?php echo (int) $t4Row['id']; ?>">
-                    <input type="hidden" name="t4action" value="discard">
-                    <?php if ($t4IsBag && (int) $t4Row['quantity'] > 1) { ?>
-                        <input type="text" name="qty" value="<?php echo (int) $t4Row['quantity']; ?>" class="t4qtynum" title="How many to discard">
-                    <?php } ?>
-                    <button type="submit" class="t4btn t4btn-discard">Discard</button>
-                </form>
-            </td>
-        </tr>
-    <?php } ?>
-    <?php if (!$t4HasUnequipped) { ?>
-        <tr><td colspan="5" class="t4empty"><?php echo HERO_ITEMS_EMPTY; ?></td></tr>
-    <?php } ?>
-    </tbody>
-</table>
+            <button type="button" class="tz-btn tz-btn-sm" onclick="var f=this.parentNode.parentNode.querySelector('.tz-hero-auc');f.style.display=f.style.display==='block'?'none':'block';">Auction</button>
+            <form action="" method="POST" class="tz-hero-inline"
+                  onsubmit="return confirm('Discard <?php echo $t4Name; ?>? This cannot be undone.');">
+                <input type="hidden" name="rowid" value="<?php echo (int) $t4Row['id']; ?>">
+                <input type="hidden" name="t4action" value="discard">
+                <?php if ($t4IsBag && $t4Qty > 1) { ?><input type="hidden" name="qty" value="<?php echo $t4Qty; ?>"><?php } ?>
+                <button type="submit" class="tz-btn tz-btn-sm tz-hero-danger">Discard</button>
+            </form>
+        </div>
+        <form action="" method="POST" class="tz-hero-auc">
+            <input type="hidden" name="t4action" value="auction">
+            <input type="hidden" name="rowid" value="<?php echo (int) $t4Row['id']; ?>">
+            <?php if ($t4IsBag) { ?>
+            <label>Amount <input type="number" name="qty" value="<?php echo $t4Qty; ?>" min="1" max="<?php echo $t4Qty; ?>" class="tz-hero-num"></label>
+            <?php } else { ?>
+            <input type="hidden" name="qty" value="1">
+            <?php } ?>
+            <label>Start price <input type="number" name="price" value="<?php echo $t4Suggest($t4Row) * ($t4IsBag ? $t4Qty : 1); ?>" min="1" class="tz-hero-num tz-hero-numw"></label>
+            <label>Runs <select name="duration"><option value="14400">4h</option><option value="28800" selected>8h</option><option value="86400">24h</option></select></label>
+            <button type="submit" class="tz-btn tz-btn-sm">List item</button>
+            <span class="tz-hero-hint">Sales pay out to your capital, minus a 10% fee.</span>
+        </form>
+    </div>
+<?php } ?>
+<?php if (!$t4HasUnequipped) { ?>
+    <div class="tz-hero-card tz-hero-empty"><div class="tz-hero-none"><?php echo HERO_ITEMS_EMPTY; ?></div></div>
+<?php } ?>
+</div>
+</div>

@@ -2,7 +2,7 @@
 /**
  * Hero services (local redesign): spend village gold in the Hero's Mansion.
  *   - finish a revive now (price by hero level)
- *   - heal to full health (price per missing health %)
+ *   - buy consumables in the shop (TZ_HERO_SHOP; Ointment replaced "Heal now")
  *   - new adventure offers (replace the current ones)
  * Prices: GameEngine/Data/gold.php (TZ_HERO_*). Paid by the village you are in.
  */
@@ -16,10 +16,32 @@ class HeroServices
         return (int) TZ_HERO_REVIVE_GOLD_BASE + (int) $level * (int) TZ_HERO_REVIVE_GOLD_PER_LEVEL;
     }
 
-    /** Gold to heal the hero from $health % to 100 %. */
-    public static function healPrice($health)
+    /** Shop price list: itemid => gold per piece. */
+    public static function shop()
     {
-        return (int) ceil(max(0, 100 - (float) $health) * TZ_HERO_HEAL_GOLD_PER_HP);
+        return defined('TZ_HERO_SHOP') ? TZ_HERO_SHOP : array();
+    }
+
+    /**
+     * Buy $qty of a shop consumable with this village's gold. Returns the
+     * number bought (0 = not possible: unknown item, bad amount, not enough gold).
+     */
+    public static function buy($db, $uid, $village, $itemid, $qty)
+    {
+        $shop = self::shop();
+        $itemid = (int) $itemid;
+        $qty = (int) $qty;
+        if (!isset($shop[$itemid]) || $qty < 1 || $qty > (int) TZ_HERO_SHOP_MAX) return 0;
+        $price = (int) $shop[$itemid] * $qty;
+        if (!$db->takeVillageGold($village->wid, $price)) return 0;
+        $items = new HeroItems();
+        if (!$items->addItem($uid, $itemid, $qty)) {
+            // could not store it: give the gold back
+            $db->addVillageGold($village->wid, $price, VillageGold::capOf($village));
+            return 0;
+        }
+        self::log($db, $village, $uid, 'Hero shop: ' . $qty . 'x ' . (function_exists('heroItemName') ? heroItemName($itemid) : '#' . $itemid), $price);
+        return $qty;
     }
 
     /** Gold for a new set of adventure offers. */
@@ -58,18 +80,6 @@ class HeroServices
         if (!$db->takeVillageGold($village->wid, $price)) return false;
         mysqli_query($db->dblink, "UPDATE " . TB_PREFIX . "hero SET trainingtime = UNIX_TIMESTAMP() - 1 WHERE heroid = " . (int) $h['heroid'] . " AND inrevive = 1");
         self::log($db, $village, $uid, 'Finish hero revive', $price);
-        return true;
-    }
-
-    /** Living hero back to 100 % health. */
-    public static function heal($db, $uid, $village)
-    {
-        $h = self::hero($db, $uid);
-        if (!$h || (int) $h['dead'] !== 0 || (float) $h['health'] >= 100) return false;
-        $price = self::healPrice($h['health']);
-        if ($price <= 0 || !$db->takeVillageGold($village->wid, $price)) return false;
-        mysqli_query($db->dblink, "UPDATE " . TB_PREFIX . "hero SET health = 100 WHERE heroid = " . (int) $h['heroid'] . " AND dead = 0");
-        self::log($db, $village, $uid, 'Heal hero', $price);
         return true;
     }
 
