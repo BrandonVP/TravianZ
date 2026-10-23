@@ -222,7 +222,7 @@ if(isset($id)){
   <div class="vhead"><?php echo ADM_BUILDINGS; ?></div>
   <table class="vtable" style="text-align:center">
     <tr style="background:#f8fafc;font-size:11px;color:#64748b"><td><?php echo ADM_ID; ?></td><td><?php echo ADM_GID; ?></td><td style="text-align:left"><?php echo ADM_NAME; ?></td><td><?php echo ADM_LVL; ?></td><td><?php echo ADM_EDIT; ?></td></tr>
-    <?php for ($i = 1; $i <= 45; $i++){ if($i == 45) $i = 99; if($fdata['f'.$i.'t'] == 0) $bu = "-"; else $bu = $funct->procResType($fdata['f'.$i.'t']); echo '<tr><td>'.$i.'</td><td>'.$fdata['f'.$i.'t'].'</td><td style="text-align:left">'.$bu.'</td><td>'.$fdata['f'.$i].'</td><td>'.($_SESSION['access'] == ADMIN ? '<a href="admin.php?p=editVillage&did='.$_GET['did'].'" class="btn-icon">'.$svgEdit.'</a>': '').'</td></tr>'; } ?>
+    <?php for ($i = 1; $i <= 47; $i++){ if($i == 47) $i = 99; if($fdata['f'.$i.'t'] == 0) $bu = "-"; else $bu = $funct->procResType($fdata['f'.$i.'t']); echo '<tr><td>'.$i.'</td><td>'.$fdata['f'.$i.'t'].'</td><td style="text-align:left">'.$bu.'</td><td>'.$fdata['f'.$i].'</td><td>'.($_SESSION['access'] == ADMIN ? '<a href="admin.php?p=editVillage&did='.$_GET['did'].'" class="btn-icon">'.$svgEdit.'</a>': '').'</td></tr>'; } ?>
   </table>
 </div>
 

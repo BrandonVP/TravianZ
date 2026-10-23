@@ -273,8 +273,8 @@ class Building {
     // Validare slot/building
     $isValidSlot =
         (
-            ($fieldId >= 1 && $fieldId <= 18 && $gid >= 1 && $gid <= 4) ||
-            ($fieldId >= 19 && $gid > 4)
+            (Slots::isField($fieldId) && Slots::isFieldType($gid)) ||
+            ($fieldId >= 19 && !Slots::isField($fieldId) && !Slots::isFieldType($gid))
         );
 
     /**
@@ -347,7 +347,7 @@ class Building {
 	*****************************************/
 
 	private function redirect($fieldId) {
-    header('Location: '.($fieldId >= 19 ? 'dorf2.php' : 'dorf1.php'));
+    header('Location: '.(Slots::isField($fieldId) ? 'dorf1.php' : 'dorf2.php'));
     exit;
 }
 
@@ -681,7 +681,8 @@ class Building {
         47 => DEFENSIVEWALL,
         48 => BIGHOSPITAL,
         49 => GREATWORKSHOP,
-        50 => BARRICADE
+        50 => BARRICADE,
+        51 => GOLDMINE   // local redesign
     );
 
     return isset($types[$ref]) ? $types[$ref] : 'Error';
@@ -717,7 +718,7 @@ class Building {
         }
 
         // resource fields
-        if ($build['field'] <= 18) {
+        if (Slots::isField($build['field'])) {
             $this->basic++;
             continue;
         }
@@ -1257,8 +1258,8 @@ class Building {
         return ($currentLevel == 20);
     }
 
-    // resource fields
-    if ($gid <= 4) {
+    // resource fields (and gold mines)
+    if (Slots::isFieldType($gid)) {
 
         // Local change: non-capital field cap comes from FIELD_MAX_NONCAPITAL (default 10).
         $nonCapitalMax = defined('FIELD_MAX_NONCAPITAL') ? (int) FIELD_MAX_NONCAPITAL : 10;
@@ -1371,7 +1372,7 @@ class Building {
 
 	/** Local redesign: build lane of a slot - 'f' resource fields (1-18), 'b' village buildings. */
 	public static function laneOf($fieldId) {
-	    return ((int) $fieldId <= 18) ? 'f' : 'b';
+	    return Slots::isField($fieldId) ? 'f' : 'b';
 	}
 
 	/** Local redesign: queued (non Master Builder) jobs in the lane of $fieldId. */
@@ -1388,7 +1389,7 @@ class Building {
 
 	/** Most jobs a lane may hold: BASIC_MAX fields / INNER_MAX buildings, +PLUS_MAX with Plus. */
 	public function laneMax($fieldId) {
-	    $max = ((int) $fieldId <= 18) ? BASIC_MAX : INNER_MAX;
+	    $max = Slots::isField($fieldId) ? BASIC_MAX : INNER_MAX;
 	    return $max + ($this->sess->plus ? PLUS_MAX : 0);
 	}
 
@@ -1890,7 +1891,7 @@ class Building {
 
     $cpTot = 0;
 
-    for ($i = 1; $i <= 44; $i++) {
+    for ($i = 1; $i <= 46; $i++) {
 
         $building = (int) $fdata['f'.$i.'t'];
 

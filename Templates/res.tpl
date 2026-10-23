@@ -96,10 +96,10 @@ if (!empty($village)) {
         $tzGoldCap = VillageGold::capOf($village);
 $tzGoldSafe = VillageGold::treasuryHolds(VillageGold::treasuryLevel($village->resarray));
 $tzGoldPct = $tzGoldCap > 0 ? max(0, min(100, $tzGold / $tzGoldCap * 100)) : 0;
-        $tzGoldTip = 'Base +' . round($tzGoldRate['base'], 1) . '/h'
-                   . ' · Main Building +' . round($tzGoldRate['mb'], 1) . '/h'
-                   . ' · Marketplace +' . round($tzGoldRate['market'], 1) . '/h'
-                   . ' · Hero +' . round($tzGoldRate['hero'], 1) . '/h'
+        // local redesign: gold comes from the village's Gold Mines
+        $tzGoldTip = ((int) ($tzGoldRate['count'] ?? 0) > 0
+                       ? (int) $tzGoldRate['count'] . ' gold mine' . ((int) $tzGoldRate['count'] === 1 ? '' : 's') . ' +' . round($tzGoldRate['mines'] ?? 0, 1) . '/h'
+                       : 'No gold mines in this village')
     . ($tzGoldSafe > 0
         ? ' · Treasury protects ' . number_format($tzGoldSafe) . ' gold'
         : ' · No Treasury: raids can steal gold');

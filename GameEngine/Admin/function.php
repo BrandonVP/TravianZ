@@ -440,6 +440,9 @@ class funct
             case 50:
                 $build = "Barricade";
                 break;
+            case 51:
+                $build = "Gold Mine";
+                break;
             default:
                 $build = "Error";
                 break;

@@ -175,7 +175,7 @@ trait DatabaseBuildingQueries {
 	 * others wait and start when the one before them finishes.
 	 */
 	static function buildLane($field) {
-	    return ((int) $field <= 18) ? 'f' : 'b';
+	    return Slots::isField($field) ? 'f' : 'b';
 	}
 
 	/**
@@ -243,7 +243,7 @@ trait DatabaseBuildingQueries {
 	    // a new building with no level left goes away completely
 	    $left = mysqli_query($this->dblink, "SELECT COUNT(*) FROM " . TB_PREFIX . "bdata WHERE wid = $wid AND field = " . (int) $job['field']);
 	    $leftN = $left ? (int) mysqli_fetch_row($left)[0] : 0;
-	    if ($leftN == 0 && $job['field'] > 18 && $job['field'] != 99 && (int) $fieldsArray['f' . $job['field']] == 0) {
+	    if ($leftN == 0 && !Slots::isField($job['field']) && $job['field'] != 99 && (int) $fieldsArray['f' . $job['field']] == 0) {
 	        $this->setVillageLevel($wid, ["f" . $job['field'] . "t"], [0]);
 	    }
 
@@ -438,7 +438,7 @@ trait DatabaseBuildingQueries {
 		// find first field that's the next one in the loop after our finished woodcutter
 		$dbarray2 = [];
         foreach ($bdata as $row) {
-            if ($row['loopcon'] == 1 && ($tribe == 1 ? $row['field'] >= 19 : true)) {
+            if ($row['loopcon'] == 1 && ($tribe == 1 ? !Slots::isField($row['field']) : true)) {
                 $dbarray2 = $row;
                 break;
             }
@@ -560,7 +560,7 @@ trait DatabaseBuildingQueries {
         // return all non-master jobs for field type under 19
         $data = [];
         foreach ($bdata as $row) {
-            if ($row['master'] == 0 && $row['field'] < 19) $data[] = $row;
+            if ($row['master'] == 0 && Slots::isField($row['field'])) $data[] = $row;
         }
 
         return $data;
@@ -573,7 +573,7 @@ trait DatabaseBuildingQueries {
         // return all non-master jobs for field type above 18
         $data = [];
         foreach ($bdata as $row) {
-            if ($row['master'] == 0 && $row['field'] > 18) $data[] = $row;
+            if ($row['master'] == 0 && !Slots::isField($row['field'])) $data[] = $row;
         }
 
         return $data;

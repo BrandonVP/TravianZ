@@ -16,6 +16,14 @@ if (!defined('TZ_GOLD_BASE'))       define('TZ_GOLD_BASE', 1.0);
 if (!defined('TZ_GOLD_PER_MB'))     define('TZ_GOLD_PER_MB', 0.5);
 if (!defined('TZ_GOLD_PER_MARKET')) define('TZ_GOLD_PER_MARKET', 0.5);
 if (!defined('TZ_GOLD_PER_HERO'))   define('TZ_GOLD_PER_HERO', 0.2);
+// local redesign: village gold now comes from Gold Mines only (resource field,
+// gid 51). Gold per hour per mine at 1x speed, by level (times SPEED in game).
+// The older sources above (base, Main Building, Marketplace, hero) are no longer
+// used by VillageGold::rate().
+if (!defined('TZ_GOLDMINE_GOLD')) define('TZ_GOLDMINE_GOLD', [
+    0, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 5.5, 6,          // levels 0-10
+    7, 7.5, 8, 9, 10, 11, 12, 13, 14, 15,              // levels 11-20
+]);
 
 // Storage: the starting capacity every resource has, until the Treasury exists.
 if (!defined('TZ_GOLD_CAP'))        define('TZ_GOLD_CAP', STORAGE_BASE);

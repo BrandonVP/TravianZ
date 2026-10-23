@@ -70,7 +70,7 @@ foreach ($varray as $vil) {
 	$sawmill = $claypit = $foundry = $grainmill = $bakery = 0;
 
 	// scan fields (38)
-	for ($i = 1; $i <= 44; $i++) {
+	for ($i = 1; $i <= 46; $i++) {
 
 		$type = $vresarray['f'.$i.'t'];
 		$level = $vresarray['f'.$i];

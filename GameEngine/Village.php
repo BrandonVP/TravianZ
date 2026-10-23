@@ -478,7 +478,7 @@ class Village {
 
 		$levels = [];
 		$last = [];
-		for ($i = 1; $i <= 44; $i++) {
+		for ($i = 1; $i <= 46; $i++) {
 			$t = (int) $this->resarray['f'.$i.'t'];
 			$lvl = $this->resarray['f'.$i];
 			$levels[$t][] = $lvl;

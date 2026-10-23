@@ -81,7 +81,7 @@ $activeFields = array();
 
 if (!empty($jobs) && is_array($jobs)) {
     foreach ($jobs as $job) {
-        if (isset($job['type']) && (int)$job['type'] <= 4) {
+        if (isset($job['type']) && Slots::isFieldType($job['type'])) {
             $fid = (int)$job['field'];
             $to  = isset($job['level']) ? (int)$job['level'] : 0;
             $activeFields[$fid] = max(isset($activeFields[$fid]) ? $activeFields[$fid] : 0, $to);
@@ -92,7 +92,13 @@ if (!empty($jobs) && is_array($jobs)) {
 /**
  * Field type => CSS modifier (ring colour)
  */
-$fieldKinds = array(1 => 'wood', 2 => 'clay', 3 => 'iron', 4 => 'crop');
+$fieldKinds = array(1 => 'wood', 2 => 'clay', 3 => 'iron', 4 => 'crop', Slots::GOLD_MINE => 'gold');
+
+/**
+ * Local redesign: the two extra field slots (45, 46), placed directly in % of
+ * the field-map art (the art numbers them 19 and 20).
+ */
+$tzExtraPos = array(45 => array(8.00, 79.55), 46 => array(89.33, 11.36));
 
 /**
  * Upscaled, transparent map art (img/fieldmap/f<type>.webp). The medallions sit on
@@ -106,7 +112,7 @@ if (!is_file(__DIR__ . '/../img/fieldmap/f' . $mapType . '.webp')) {
 <div id="village_map" class="fieldmap">
     <img class="fm-art" src="img/fieldmap/f<?php echo $mapType; ?>.webp?v=<?php echo @filemtime(__DIR__ . '/../img/fieldmap/f' . $mapType . '.webp'); ?>" alt="" />
 <?php
-for ($i = 1; $i <= 18; $i++) {
+foreach (Slots::fields() as $i) {
 
     $fieldType  = isset($arrayVillage['f'.$i.'t']) ? (int)$arrayVillage['f'.$i.'t'] : 0;
     $fieldLevel = isset($arrayVillage['f'.$i])     ? (int)$arrayVillage['f'.$i]     : 0;
@@ -115,9 +121,13 @@ for ($i = 1; $i <= 18; $i++) {
         continue;
     }
 
-    list($cx, $cy) = array_map('intval', explode(',', $coorarray[$i]));
-    $left = round($cx / 300 * 100, 2);
-    $top  = round($cy / 264 * 100, 2);
+    if (isset($tzExtraPos[$i])) {
+        list($left, $top) = $tzExtraPos[$i];
+    } else {
+        list($cx, $cy) = array_map('intval', explode(',', $coorarray[$i]));
+        $left = round($cx / 300 * 100, 2);
+        $top  = round($cy / 264 * 100, 2);
+    }
 
     $kind  = isset($fieldKinds[$fieldType]) ? $fieldKinds[$fieldType] : 'wood';
     $title = Building::procResType($fieldType) . ' Level ' . $fieldLevel;

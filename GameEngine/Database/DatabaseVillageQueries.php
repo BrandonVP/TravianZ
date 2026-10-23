@@ -381,7 +381,8 @@ trait DatabaseVillageQueries {
 	    }
 
 	    //Set the default villages structure (resources fields and main building)
-	    $defaultVillage = "vref,f1t,f2t,f3t,f4t,f5t,f6t,f7t,f8t,f9t,f10t,f11t,f12t,f13t,f14t,f15t,f16t,f17t,f18t"
+	    // local redesign: + the two extra resource field slots (Slots::layout)
+	    $defaultVillage = "vref,f1t,f2t,f3t,f4t,f5t,f6t,f7t,f8t,f9t,f10t,f11t,f12t,f13t,f14t,f15t,f16t,f17t,f18t,f45t,f46t"
 	                       .($buildingsArray != null ? ",".implode(",",$buildingsArray[0]) : ",f26,f26t");
 	    $defaultValues = [];
 	    
@@ -405,6 +406,15 @@ trait DatabaseVillageQueries {
 	            default: $stringValues .= "4,4,1,4,4,2,3,4,4,3,3,4,4,1,4,2,1,2";
 	        }
 	        
+	        // local redesign: field design for this village type - slots 45/46,
+	        // and an original field turned into a gold mine on 3-mine designs
+	        $tzLayout = Slots::layout($types[$index]);
+	        $tzHead = substr($stringValues, 0, strpos($stringValues, ",") + 1);
+	        $tzFields = explode(",", substr($stringValues, strlen($tzHead)));
+	        foreach ($tzLayout['convert'] as $tzSlot => $tzGid) {
+	            if ($tzSlot >= 1 && $tzSlot <= 18) $tzFields[$tzSlot - 1] = (int) $tzGid;
+	        }
+	        $stringValues = $tzHead . implode(",", $tzFields) . "," . (int) $tzLayout[45] . "," . (int) $tzLayout[46];
 	        $stringValues .= $buildingsArray != null ? ",".implode(",",$buildingsArray[1][$index]).")" : ",1,15)";
 	        $defaultValues[] = $stringValues;
 	    }
@@ -2375,7 +2385,7 @@ trait DatabaseVillageQueries {
 
 		$buildarray = $this->getResourceLevel($wref);
 		$cropholder = [];
-		for($i = 1; $i <= 44; $i++){
+		for($i = 1; $i <= 46; $i++){
 			if($buildarray['f'.$i.'t'] == 4) array_push($cropholder, 'f'.$i);
 			if($buildarray['f'.$i.'t'] == 8) $grainmill = $buildarray['f'.$i];
 			if($buildarray['f'.$i.'t'] == 9) $bakery = $buildarray['f'.$i];

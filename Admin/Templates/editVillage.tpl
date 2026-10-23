@@ -93,8 +93,8 @@ if(isset($id)) { include("search2.tpl"); ?>
       <thead><tr><th style="width:50px"><?php echo ADM_ID; ?></th><th style="width:70px"><?php echo ADM_GID; ?></th><th><?php echo ADM_NAME; ?></th><th style="width:70px"><?php echo ADM_LEVEL_2; ?></th></tr></thead>
       <tbody>
       <?php
-      for($i=1;$i<=45;$i++){
-        if($i==45)$i=99;
+      for($i=1;$i<=47;$i++){
+        if($i==47)$i=99;
         $gid=(int)$fdata['f'.$i.'t']; $lvl=(int)$fdata['f'.$i];
         $bu=$gid==0?'-':$funct->procResType($gid);
         echo '<tr>

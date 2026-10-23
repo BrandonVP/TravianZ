@@ -79,7 +79,7 @@ switch ($bindicate) {
         break;
     case 8:
     case 9:
-        $href = $session->access == BANNED? 'banned.php' : (($id <= 18)? "dorf1.php?a=$id&c=$session->checker" : "dorf2.php?a=$id&c=$session->checker");
+        $href = $session->access == BANNED? 'banned.php' : ((Slots::isField($id))? "dorf1.php?a=$id&c=$session->checker" : "dorf2.php?a=$id&c=$session->checker");
         $lvl = $bindicate == 8? $village->resarray['f'.$id] + 1 : $village->resarray['f'.$id] + ($loopsame > 0? 2 : 1);
         echo '<a class="build" href="'.$href.'">'.UPGRADE_LEVEL.' '.$lvl.'.</a>';
         if ($bindicate == 9) echo ' <span class="none">'.WAITING.'</span>';
@@ -88,7 +88,7 @@ switch ($bindicate) {
 
 if (in_array($bindicate, [2,3,7]) && $session->goldclub == 1) {
     echo '<br/>';
-    $masterHref = ($id <= 18? 'dorf1.php' : 'dorf2.php'). "?master=$bid&id=$id&c=$session->checker";
+    $masterHref = (Slots::isField($id)? 'dorf1.php' : 'dorf2.php'). "?master=$bid&id=$id&c=$session->checker";
     if (VillageGold::masterCan($village, $session) && $village->master == 0) {
         echo '<a class="build" href="'.$masterHref.'">'.CONSTRUCTING_MASTER_BUILDER.'</a>';
     } else {

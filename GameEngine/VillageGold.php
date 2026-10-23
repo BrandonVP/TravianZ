@@ -459,30 +459,30 @@ class VillageGold
     }
 
     /**
-     * Gold per hour for a village, with the breakdown:
-     * array('base', 'mb', 'market', 'hero', 'total'), all already times SPEED.
+     * Gold per hour for a village (already times SPEED).
+     * Local redesign: gold comes from Gold Mines only (resource field gid 51,
+     * TZ_GOLDMINE_GOLD per level). The older sources (base, Main Building,
+     * Marketplace, hero) are gone; their keys stay at 0 for older callers.
+     * array('mines' => gold/h, 'count' => number of mines, 'total' => gold/h, ...)
      */
     public static function rate($db, $wref, $resArray)
     {
-        list($mb, $market) = self::buildingLevels($resArray);
-
-        $heroLevel = 0;
-        if (method_exists($db, 'getHeroForVillage')) {
-            $hero = $db->getHeroForVillage($wref);
-            if (is_array($hero) && isset($hero['level'])) {
-                $heroLevel = (int) $hero['level'];
-            }
+        $table = defined('TZ_GOLDMINE_GOLD') ? TZ_GOLDMINE_GOLD : array(0);
+        $mines = 0.0;
+        $count = 0;
+        foreach (Slots::fields() as $slot) {
+            if ((int) ($resArray['f' . $slot . 't'] ?? 0) !== Slots::GOLD_MINE) continue;
+            $count++;
+            $lvl = (int) ($resArray['f' . $slot] ?? 0);
+            $mines += (float) ($table[$lvl] ?? end($table));
         }
-
         $speed = (float) SPEED;
-        $out = array(
-            'base'   => TZ_GOLD_BASE * $speed,
-            'mb'     => $mb * TZ_GOLD_PER_MB * $speed,
-            'market' => $market * TZ_GOLD_PER_MARKET * $speed,
-            'hero'   => $heroLevel * TZ_GOLD_PER_HERO * $speed,
+        return array(
+            'mines' => $mines * $speed,
+            'count' => $count,
+            'base' => 0, 'mb' => 0, 'market' => 0, 'hero' => 0,
+            'total' => $mines * $speed,
         );
-        $out['total'] = $out['base'] + $out['mb'] + $out['market'] + $out['hero'];
-        return $out;
     }
 
     /**

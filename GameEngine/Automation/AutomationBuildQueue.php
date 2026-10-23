@@ -86,8 +86,8 @@ trait AutomationBuildQueue {
                 else
                 {
                     // special condition for Roman military buildings
-                    if ($indi['field'] > 18) $loopconUpdates[$indi['wid']] = ' AND field > 18';                    
-                    else $loopconUpdates[$indi['wid']] = ' AND field < 19';                                      
+                    if (!Slots::isField($indi['field'])) $loopconUpdates[$indi['wid']] = ' AND ' . Slots::sqlIsBuilding();                    
+                    else $loopconUpdates[$indi['wid']] = ' AND ' . Slots::sqlIsField();                                      
                 }
 
                 $dbIdsToDelete[] = (int) $indi['id'];
@@ -267,13 +267,13 @@ trait AutomationBuildQueue {
             // buildings, same limits as a normal order: BASIC_MAX / INNER_MAX,
             // +PLUS_MAX with Plus or in a World Wonder village) and then joins the
             // end of that lane like a normal order.
-            $isField = ((int) $master['field'] <= 18);
+            $isField = Slots::isField($master['field']);
             $laneMax = ($isField ? BASIC_MAX : INNER_MAX)
                 + (($database->getUserField($owner, 'plus', 0) > time() || $ww > 0) ? PLUS_MAX : 0);
             $laneJobs = 0;
             $laneEnd = time();
             foreach ((array) $database->getJobs($master['wid']) as $tzJob) {
-                if ((int) $tzJob['master'] != 0 || (((int) $tzJob['field'] <= 18) !== $isField)) {
+                if ((int) $tzJob['master'] != 0 || (Slots::isField($tzJob['field']) !== $isField)) {
                     continue;
                 }
                 $laneJobs++;

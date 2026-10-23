@@ -37,7 +37,7 @@ trait AutomationVillageUpkeep {
         $fdata = $database->getResourceLevel($vid, $use_cache);
         $popTot = 0;
 
-        for ($i = 1; $i <= 44; $i++) {
+        for ($i = 1; $i <= 46; $i++) {
             $lvl = $fdata["f".$i];
             $building = $fdata["f".$i."t"];
 			if($building) $popTot += $this->buildingPOP($building, $lvl);

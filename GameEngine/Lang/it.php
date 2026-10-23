@@ -1756,6 +1756,8 @@ tz_def('TZ_TRAVIAN', 'Travian');
 tz_def('TZ_TRAVIANX', 'TravianX');
 tz_def('TZ_TRAVIANZ', 'Empires of Rome'); // local rebrand (was TravianZ)
 tz_def('TZ_BRAND_TAGLINE', 'a TravianZ spin-off');
+tz_def('GOLDMINE', 'Gold Mine'); // local redesign: resource field producing village gold
+tz_def('GOLDMINE_DESC', 'Miners dig gold out of the hills around your village. Every level adds gold per hour to this village; the Treasury decides how much it can hold.');
 tz_def('TZ_TRAVIAN_GAMES', 'Travian Games');
 tz_def('TZ_UNDERLINE', 'sottolineato');
 tz_def('TZ_UNDERLINED', 'sottolineato');

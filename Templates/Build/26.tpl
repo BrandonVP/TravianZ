@@ -55,7 +55,7 @@ if($_POST && $_GET['action'] == 'change_capital' && !$village->capital && !$isWo
 			$data3 = mysqli_fetch_assoc($query3);
 
 			// 1. REMOVE RESOURCE OLD CAPITAL TO LEVEL 10
-			for($i = 1; $i <= 18; ++$i){
+			foreach (Slots::fields() as $i) {
 				if($data2['f'.$i] > 10){
 					mysqli_query($database->dblink, 'UPDATE `'.TB_PREFIX.'fdata` SET `f'.$i.'` = 10 WHERE `vref` = '.$oldWid);
 				}

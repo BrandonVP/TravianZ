@@ -69,7 +69,7 @@ if(isset($_GET['newdid'])){
     exit;
 }
 // local redesign: building slots go up to 44 (41-44 = the four extra pads)
-if(isset($_GET['id']) && ($_GET['id'] < 1 || $_GET['id'] > 44 && ($_GET['id'] == 99 && $village->natar == 0 || $_GET['id'] != 99))){
+if(isset($_GET['id']) && ($_GET['id'] < 1 || $_GET['id'] > 46 && ($_GET['id'] == 99 && $village->natar == 0 || $_GET['id'] != 99))){
     header("Location: dorf2.php");
     exit;
 }
@@ -96,7 +96,7 @@ if ( isset( $_GET['id'] ) ) {
 
     $checkBuildings = [0, 16, 17, 25, 26, 27];
 
-    if ( $_GET['id'] < 19 || ( isset( $_GET['gid'] ) && ! in_array( $_GET['gid'], $checkBuildings ) ) ) {
+    if ( Slots::isField($_GET['id']) || ( isset( $_GET['gid'] ) && ! in_array( $_GET['gid'], $checkBuildings ) ) ) {
         $_GET['t'] = "";
         $_GET['s'] = "";
     }
@@ -385,7 +385,7 @@ if(isset($_GET['mode']) && $_GET['mode'] == 'troops' && isset($_GET['cancel']) &
 <?php
 // local redesign: back to the field / village overview
 $tzBackId = (int) ($_GET['id'] ?? 0);
-if ($tzBackId >= 1 && $tzBackId <= 18) {
+if (Slots::isField($tzBackId)) {
     echo '<a class="tz-back" href="dorf1.php">&larr; ' . (defined('TZ_FIELDS_LABEL') ? TZ_FIELDS_LABEL : 'Fields') . '</a>';
 } else {
     echo '<a class="tz-back" href="dorf2.php">&larr; ' . (defined('TZ_VILLAGE_LABEL') ? TZ_VILLAGE_LABEL : 'Village') . '</a>';
@@ -399,7 +399,7 @@ if(isset($_GET['id']) || isset($_GET['gid']) || $route == 1 || isset($_POST['rou
 	$id = $_GET['id'];
 	if($_GET['id'] == 99 && $village->resarray['f99t'] == 40){
 	   include("Templates/Build/ww.tpl");
-	} elseif($village->resarray['f'.$_GET['id'].'t'] == 0 && $_GET['id'] >= 19) {
+	} elseif($village->resarray['f'.$_GET['id'].'t'] == 0 && $_GET['id'] >= 19 && !Slots::isField($_GET['id'])) {
 		include("Templates/Build/avaliable.tpl");
 	}
 	else {

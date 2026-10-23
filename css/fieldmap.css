@@ -59,6 +59,7 @@ div#village_map.fieldmap a.fm-wood { border-color: #8a5a2b; }
 div#village_map.fieldmap a.fm-clay { border-color: #b4532a; }
 div#village_map.fieldmap a.fm-iron { border-color: #56636e; }
 div#village_map.fieldmap a.fm-crop { border-color: #b8901f; }
+div#village_map.fieldmap a.fm-gold { border-color: #e0b52a; background: radial-gradient(circle at 35% 30%, #fff6cf, #f1d277 70%); box-shadow: 0 0 0 2px rgba(224, 181, 42, .35); } /* local redesign: gold mine */
 
 div#village_map.fieldmap a.fm-field.fm-active,
 div#village_map.fieldmap a.fm-field.fm-active:hover {

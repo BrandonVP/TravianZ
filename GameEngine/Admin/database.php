@@ -122,7 +122,7 @@ class adm_DB {
         global $database;
         $fdata = $database->getResourceLevel($vid);
         $popTot = 0;
-        for ($i = 1; $i <= 44; $i++) {
+        for ($i = 1; $i <= 46; $i++) {
             $lvl = $fdata["f". $i];
             $building = $fdata["f". $i. "t"];
             if ($building > 0 && $lvl > 0) {
@@ -137,7 +137,7 @@ class adm_DB {
         global $database;
         $fdata = $database->getResourceLevel($vid);
         $popTot = 0;
-        for ($i = 1; $i <= 44; $i++) {
+        for ($i = 1; $i <= 46; $i++) {
             $lvl = $fdata["f". $i];
             $building = $fdata["f". $i. "t"];
             if ($building > 0 && $lvl > 0) {
@@ -272,7 +272,7 @@ class adm_DB {
 		mysqli_query($this->connection, "UPDATE ". TB_PREFIX ."vdata SET pop=". (int)$pop ." WHERE wref=$vid");
     
     $fdata = $database->getResourceLevel($vid);
-    for ($i = 1; $i <= 44; $i++) {
+    for ($i = 1; $i <= 46; $i++) {
         if ($fdata['f'.$i] > 1) {
             $zm = ($fdata['f'.$i] / 100) * $proc;
             $zm = ($zm < 1) ? 1 : floor($zm);
@@ -866,7 +866,7 @@ class adm_DB {
         global $bid1, $bid5;
         $basewood = $sawmill = 0;
         $woodholder = array();
-        for ($i = 1; $i <= 44; $i++) {
+        for ($i = 1; $i <= 46; $i++) {
             if ($fdata['f'. $i. 't'] == 1) {
                 array_push($woodholder, 'f'. $i);
             }
@@ -892,7 +892,7 @@ class adm_DB {
         global $bid2, $bid6;
         $baseclay = $brick = 0;
         $clayholder = array();
-        for ($i = 1; $i <= 44; $i++) {
+        for ($i = 1; $i <= 46; $i++) {
             if ($fdata['f'. $i. 't'] == 2) {
                 array_push($clayholder, 'f'. $i);
             }
@@ -918,7 +918,7 @@ class adm_DB {
         global $bid3, $bid7;
         $baseiron = $foundry = 0;
         $ironholder = array();
-        for ($i = 1; $i <= 44; $i++) {
+        for ($i = 1; $i <= 46; $i++) {
             if ($fdata['f'. $i. 't'] == 3) {
                 array_push($ironholder, 'f'. $i);
             }
@@ -944,7 +944,7 @@ class adm_DB {
         global $bid4, $bid8, $bid9;
         $basecrop = $grainmill = $bakery = 0;
         $cropholder = array();
-        for ($i = 1; $i <= 44; $i++) {
+        for ($i = 1; $i <= 46; $i++) {
             if ($fdata['f'. $i. 't'] == 4) {
                 array_push($cropholder, 'f'. $i);
             }
