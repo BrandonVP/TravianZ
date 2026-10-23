@@ -25,7 +25,15 @@ class Slots
      * Types 1 (9 crop) and 6 (15 crop) stay as they are.
      */
     const LAYOUTS = array(
-        // filled in from the field-map designs
+        // from the field-map art (img/fieldmap/f<type>.webp, 2026-10-23); types
+        // not listed (1, 3, 6, 7, 10) have gold mines in 45 and 46
+        2  => array(45 => 1, 46 => 51),               // 1 mine, extra woodcutter
+        5  => array(45 => 2, 46 => 51),               // 1 mine, extra clay pit
+        8  => array(45 => 51, 46 => 1),               // 1 mine, extra woodcutter
+        12 => array(45 => 3, 46 => 51),               // 1 mine, extra iron mine
+        4  => array('convert' => array(4 => 51)),    // 3 mines: clay pit 4 is a gold mine
+        9  => array('convert' => array(1 => 51)),    // 3 mines: iron mine 1 is a gold mine
+        11 => array('convert' => array(4 => 51)),    // 3 mines: iron mine 4 is a gold mine
     );
 
     /** array(45 => gid, 46 => gid, 'convert' => array(slot => gid)) for a village type. */
