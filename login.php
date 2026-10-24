@@ -81,7 +81,7 @@ $stime = strtotime(date('m/d/Y H:i', strtotime(START_DATE . ' ' . START_TIME)));
 <?php
 if ($form->getError("pw") == LOGIN_PW_ERROR) {
 	echo '<div class="og-error"><b>' . PW_FORGOTTEN . '</b><br>' . PW_REQUEST . '<br>'
-		. '<a href="password.php?npw=' . $database->getUserField($form->getValue('user'), 'id', 1) . '">' . PW_GENERATE . '</a></div>';
+		. '<a href="password.php">' . PW_GENERATE . '</a></div>';
 }
 if ($form->getError("activate") != "") {
 	echo '<div class="og-error"><b>' . EMAIL_NOT_VERIFIED . '</b><br>' . EMAIL_FOLLOW . '<br>'

@@ -36,8 +36,7 @@ class Mailer
 			"Thank you for your registration.\n\n" .
 			"----------------------------\n" .
 			"Name: " . $username . "\n" .
-			"Password: " . $pass . "\n" .
-			"Activation code: " . $act . "\n" .
+			"Activation code: " . $act . "\n" .   // local security fix: no password in e-mails
 			"----------------------------\n\n" .
 			"Click the following link in order to activate your account:\n" .
 			SERVER . "activate.php?code=" . $act . "\n\n" .
@@ -93,32 +92,31 @@ class Mailer
 
 	/**
 	 * -------------------------------------------------------------------------
-	 * SEND PASSWORD RESET EMAIL
+	 * SEND PASSWORD RESET LINK (local security fix)
 	 * -------------------------------------------------------------------------
+	 * The old sendPassword() mailed a new plain-text password and built its
+	 * link from the Host header. The link now comes from PasswordReset with
+	 * SERVER as base.
 	 */
-	function sendPassword($email, $uid, $username, $npw, $cpw)
+	function sendPasswordReset($email, $username, $link)
 	{
-		$subject = "Password forgotten";
+		if (strpos($email, "\r") !== false || strpos($email, "\n") !== false || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			return false;
+		}
 
-		$host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+		$subject = SERVER_NAME . " - reset your password";
 
 		$message =
 			"Hello " . $username . "\n\n" .
-			"You have requested a new password for " . SERVER_NAME . ".\n\n" .
-			"----------------------------\n" .
-			"Name: " . $username . "\n" .
-			"Password: " . $npw . "\n" .
-			"----------------------------\n\n" .
-			"Please click this link to activate your new password. The old password then becomes invalid:\n\n" .
-			"http://" . $host . "/password.php?cpw=" . $cpw . "&npw=" . $uid . "\n\n" .
-			"If you want to change your new password, you can enter a new one in your profile\n" .
-			"on tab \"account\".\n\n" .
-			"In case you did not request a new password you may ignore this email.\n\n" .
+			"Someone (hopefully you) asked to reset the password of your " . SERVER_NAME . " account.\n\n" .
+			"Open this link within one hour to choose a new password:\n" .
+			$link . "\n\n" .
+			"The link works once. If you did not ask for this, ignore this e-mail - your password stays the same.\n\n" .
 			SERVER_NAME . " team";
 
 		$headers = "From: " . ADMIN_EMAIL . "\r\n";
 
-		@mail($email, $subject, $message, $headers);
+		return @mail($email, $subject, $message, $headers);
 	}
 }
 

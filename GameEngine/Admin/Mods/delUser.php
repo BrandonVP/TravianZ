@@ -124,6 +124,14 @@ $database->query("DELETE FROM " . TB_PREFIX . "login_log WHERE uid = $uid");
 $database->query("DELETE FROM " . TB_PREFIX . "banlist WHERE uid = $uid");
 $database->query("DELETE FROM " . TB_PREFIX . "deleting WHERE uid = $uid");
 $database->query("DELETE FROM " . TB_PREFIX . "password WHERE uid = $uid");
+// local privacy fix: login fingerprints, global chat and reset links of the player
+foreach (array("mad_session WHERE uid", "chat_global WHERE id_user", "chat_mutes WHERE id_user") as $tzWhere) {
+    $tzHas = $database->query("SHOW TABLES LIKE '" . TB_PREFIX . strtok($tzWhere, ' ') . "'");
+    if ($tzHas && mysqli_num_rows($tzHas) > 0) {
+        $database->query("DELETE FROM " . TB_PREFIX . $tzWhere . " = $uid");
+    }
+}
+PasswordReset::forget($uid);
 $database->query("DELETE FROM " . TB_PREFIX . "illegal_log WHERE user = $uid");
 $database->query("DELETE FROM " . TB_PREFIX . "ali_invite WHERE uid = $uid");
 $database->query("DELETE FROM " . TB_PREFIX . "ali_permission WHERE uid = $uid");

@@ -313,6 +313,15 @@ class Account {
     // Păstrăm comportamentul exact (null aici)
     $userData = null;
 
+    // local security fix: too many failed logins from this IP or for this account
+    if (AuthThrottle::loginBlocked((string) $username)) {
+        $form->addError("pw", "Too many failed logins. Please wait 15 minutes and try again.");
+        $_SESSION['errorarray'] = $form->getErrors();
+        $_SESSION['valuearray'] = array('user' => $username);
+        header("Location: login.php");
+        exit();
+    }
+
     // ==================== VALIDĂRI ====================
 
     // Username
@@ -322,10 +331,14 @@ class Account {
         $form->addError("user", USR_NT_FOUND);
     }
 
-    // Password
+    // Password (local security fix: each check runs once, results kept below)
+    $tzOwnerOk = false;
+    $tzSitterUid = 0;
     if (empty($password)) {
         $form->addError("pw", LOGIN_PASS_EMPTY);
-    } elseif (!$database->login($username, $password) && !$database->sitterLogin($username, $password)) {
+    } elseif (!($tzOwnerOk = (bool) $database->login($username, $password))
+           && !($tzSitterUid = (int) $database->sitterLogin($username, $password))) {
+        AuthThrottle::loginFailed((string) $username);
         // try activation data if the user was not found
         // (păstrăm exact logica originală - $userData e încă null aici)
         if (!$userData) {
@@ -351,7 +364,7 @@ class Account {
     // ==================== VERIFICARE ERORI ====================
     if ($form->returnErrors() > 0) {
         $_SESSION['errorarray'] = $form->getErrors();
-        $_SESSION['valuearray'] = $_POST;
+        $_SESSION['valuearray'] = array_diff_key($_POST, array('pw' => 1)); // never keep the password in the session
         header("Location: login.php");
         exit();
     }
@@ -374,10 +387,12 @@ class Account {
      */
     $sitterUid = 0;
 
-    if ($database->login($username, $password)) {
+    AuthThrottle::clear('login_user', (string) $username);
+
+    if ($tzOwnerOk) {
         $database->UpdateOnline("login", $username, time(), $userData['id']);
     } else {
-        $sitterUid = (int) $database->sitterLogin($username, $password);
+        $sitterUid = $tzSitterUid;
 
         if ($sitterUid > 0) {
             $database->UpdateOnline("sitter", $username, time(), $userData['id']);

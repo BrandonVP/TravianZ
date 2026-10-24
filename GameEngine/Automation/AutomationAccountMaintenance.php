@@ -37,8 +37,11 @@ trait AutomationAccountMaintenance {
                 //Get the villages which have to be deleted
                 $needVillages = $database->getVillagesID($need['uid']);
                 
-                //Delete all villages
-                $database->DelVillage($needVillages);
+                //Delete all villages (local fix: an account with no villages left
+                //made DelVillage build "IN ()" and broke every page load)
+                if (!empty($needVillages)) {
+                    $database->DelVillage($needVillages);
+                }
 
                 for($i = 0;$i < 20; $i++){
                     $q = "SELECT id FROM ".TB_PREFIX."users where friend".$i." = ".$need['uid']." or friend".$i."wait = ".$need['uid']."";
@@ -71,6 +74,23 @@ trait AutomationAccountMaintenance {
 
                 $q = "DELETE FROM ".TB_PREFIX."ndata where uid = ".$need['uid'];
                 $database->query($q);
+
+                // local privacy fix: logs and personal rows of the account go too
+                // (admin delUser.php already removed most of these; self-delete did not)
+                foreach (array("login_log WHERE uid", "illegal_log WHERE user", "gold_fin_log WHERE uid",
+                               "medal WHERE userid", "forum_post WHERE owner", "forum_topic WHERE owner",
+                               "chat WHERE id_user", "banlist WHERE uid", "links WHERE userid",
+                               "online WHERE uid", "password WHERE uid") as $tzWhere) {
+                    $database->query("DELETE FROM " . TB_PREFIX . $tzWhere . " = " . $need['uid']);
+                }
+                foreach (array("mad_session WHERE uid", "chat_global WHERE id_user", "chat_mutes WHERE id_user") as $tzWhere) {
+                    $tzTable = strtok($tzWhere, ' ');
+                    $tzHas = mysqli_query($database->dblink, "SHOW TABLES LIKE '" . TB_PREFIX . $tzTable . "'");
+                    if ($tzHas && mysqli_num_rows($tzHas) > 0) {
+                        $database->query("DELETE FROM " . TB_PREFIX . $tzWhere . " = " . $need['uid']);
+                    }
+                }
+                PasswordReset::forget($need['uid']);
 
                 $q = "DELETE FROM ".TB_PREFIX."users where id = ".$need['uid'];
                 $database->query($q);

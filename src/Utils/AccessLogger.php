@@ -27,6 +27,17 @@ class AccessLogger {
     /**
      * Logs current request into a file defined via config constant.
      */
+    /**
+     * Local security fix: passwords, reset tokens and session cookies are
+     * never written to the access log, even when LOG_PAGE_ACCESS is on.
+     */
+    private static function redact($key, $value) {
+        if (preg_match('/^(pw\d*|pass|passw|password|del_pw|npw|cpw|token|checker|mchecker)$|sess|PHPSESSID/i', (string) $key)) {
+            return '[redacted]';
+        }
+        return is_array($value) ? json_encode($value) : $value;
+    }
+
     public static function logRequest() {
         try {
             if (defined('LOG_PAGE_ACCESS') && LOG_PAGE_ACCESS) {
@@ -66,7 +77,7 @@ class AccessLogger {
                 if (count($_COOKIE)) {
                     $out = [];
                     foreach ($_COOKIE as $key => $value) {
-                        $out[] = $key.'='.$value;
+                        $out[] = $key.'='.self::redact($key, $value);
                     }
 
                     // write the log line
@@ -79,7 +90,7 @@ class AccessLogger {
                 if (count($_GET)) {
                     $out = [];
                     foreach ($_GET as $key => $value) {
-                        $out[] = $key.'='.$value;
+                        $out[] = $key.'='.self::redact($key, $value);
                     }
 
                     $get_info = '?'.implode("&", $out);
@@ -94,7 +105,7 @@ class AccessLogger {
                 if (count($_POST)) {
                     $out = [];
                     foreach ($_POST as $key => $value) {
-                        $out[] = $key.'='.$value;
+                        $out[] = $key.'='.self::redact($key, $value);
                     }
 
                     // write the log line

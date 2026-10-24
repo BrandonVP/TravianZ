@@ -353,12 +353,9 @@ trait DatabaseUserQueries {
 	}
 
 	function login($username, $password) {
-        static $cachedResult = null;
-
-        if ($cachedResult !== null) {
-            return $cachedResult;
-        }
-
+        // local security fix: the old static cache had no key at all, so a
+        // second call in the same request got the first call's answer even
+        // for another user/password. Account::Login now calls this once.
         list($username, $password) = $this->escape_input($username, $password);
 		$q = "SELECT id,password,sessid,is_bcrypt FROM " . TB_PREFIX . "users where username = '$username'";
 		$result = mysqli_query($this->dblink,$q);
@@ -411,9 +408,6 @@ trait DatabaseUserQueries {
 		return $cachedResult;
 	}
 
-	/** @var array cache per request: username => uid-ul sitterului care s-a potrivit */
-	private static $sitterLoginCache = array();
-
 	/**
 	 * Autentificare ca sitter pe contul $username.
 	 *
@@ -423,19 +417,11 @@ trait DatabaseUserQueries {
 	 * Un uid e mereu > 0, iar 0 e falsy, deci apelurile vechi de forma
 	 * "if ($database->sitterLogin(...))" continua sa functioneze identic.
 	 *
-	 * Account.php o cheama de doua ori pe acelasi login (o data la validare,
-	 * o data ca sa scrie in tabela online). Cache-ul de mai jos face ca a
-	 * doua verificare de parola sa nu se mai execute - password_verify e
-	 * intentionat lent, deci conteaza.
+	 * Local security fix: no cache any more (its key was md5 of the password);
+	 * Account::Login calls this once and keeps the result.
 	 */
 	function sitterLogin($username, $password) {
         list($username, $password) = $this->escape_input($username, $password);
-
-		$cacheKey = $username . '|' . md5($password);
-
-		if (isset(self::$sitterLoginCache[$cacheKey])) {
-			return self::$sitterLoginCache[$cacheKey];
-		}
 
 		$q = "SELECT sit1,sit2 FROM " . TB_PREFIX . "users where username = '$username' and access != " . BANNED ." LIMIT 1";
 		$result = mysqli_query($this->dblink,$q);
@@ -447,7 +433,7 @@ trait DatabaseUserQueries {
 		 * null". Iesim din start - oricum nu are cine sa fie sitter.
 		 */
 		if (!is_array($dbarray)) {
-			return self::$sitterLoginCache[$cacheKey] = 0;
+			return 0;
 		}
 
 		$dbarray2 = null;
@@ -468,15 +454,15 @@ trait DatabaseUserQueries {
 		    // sit1/sit2 pot fi setati independent, deci unul dintre randuri
 		    // poate lipsi; fara ?? '' iesea warning pe null.
 		    if (password_verify($password, (string) ($dbarray2['password'] ?? ''))) {
-				return self::$sitterLoginCache[$cacheKey] = (int) $dbarray['sit1'];
+				return (int) $dbarray['sit1'];
 			} else if (password_verify($password, (string) ($dbarray3['password'] ?? ''))) {
-				return self::$sitterLoginCache[$cacheKey] = (int) $dbarray['sit2'];
+				return (int) $dbarray['sit2'];
 			} else {
-				return self::$sitterLoginCache[$cacheKey] = 0;
+				return 0;
 			}
 		} else {
 			// contul nu are niciun sitter definit
-			return self::$sitterLoginCache[$cacheKey] = 0;
+			return 0;
 		}
 	}
 
@@ -712,27 +698,8 @@ trait DatabaseUserQueries {
 		return mysqli_query($this->dblink,$q);
 	}
 
-	function addPassword($uid, $npw, $cpw) {
-	    list($uid, $npw, $cpw) = $this->escape_input((int) $uid, $npw, $cpw);
-		$q = "REPLACE INTO `" . TB_PREFIX . "password`(uid, npw, cpw) VALUES ($uid, '$npw', '$cpw')";
-		mysqli_query($this->dblink,$q);
-	}
-
-	function resetPassword($uid, $cpw) {
-	    list($uid, $cpw) = $this->escape_input((int) $uid, $cpw);
-		$q = "SELECT npw FROM `" . TB_PREFIX . "password` WHERE uid = $uid AND cpw = '$cpw' AND used = 0 LIMIT 1";
-		$result = mysqli_query($this->dblink,$q);
-		$dbarray = mysqli_fetch_array($result);
-
-		if(!empty($dbarray)) {
-		    if(!$this->updateUserField($uid, 'password', password_hash($dbarray['npw'], PASSWORD_BCRYPT,['cost' => 12]), 1)) return false;
-			$q = "UPDATE `" . TB_PREFIX . "password` SET used = 1 WHERE uid = $uid AND cpw = '$cpw' AND used = 0";
-			mysqli_query($this->dblink,$q);
-			return true;
-		}
-
-		return false;
-	}
+	// addPassword()/resetPassword() removed (local security fix): resets now use
+	// one-time links, see GameEngine/PasswordReset.php
 
 	//end general statistics
 

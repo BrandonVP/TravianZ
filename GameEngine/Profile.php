@@ -471,6 +471,7 @@ class Profile {
 						password_hash($post['pw2'], PASSWORD_BCRYPT, ['cost' => 12]),
 						1
 					);
+					$session->tzRefreshPwFingerprint(); // local security fix: other sessions end
 				} else {
 					$form->addError("pw", LOGIN_PW_ERROR);
 				}

@@ -43,8 +43,21 @@ mysqli_query($GLOBALS["link"], "SET FOREIGN_KEY_CHECKS=0");
 
 $tables = ["a2b","abdata","activate","active","admin_log","alidata","ali_invite","ali_log","ali_permission","allimedal","artefacts","attacks","banlist","bdata","build_log","chat","deleting","demolition","diplomacy","enforcement","farmlist","fdata","forum_cat","forum_edit","forum_post","forum_survey","forum_topic","general","gold_fin_log","hero","illegal_log","links","login_log","market","market_log","mdata","medal","movement","ndata","online","odata","password","prisoners","raidlist","research","route","send","tdata","tech_log","training","units","vdata","wdata","ww_attacks","croppers","users"];
 
+// local fix: tables added since (login fingerprints, global chat, hero items,
+// auctions, redesign features...) were left behind and their rows were then
+// attached to the new accounts that reuse the same ids. Missing tables are
+// skipped: TRUNCATE on a missing table throws in PHP 8 and aborted the reset.
+$tables = array_merge($tables, ["alliance_bonus","alliance_donation","alliance_donation_log","artefacts_chrono",
+    "auction","banlist_ip","chat_global","chat_global_polls","chat_global_poll_votes","chat_global_shared_reports",
+    "chat_mutes","gold_promo_redeem","healing","hero_adventure","hero_items","hospital","mad_session","milestones",
+    "player_statistics_history","push_override","resource_transfer_log","tz_auth_throttle","tz_autobuy",
+    "tz_contracts","tz_festivities","tz_pwreset","tz_storage_boost","tz_wargames"]);
+
 foreach($tables as $t){
-    mysqli_query($GLOBALS["link"], "TRUNCATE TABLE `".TB_PREFIX.$t."`");
+    $tzHas = mysqli_query($GLOBALS["link"], "SHOW TABLES LIKE '".TB_PREFIX.$t."'");
+    if ($tzHas && mysqli_num_rows($tzHas) > 0) {
+        mysqli_query($GLOBALS["link"], "TRUNCATE TABLE `".TB_PREFIX.$t."`");
+    }
 }
 
 mysqli_query($GLOBALS["link"], "SET FOREIGN_KEY_CHECKS=1");
@@ -54,7 +67,10 @@ $database->createDbStructure();
 $database->populateWorldData();
 
 // 4. Conturi sistem
-$passw = password_hash("12345", PASSWORD_BCRYPT, ['cost' => 12]);
+// local security fix: Multihunter (admin rights) used to come back with the
+// password "12345". It now has no password (cannot log in) until an admin
+// sets one in the admin panel.
+$passw = '';
 mysqli_query($GLOBALS["link"], "INSERT INTO `".TB_PREFIX."users` (id, username, password, email, tribe, access, gold, plus, protect) VALUES
 (1, 'Support', '', 'support@travianz.game', 0, 8, 0, 0, 0),
 (2, 'Nature', '', 'nature@travianz.game', 4, 8, 0, 0, 0),

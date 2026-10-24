@@ -214,6 +214,9 @@ function __construct() {
     public function Login($user) {
         global $database, $generator, $logging;
 
+        // local security fix: fresh session id on login (no session fixation)
+        session_regenerate_id(true);
+
         $this->logged_in = true;
 
         $_SESSION['sessid'] = $generator->generateRandID();
@@ -259,6 +262,7 @@ function __construct() {
             $database->updateActiveUser($user_sanitized, $this->time);
             $database->updateUserField($user_sanitized, "sessid", $_SESSION['sessid'], 0);
         }
+        $this->tzRefreshPwFingerprint($user);
 
         $logging->addLoginLog($dbarray['id'], \App\Utils\IpResolver::getClientIp() ?? ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'));
 
@@ -312,6 +316,35 @@ function __construct() {
         session_start();
     }
 
+    /**
+     * Local security fix: the session remembers a fingerprint of the account's
+     * password hash. When the password changes (profile, reset link) the
+     * fingerprint no longer matches and the session is logged out, on every
+     * device. Sessions from before this fix get their fingerprint on first use.
+     */
+    private static function tzPwHashFingerprint($user) {
+        global $database;
+        $u = $database->escape((string) $user);
+        $r = mysqli_query($database->dblink, "SELECT password FROM " . TB_PREFIX . "users WHERE username = '$u' LIMIT 1");
+        $row = $r ? mysqli_fetch_assoc($r) : null;
+        return $row ? substr(hash('sha256', (string) $row['password']), 0, 32) : '';
+    }
+
+    private function tzPwFingerprintOk($user) {
+        $fp = self::tzPwHashFingerprint($user);
+        if ($fp === '') return false;
+        if (!isset($_SESSION['tz_pwfp'])) {
+            $_SESSION['tz_pwfp'] = $fp;
+            return true;
+        }
+        return hash_equals((string) $_SESSION['tz_pwfp'], $fp);
+    }
+
+    /** Call after changing the logged-in account's own password to keep this session. */
+    public function tzRefreshPwFingerprint($user = null) {
+        $_SESSION['tz_pwfp'] = self::tzPwHashFingerprint($user ?? ($_SESSION['username'] ?? ''));
+    }
+
     public function changeChecker() {
         global $generator;
 
@@ -340,6 +373,12 @@ function __construct() {
         }
 
         if ($user && ($admin || isset($_SESSION['sessid']))) {
+
+            // local security fix: a password change or reset ends every session
+            if (!$admin && !$this->tzPwFingerprintOk($user)) {
+                unset($_SESSION['username'], $_SESSION['sessid'], $_SESSION['tz_pwfp']);
+                return false;
+            }
 
             $this->maintenance();
             $this->isWinner();

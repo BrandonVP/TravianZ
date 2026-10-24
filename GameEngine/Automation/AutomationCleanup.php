@@ -71,6 +71,7 @@ trait AutomationCleanup {
             'reports'  => 0,
             'chat'     => 0,
             'messages' => 0,
+            'logins'   => 0,
         );
 
         // --- Rapoarte de lupta ------------------------------------------------
@@ -127,6 +128,32 @@ trait AutomationCleanup {
                 $removed['messages'] = mysqli_affected_rows($database->dblink);
             }
         }
+
+        // --- Login data (local privacy fix) --------------------------------
+        // Login IPs and browser strings are kept LOGIN_DATA_RETENTION_DAYS
+        // (default 365, as promised in privacy.php), then deleted.
+        $loginDays = defined('LOGIN_DATA_RETENTION_DAYS') ? (int) LOGIN_DATA_RETENTION_DAYS : 365;
+
+        if ($loginDays > 0) {
+            $cutoff = time() - ($loginDays * 86400);
+
+            if (mysqli_query($database->dblink, "DELETE FROM " . TB_PREFIX . "login_log
+                  WHERE `date` < FROM_UNIXTIME(" . $cutoff . ") LIMIT " . $batch)) {
+                $removed['logins'] += mysqli_affected_rows($database->dblink);
+            }
+
+            // mad_session is created on the first login (MultiAccount), so it may be missing
+            $tzMad = mysqli_query($database->dblink, "SHOW TABLES LIKE '" . TB_PREFIX . "mad_session'");
+            if ($tzMad && mysqli_num_rows($tzMad) > 0
+                && mysqli_query($database->dblink, "DELETE FROM " . TB_PREFIX . "mad_session
+                  WHERE login_time < " . $cutoff . " LIMIT " . $batch)) {
+                $removed['logins'] += mysqli_affected_rows($database->dblink);
+            }
+        }
+
+        // Rate-limit rows (1 day) and expired password reset links
+        AuthThrottle::prune();
+        PasswordReset::prune();
 
         // Marker + ultimul rezultat (citit de panoul de admin pentru afisare).
         @file_put_contents(
