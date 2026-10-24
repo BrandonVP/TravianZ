@@ -25,6 +25,17 @@
 	Deny from all
 </Files>
 
+## Local (Empires of Rome): never serve backups, editor leftovers or build
+## files - a config.php.bak once exposed the database password - and hide the
+## git repository and dotfiles (.git, .env*) the site is served from.
+<FilesMatch "(\.(bak|orig|old|swp|save)$|\.bak[-.]|~$|^Dockerfile|^docker-compose|\.example$)">
+	Order Allow,Deny
+	Deny from all
+</FilesMatch>
+<IfModule mod_alias.c>
+	RedirectMatch 404 "/\.(git|env|svn|hg)"
+</IfModule>
+
 <Files "*.sql">
     Order Allow,Deny
     Deny from all
