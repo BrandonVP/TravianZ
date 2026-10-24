@@ -1,3 +1,23 @@
+## Local (Empires of Rome): behind Cloudflare, Apache only sees plain http.
+## Mark requests the visitor made over https as HTTPS so PHP sets the Secure
+## flag on session cookies (Session.php checks $_SERVER['HTTPS']). Direct LAN
+## access over http has no such header and keeps working.
+<IfModule mod_setenvif.c>
+	SetEnvIf X-Forwarded-Proto "^https$" HTTPS=on
+</IfModule>
+
+## Session cookie defaults for every page. Many pages call session_start()
+## themselves, so the flags set in Session.php did not always apply and the
+## first page of a visit handed out a cookie without them.
+<IfModule mod_php.c>
+	php_flag session.cookie_httponly on
+	php_value session.cookie_samesite Lax
+	php_flag session.use_strict_mode on
+	<If "%{HTTP:X-Forwarded-Proto} == 'https'">
+		php_flag session.cookie_secure on
+	</If>
+</IfModule>
+
 <Files "*.tpl">
 	Order Allow,Deny
 	Deny from all
