@@ -26,7 +26,9 @@ $nextProd      = $tzGoldAt($nextLevel);
 $tzFmt         = function ($v) { return rtrim(rtrim(number_format($v, 1), '0'), '.'); };
 ?>
 <div id="build" class="gid51">
-    <span class="build_logo tz-goldmine-logo" aria-hidden="true"></span>
+    <a href="#" onclick="return false;" class="build_logo">
+        <img class="building g51" src="img/x.gif" alt="<?= GOLDMINE ?>" title="<?= GOLDMINE ?>">
+    </a>
 
     <h1>
         <?= GOLDMINE ?>

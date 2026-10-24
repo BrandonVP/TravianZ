@@ -8389,6 +8389,9 @@ img.g3 {
 img.g4 {
     background-image: url("../../img/g/g4.gif");
 }
+img.g51 { /* local redesign: gold mine (art by Grok, gpack/travian_modern/img/g/g51.gif) */
+    background-image: url("../../img/g/g51.gif");
+}
 img.g5 {
     background-image: url("../../img/g/g5.gif");
 }

@@ -4,7 +4,7 @@
  *
  * fdata slots: 1-18 resource fields, 19-38 village buildings, 39 rally point,
  * 40 wall, 41-44 extra village building slots, 45-46 extra resource fields
- * (gold mines or a normal field, per village type - Data/fieldlayout.php),
+ * (gold mines or a normal field, per village type - see LAYOUTS below),
  * 99 Wonder of the World. Code that used to say "slot <= 18 is a field"
  * asks Slots::isField() instead.
  */
@@ -20,9 +20,9 @@ class Slots
      * Field design per village type (wdata.fieldtype 1-12): what slots 45 and
      * 46 hold, and optionally one original field turned into something else.
      * Types not listed get two gold mines in 45/46 and keep their 18 fields.
-     *   1 gold mine : array(45 => 51, 46 => 1)                (extra woodcutter)
-     *   3 gold mines: array(45 => 51, 46 => 51, 'convert' => array(5 => 51))
-     * Types 1 (9 crop) and 6 (15 crop) stay as they are.
+     * 1 gold mine: one of 45/46 is a normal field; 3 gold mines: 'convert'
+     * turns one original field into a mine (its level is kept). The 9- and
+     * 15-croppers (types 1 and 6) keep every crop field.
      */
     const LAYOUTS = array(
         // from the field-map art (img/fieldmap/f<type>.webp, 2026-10-23); types
@@ -45,6 +45,12 @@ class Slots
             46 => (int) ($l[46] ?? self::GOLD_MINE),
             'convert' => (array) ($l['convert'] ?? array()),
         );
+    }
+
+    /** Every fdata slot: fields, buildings 19-44, extra fields, WW (99). */
+    public static function all()
+    {
+        return array_merge(range(1, 46), array(99));
     }
 
     /** True for a resource field slot (1-18, 45, 46). */

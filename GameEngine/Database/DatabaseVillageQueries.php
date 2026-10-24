@@ -1381,99 +1381,14 @@ trait DatabaseVillageQueries {
         // please don't scream...
         // with the current table structure, there really IS NOT another way
         // (except for stored procedures, which we can't rely on to be allowed on the server)
-        $result = mysqli_query($this->dblink, 'SELECT '.
-         'CASE '.
-           'WHEN `f1t` IN ('.$fieldType.') THEN `f1` '.
-           'WHEN `f2t` IN ('.$fieldType.') THEN `f2` '.
-           'WHEN `f3t` IN ('.$fieldType.') THEN `f3` '.
-           'WHEN `f4t` IN ('.$fieldType.') THEN `f4` '.
-           'WHEN `f5t` IN ('.$fieldType.') THEN `f5` '.
-           'WHEN `f6t` IN ('.$fieldType.') THEN `f6` '.
-           'WHEN `f7t` IN ('.$fieldType.') THEN `f7` '.
-           'WHEN `f8t` IN ('.$fieldType.') THEN `f8` '.
-           'WHEN `f9t` IN ('.$fieldType.') THEN `f9` '.
-           'WHEN `f10t` IN ('.$fieldType.') THEN `f10` '.
-           'WHEN `f11t` IN ('.$fieldType.') THEN `f11` '.
-           'WHEN `f12t` IN ('.$fieldType.') THEN `f12` '.
-           'WHEN `f13t` IN ('.$fieldType.') THEN `f13` '.
-           'WHEN `f14t` IN ('.$fieldType.') THEN `f14` '.
-           'WHEN `f15t` IN ('.$fieldType.') THEN `f15` '.
-           'WHEN `f16t` IN ('.$fieldType.') THEN `f16` '.
-           'WHEN `f17t` IN ('.$fieldType.') THEN `f17` '.
-           'WHEN `f18t` IN ('.$fieldType.') THEN `f18` '.
-           'WHEN `f19t` IN ('.$fieldType.') THEN `f19` '.
-           'WHEN `f20t` IN ('.$fieldType.') THEN `f20` '.
-           'WHEN `f21t` IN ('.$fieldType.') THEN `f21` '.
-           'WHEN `f22t` IN ('.$fieldType.') THEN `f22` '.
-           'WHEN `f23t` IN ('.$fieldType.') THEN `f23` '.
-           'WHEN `f24t` IN ('.$fieldType.') THEN `f24` '.
-           'WHEN `f25t` IN ('.$fieldType.') THEN `f25` '.
-           'WHEN `f26t` IN ('.$fieldType.') THEN `f26` '.
-           'WHEN `f27t` IN ('.$fieldType.') THEN `f27` '.
-           'WHEN `f28t` IN ('.$fieldType.') THEN `f28` '.
-           'WHEN `f29t` IN ('.$fieldType.') THEN `f29` '.
-           'WHEN `f30t` IN ('.$fieldType.') THEN `f30` '.
-           'WHEN `f31t` IN ('.$fieldType.') THEN `f31` '.
-           'WHEN `f32t` IN ('.$fieldType.') THEN `f32` '.
-           'WHEN `f33t` IN ('.$fieldType.') THEN `f33` '.
-           'WHEN `f34t` IN ('.$fieldType.') THEN `f34` '.
-           'WHEN `f35t` IN ('.$fieldType.') THEN `f35` '.
-           'WHEN `f36t` IN ('.$fieldType.') THEN `f36` '.
-           'WHEN `f37t` IN ('.$fieldType.') THEN `f37` '.
-           'WHEN `f38t` IN ('.$fieldType.') THEN `f38` '.
-           'WHEN `f39t` IN ('.$fieldType.') THEN `f39` '.
-           'WHEN `f40t` IN ('.$fieldType.') THEN `f40` '.
-           'WHEN `f99t` IN ('.$fieldType.') THEN `f99` '.
-           'ELSE 0 '.
-         'END AS level '.
-         'FROM `'.TB_PREFIX.'fdata` '.
-         'WHERE '.
-           '`vref` = '.$vid.' '.
-           'AND ('.
-          '`f1t` IN ('.$fieldType.') OR '.
-          '`f2t` IN ('.$fieldType.') OR '.
-          '`f3t` IN ('.$fieldType.') OR '.
-          '`f4t` IN ('.$fieldType.') OR '.
-          '`f5t` IN ('.$fieldType.') OR '.
-          '`f6t` IN ('.$fieldType.') OR '.
-          '`f7t` IN ('.$fieldType.') OR '.
-          '`f8t` IN ('.$fieldType.') OR '.
-          '`f9t` IN ('.$fieldType.') OR '.
-          '`f10t` IN ('.$fieldType.') OR '.
-          '`f11t` IN ('.$fieldType.') OR '.
-          '`f12t` IN ('.$fieldType.') OR '.
-          '`f13t` IN ('.$fieldType.') OR '.
-          '`f14t` IN ('.$fieldType.') OR '.
-          '`f15t` IN ('.$fieldType.') OR '.
-          '`f16t` IN ('.$fieldType.') OR '.
-          '`f17t` IN ('.$fieldType.') OR '.
-          '`f18t` IN ('.$fieldType.') OR '.
-          '`f19t` IN ('.$fieldType.') OR '.
-          '`f20t` IN ('.$fieldType.') OR '.
-          '`f20t` IN ('.$fieldType.') OR '.
-          '`f21t` IN ('.$fieldType.') OR '.
-          '`f22t` IN ('.$fieldType.') OR '.
-          '`f23t` IN ('.$fieldType.') OR '.
-          '`f24t` IN ('.$fieldType.') OR '.
-          '`f25t` IN ('.$fieldType.') OR '.
-          '`f26t` IN ('.$fieldType.') OR '.
-          '`f27t` IN ('.$fieldType.') OR '.
-          '`f28t` IN ('.$fieldType.') OR '.
-          '`f29t` IN ('.$fieldType.') OR '.
-          '`f30t` IN ('.$fieldType.') OR '.
-          '`f30t` IN ('.$fieldType.') OR '.
-          '`f31t` IN ('.$fieldType.') OR '.
-          '`f32t` IN ('.$fieldType.') OR '.
-          '`f33t` IN ('.$fieldType.') OR '.
-          '`f34t` IN ('.$fieldType.') OR '.
-          '`f35t` IN ('.$fieldType.') OR '.
-          '`f36t` IN ('.$fieldType.') OR '.
-          '`f37t` IN ('.$fieldType.') OR '.
-          '`f38t` IN ('.$fieldType.') OR '.
-          '`f39t` IN ('.$fieldType.') OR '.
-          '`f40t` IN ('.$fieldType.') OR '.
-          '`f99t` IN ('.$fieldType.')) '.
-         'LIMIT 1');
+        // local redesign: lists built from Slots::all() (now also slots 41-46)
+        $tzWhen = $tzAny = array();
+        foreach (Slots::all() as $tzSlot) {
+            $tzWhen[] = 'WHEN `f'.$tzSlot.'t` IN ('.$fieldType.') THEN `f'.$tzSlot.'` ';
+            $tzAny[]  = '`f'.$tzSlot.'t` IN ('.$fieldType.')';
+        }
+        $result = mysqli_query($this->dblink, 'SELECT CASE '.implode('', $tzWhen).'ELSE 0 END AS level '.
+         'FROM `'.TB_PREFIX.'fdata` WHERE `vref` = '.$vid.' AND ('.implode(' OR ', $tzAny).') LIMIT 1');
         $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
 
         self::$fieldLevelsInVillageSearchCache[$vid.$fieldType] = isset($row['level']) ? (int)$row['level'] : 0;
@@ -1512,6 +1427,12 @@ trait DatabaseVillageQueries {
             return $cachedValue;
         }
 
+	    // local redesign: every slot from Slots::all() (now also 41-46 and 99)
+	    $tzParts = array();
+	    foreach (Slots::all() as $tzSlot) {
+	        $tzParts[] = '(f'.$tzSlot.'t = '.$field.($lvl !== false ? ' AND f'.$tzSlot.' '.$lvlComparisonSign.' '.$lvl : '').')';
+	    }
+	    $tzSlotsSql = implode("\n                    OR ", $tzParts);
 	    $q = "
             SELECT
             	Count(*) as Total
@@ -1523,46 +1444,7 @@ trait DatabaseVillageQueries {
             	u.id = ".$uid."
                 AND
                 (
-                    (f1t = ".$field.($lvl !== false ? ' AND f1 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f2t = ".$field.($lvl !== false ? ' AND f2 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f3t = ".$field.($lvl !== false ? ' AND f3 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f4t = ".$field.($lvl !== false ? ' AND f4 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f5t = ".$field.($lvl !== false ? ' AND f5 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f6t = ".$field.($lvl !== false ? ' AND f6 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f7t = ".$field.($lvl !== false ? ' AND f7 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f8t = ".$field.($lvl !== false ? ' AND f8 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f9t = ".$field.($lvl !== false ? ' AND f9 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f10t = ".$field.($lvl !== false ? ' AND f10 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f11t = ".$field.($lvl !== false ? ' AND f11 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f12t = ".$field.($lvl !== false ? ' AND f12 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f13t = ".$field.($lvl !== false ? ' AND f13 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f14t = ".$field.($lvl !== false ? ' AND f14 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f15t = ".$field.($lvl !== false ? ' AND f15 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f16t = ".$field.($lvl !== false ? ' AND f16 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f17t = ".$field.($lvl !== false ? ' AND f17 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f18t = ".$field.($lvl !== false ? ' AND f18 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f19t = ".$field.($lvl !== false ? ' AND f19 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f20t = ".$field.($lvl !== false ? ' AND f20 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f21t = ".$field.($lvl !== false ? ' AND f21 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f22t = ".$field.($lvl !== false ? ' AND f22 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f23t = ".$field.($lvl !== false ? ' AND f23 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f24t = ".$field.($lvl !== false ? ' AND f24 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f25t = ".$field.($lvl !== false ? ' AND f25 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f26t = ".$field.($lvl !== false ? ' AND f26 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f27t = ".$field.($lvl !== false ? ' AND f27 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f28t = ".$field.($lvl !== false ? ' AND f28 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f29t = ".$field.($lvl !== false ? ' AND f29 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f30t = ".$field.($lvl !== false ? ' AND f30 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f31t = ".$field.($lvl !== false ? ' AND f31 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f32t = ".$field.($lvl !== false ? ' AND f32 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f33t = ".$field.($lvl !== false ? ' AND f33 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f34t = ".$field.($lvl !== false ? ' AND f34 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f35t = ".$field.($lvl !== false ? ' AND f35 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f36t = ".$field.($lvl !== false ? ' AND f36 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f37t = ".$field.($lvl !== false ? ' AND f37 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f38t = ".$field.($lvl !== false ? ' AND f38 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f39t = ".$field.($lvl !== false ? ' AND f39 '.$lvlComparisonSign.' '.$lvl : '').")
-                    OR (f40t = ".$field.($lvl !== false ? ' AND f40 '.$lvlComparisonSign.' '.$lvl : '').")
+                    ".$tzSlotsSql."
                 )";
 
 	    $result = mysqli_query($this->dblink,$q);
