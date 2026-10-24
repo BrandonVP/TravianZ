@@ -2156,3 +2156,52 @@ div#build.gid37 .t4advRunning b { color: #5a3d14; }
 .tz-hero-ql { display: inline-block; margin-left: 3px; padding: 0 5px; border-radius: 999px; font-size: 10px; font-weight: 700; vertical-align: 1px; }
 .tz-hero-ql.up { background: #dfeccb; color: #2f5220; }
 .tz-hero-ql.down { background: #f3dcd3; color: #8a2f1c; }
+
+/* local redesign: building pages and the Marketplace on phones */
+@media (max-width: 640px) {
+    /* smaller building picture, so title and description get the width back */
+    div#content.build div#build a.build_logo img.building {
+        width: 54px; height: 72px; background-size: 54px 72px; right: 6px;
+    }
+    div#content.build div#build h1 { padding-right: 64px; }
+    div#content.build div#build p.build_desc { padding-right: 0; }
+
+    /* Send resources: one column, full width */
+    div#build.gid17 table.send_res,
+    div#build.gid17 table.res_target { float: none; width: 100%; margin: 0 0 10px; }
+    div#build.gid17 table.send_res td.nam { width: auto; }
+    div#build.gid17 table.send_res td.val { width: 40%; }
+    div#build.gid17 table.send_res td.val input.text { width: 100%; min-width: 70px; box-sizing: border-box; }
+    div#build.gid17 table.send_res td.max { width: auto; text-align: right; white-space: nowrap; }
+    div#build.gid17 table#target_select td.vil *,
+    div#build.gid17 table#target_select td.coo * { float: none; }
+    div#build.gid17 table#target_select td.vil { display: flex; align-items: center; gap: 10px; }
+    div#build.gid17 table#target_select td.vil input.text { flex: 1 1 auto; width: auto; min-width: 0; margin: 0; }
+    div#build.gid17 table#target_select td.coo { display: flex; align-items: center; gap: 8px; }
+    div#build.gid17 table#target_select td.coo input.text { width: 70px; margin: 0 10px 0 0; }
+    div#build.gid17 .tz-express-opt,
+    div#build.gid17 .tz-express-opt label { white-space: normal; }
+
+    /* Buy: filters stacked, 1:1 / 1:x side by side */
+    div#build.gid17 table.buy_select,
+    div#build.gid17 table#search_select,
+    div#build.gid17 table#ratio_select,
+    div#build.gid17 table#bid_select { float: none; margin: 0 0 8px; }
+    div#build.gid17 table#ratio_select tbody { display: flex; }
+    div#build.gid17 table#ratio_select tr { display: block; }
+
+    /* Offer: the transport-time / alliance options get their own row */
+    div#build.gid17 table#sell { width: 100%; }
+    div#build.gid17 table#sell tr { display: flex; flex-wrap: wrap; align-items: center; }
+    div#build.gid17 table#sell th { flex: 0 0 88px; width: auto; text-align: left; }
+    div#build.gid17 table#sell td.val { flex: 1 1 70px; width: auto; }
+    div#build.gid17 table#sell td.val input.text { width: 100%; box-sizing: border-box; }
+    div#build.gid17 table#sell td.res { flex: 0 0 auto; width: auto; }
+    div#build.gid17 table#sell td.tra,
+    div#build.gid17 table#sell td.al { flex: 1 1 100%; width: auto; }
+
+    /* NPC trading: inputs shrink so the table fits */
+    div#build.gid17 table#npc td { padding-left: 2px; padding-right: 2px; }
+    div#build.gid17 table#npc input { width: 100%; min-width: 0; box-sizing: border-box; }
+    div#build.gid17 table#npc td.sum { white-space: normal; font-size: 0.9em; }
+}
