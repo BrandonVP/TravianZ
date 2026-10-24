@@ -797,7 +797,7 @@ tz_def('LEARN1', 'Upgrade your fields and mines to increase your resource produc
 tz_def('LEARN2', 'Construct and expand the buildings in your village. Buildings improve your overall infrastructure, increase your resource production and allow you to research, train and upgrade your troops.');
 tz_def('LEARN3', 'View and interact with your surroundings. You can make new friends or new enemies, make use of the nearby oases and observe as your empire grows and becomes stronger.');
 tz_def('LEARN4', 'Follow your improvement and success and compare yourself to other players. Look at the Top 10 rankings and fight to win a weekly medal.');
-tz_def('LEARN5', 'Receive detailed reports about your adventures, trades and battles. Don`t forget to check the brand new reports about the happenings taking place in your surroundings.');
+tz_def('LEARN5', 'Receive detailed reports about your quests, trades and battles. Don`t forget to check the brand new reports about the happenings taking place in your surroundings.');
 tz_def('LEARN6', 'Exchange information and conduct diplomacy with other players. Always remember that communication is the key to winning new friends and solving old conflicts.');
 tz_def('LOGIN_TO', 'Log in to '.SERVER_NAME);
 tz_def('REGIN_TO', 'Register in '.SERVER_NAME);
@@ -2826,7 +2826,7 @@ if (!function_exists('tz_loc_topic')) {
 tz_def('HERO_T4_TAB_HERO',       'Hero');
 tz_def('HERO_T4_TAB_OASIS',      'Oasis');
 tz_def('HERO_T4_TAB_ITEMS',      'Inventory');
-tz_def('HERO_T4_TAB_ADVENTURES', 'Adventures');
+tz_def('HERO_T4_TAB_ADVENTURES', 'Quests');
 tz_def('HERO_T4_TAB_AUCTION',    'Auctions');
 
 tz_def('HERO_EXCHANGE', 'Exchange office');
@@ -2856,7 +2856,7 @@ tz_def('HERO_SLOT_7', 'Bag');
 /* Inventory actions */
 tz_def('HERO_ITEMS_EQUIPPED',    'Equipped');
 tz_def('HERO_ITEMS_BAG',         'Inventory');
-tz_def('HERO_ITEMS_EMPTY',       'Your hero owns no items yet. Adventures and the auction house are good places to find some.');
+tz_def('HERO_ITEMS_EMPTY',       'Your hero owns no items yet. Quests and the auction house are good places to find some.');
 tz_def('HERO_EQUIP',             'Equip');
 tz_def('HERO_UNEQUIP',           'Take off');
 tz_def('HERO_USE_ITEM',          'Use');
@@ -2869,11 +2869,11 @@ tz_def('HERO_LOCKED_NOHERO', 'You have no hero yet. Train one in the Hero\'s Man
 tz_def('HERO_EQUIP_FAIL',        'This item cannot be equipped (wrong hero unit or item type).');
 tz_def('HERO_UNEQUIP_OK',        'Item taken off.');
 
-/* Adventures */
-tz_def('HERO_ADV_NORMAL',        'a normal adventure');
-tz_def('HERO_ADV_HARD',          'a hard adventure');
-tz_def('HERO_ADV_LIST',          'Available adventures');
-tz_def('HERO_ADV_NONE',          'No adventures available right now. New ones appear over time.');
+/* Hero quests (were "adventures") */
+tz_def('HERO_ADV_NORMAL',        'a normal quest');
+tz_def('HERO_ADV_HARD',          'a hard quest');
+tz_def('HERO_ADV_LIST',          'Available quests');
+tz_def('HERO_ADV_NONE',          'No quests available right now. New ones appear over time.');
 tz_def('HERO_ADV_DIFFICULTY',    'Difficulty');
 tz_def('HERO_ADV_DIFF_NORMAL',   'Normal');
 tz_def('HERO_ADV_DIFF_HARD',     'Hard');
@@ -2882,12 +2882,12 @@ tz_def('HERO_ADV_DANGER', 'Danger');
 tz_def('HERO_ADV_LINK', 'Link');
 tz_def('HERO_ADV_DURATION',      'Travel time (one way)');
 tz_def('HERO_ADV_EXPIRES',       'Expires in');
-tz_def('HERO_ADV_GO',            'Start adventure');
-tz_def('HERO_ADV_RUNNING',       'Your hero is on an adventure and will arrive in');
-tz_def('HERO_ADV_START_OK',      'Your hero has set off on the adventure.');
-tz_def('HERO_ADV_START_NOHERO',  'You need a living hero to start an adventure.');
+tz_def('HERO_ADV_GO',            'Start quest');
+tz_def('HERO_ADV_RUNNING',       'Your hero is on a quest and will arrive in');
+tz_def('HERO_ADV_START_OK',      'Your hero has set off on the quest.');
+tz_def('HERO_ADV_START_NOHERO',  'You need a living hero to start a quest.');
 tz_def('HERO_ADV_START_AWAY',    'Your hero is not at home.');
-tz_def('HERO_ADV_START_FAIL',    'This adventure is no longer available.');
+tz_def('HERO_ADV_START_FAIL',    'This quest is no longer available.');
 tz_def('HERO_ADV_RETURNED',      'Your hero has returned from');
 tz_def('HERO_ADV_REWARD',        'Reward');
 tz_def('HERO_ADV_AMOUNT',        'Amount');
@@ -2926,16 +2926,17 @@ tz_def('HERO_AUC_PAYOUT',        'Payout');
 tz_def('HERO_AUC_EXPIRED',       'Your auction ended without bids. The item was returned to your inventory:');
 
 /* Report topics (raw English strings live in ndata.topic) */
-tz_def('TZ_RT_ADV_RETURNED',     'Hero returned from an adventure');
-tz_def('TZ_RT_ADV_FELL',         'Hero fell on an adventure');
+tz_def('TZ_RT_ADV_RETURNED',     'Hero returned from a quest');
+tz_def('TZ_RT_ADV_FELL',         'Hero fell on a quest');
+tz_def('TZ_REPORTS_QUESTS',      'Quests');
 tz_def('TZ_RT_AUC_WON',          'Auction won');
 tz_def('TZ_RT_AUC_SOLD',         'Auction sold');
 tz_def('TZ_RT_AUC_EXPIRED',      'Auction expired');
 
 /* T4 hero port - movement display (dorf1 + rally point) */
-tz_def('HERO_ADV_MOV_OUT',   'Hero on an adventure');
-tz_def('HERO_ADV_MOV_BACK',  'Hero returning from an adventure');
-tz_def('HERO_ADV_MOV_SHORT', 'Adventure');
+tz_def('HERO_ADV_MOV_OUT',   'Hero on a quest');
+tz_def('HERO_ADV_MOV_BACK',  'Hero returning from a quest');
+tz_def('HERO_ADV_MOV_SHORT', 'Quest');
 
 /* T4 hero port - tooltip effect fragments (heroItemBonusText) */
 tz_def('HB_TXT_FIGHT',      'fighting strength');
@@ -3578,7 +3579,7 @@ tz_def('ADM_ROLE', 'Role');
 tz_def('ADM_PRICE', 'Price');
 tz_def('ADM_ENDS', 'Ends');
 tz_def('ADM_CANCEL', 'Cancel');
-tz_def('ADM_ADVENTURES', 'Adventures');
+tz_def('ADM_ADVENTURES', 'Quests');
 tz_def('ADM_RUNNING', 'Running:');
 tz_def('ADM_OFFER', 'Offer');
 tz_def('ADM_DIFFICULTY', 'Difficulty');
@@ -4379,11 +4380,11 @@ tz_def('HERO_HEADER_AT_HOME',   'Hero at home');
 tz_def('HERO_HEADER_DEAD',      'Hero is dead');
 tz_def('HERO_HEADER_TRAINING',  'Hero in training');
 tz_def('HERO_HEADER_NOHERO',    'No hero yet');
-tz_def('HERO_HEADER_ADVENTURE', 'Hero on adventure');
+tz_def('HERO_HEADER_ADVENTURE', 'Hero on a quest');
 tz_def('HERO_HEADER_ATTACK',    'Hero is with the army');
 tz_def('HERO_HEADER_REINFORCE', 'Hero is reinforcing');
 tz_def('HERO_HEADER_IN',        'in');
-tz_def('HERO_HEADER_RETURN_ADV',  'Hero returning from adventure');
+tz_def('HERO_HEADER_RETURN_ADV',  'Hero returning from a quest');
 tz_def('HERO_HEADER_RETURN_HOME', 'Hero returning home');
 tz_def('HERO_HEADER_PER_HOUR',    'per hour');
 tz_def('TZ_HEALTH',             'Health');

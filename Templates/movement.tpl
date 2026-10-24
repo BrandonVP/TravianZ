@@ -312,8 +312,8 @@ foreach ($movement20_0 as $receive) {
 renderMovementRow(
     'adv_out',
     'adv',
-    defined('HERO_ADV_MOV_OUT') ? HERO_ADV_MOV_OUT : 'Hero on an adventure',
-    defined('HERO_ADV_MOV_SHORT') ? HERO_ADV_MOV_SHORT : 'Adventure',
+    defined('HERO_ADV_MOV_OUT') ? HERO_ADV_MOV_OUT : 'Hero on a quest',
+    defined('HERO_ADV_MOV_SHORT') ? HERO_ADV_MOV_SHORT : 'Quest',
     count($movement20_0),
     !empty($advOutArrival) ? min($advOutArrival) : 0,
     $generator,
@@ -327,8 +327,8 @@ foreach ($movement21_1 as $receive) {
 renderMovementRow(
     'adv_back',
     'd1',
-    defined('HERO_ADV_MOV_BACK') ? HERO_ADV_MOV_BACK : 'Hero returning from an adventure',
-    defined('HERO_ADV_MOV_SHORT') ? HERO_ADV_MOV_SHORT : 'Adventure',
+    defined('HERO_ADV_MOV_BACK') ? HERO_ADV_MOV_BACK : 'Hero returning from a quest',
+    defined('HERO_ADV_MOV_SHORT') ? HERO_ADV_MOV_SHORT : 'Quest',
     count($movement21_1),
     !empty($advBackArrival) ? min($advBackArrival) : 0,
     $generator,

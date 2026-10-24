@@ -45,7 +45,7 @@ $goldFeatures = [
     ['title'=>'Express caravans', 'img'=>null, 'text'=>'With a Trade Office: send resources to your own villages much faster for ' . TZ_EXPRESS_GOLD_PER_MERCHANT . ' gold per merchant.'],
     ['title'=>'NPC Merchant', 'img'=>'npc', 'text'=>'Exchange resources 1:1 for ' . TZ_GOLD_PRICE_NPC . ' gold. Deliberately expensive - contracts are the better deal.'],
     ['title'=>'Trade routes', 'img'=>null, 'text'=>'Automatic Marketplace shipments for ' . TZ_GOLD_PRICE_ROUTE . ' gold per route, with optional auto-renew and a "send when storage is full" trigger.'],
-    ['title'=>'Hero services', 'img'=>null, 'text'=>'In the Hero\'s Mansion: finish a revive, heal your hero (' . TZ_HERO_HEAL_GOLD_PER_HP . ' gold per missing %) or find new adventures (' . TZ_HERO_REROLL_GOLD . ' gold).'],
+    ['title'=>'Hero services', 'img'=>null, 'text'=>'In the Hero\'s Mansion: finish a revive, heal your hero (' . TZ_HERO_HEAL_GOLD_PER_HP . ' gold per missing %) or find new quests (' . TZ_HERO_REROLL_GOLD . ' gold).'],
     ['title'=>'War games', 'img'=>null, 'text'=>'In the Tournament Square: an exercise that gives the next attack or raid from the village +5% to +15% attack.'],
     ['title'=>'Festivities', 'img'=>null, 'text'=>'In the Residence or Palace: Harvest Feast and Travelling Players for loyalty, Patron of the Arts and the Village Monument for culture points - each once a week.'],
     ['title'=>'Rented storage', 'img'=>null, 'text'=>'On the Warehouse and Granary pages: hire storage carts or grain lofts for +25% room for a day (wood for the carts, plus gold).'],

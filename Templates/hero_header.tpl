@@ -411,11 +411,11 @@ $tzTxtAtHome     = defined('HERO_HEADER_AT_HOME')  ? HERO_HEADER_AT_HOME  : 'Her
 $tzTxtDead       = defined('HERO_HEADER_DEAD')     ? HERO_HEADER_DEAD     : 'Hero is dead';
 $tzTxtTraining   = defined('HERO_HEADER_TRAINING') ? HERO_HEADER_TRAINING : 'Hero in training';
 $tzTxtNoHero     = defined('HERO_HEADER_NOHERO')   ? HERO_HEADER_NOHERO   : 'No hero yet';
-$tzTxtAdventure  = defined('HERO_HEADER_ADVENTURE') ? HERO_HEADER_ADVENTURE : 'Hero on adventure';
+$tzTxtAdventure  = defined('HERO_HEADER_ADVENTURE') ? HERO_HEADER_ADVENTURE : 'Hero on a quest';
 $tzTxtAttack     = defined('HERO_HEADER_ATTACK')    ? HERO_HEADER_ATTACK    : 'Hero is with the army';
 $tzTxtReinforce  = defined('HERO_HEADER_REINFORCE') ? HERO_HEADER_REINFORCE : 'Hero is reinforcing';
 $tzTxtIn         = defined('HERO_HEADER_IN')        ? HERO_HEADER_IN        : 'in';
-$tzTxtRetAdv     = defined('HERO_HEADER_RETURN_ADV')  ? HERO_HEADER_RETURN_ADV  : 'Hero returning from adventure';
+$tzTxtRetAdv     = defined('HERO_HEADER_RETURN_ADV')  ? HERO_HEADER_RETURN_ADV  : 'Hero returning from a quest';
 $tzTxtRetHome    = defined('HERO_HEADER_RETURN_HOME') ? HERO_HEADER_RETURN_HOME : 'Hero returning home';
 $tzTxtResources  = defined('RESOURCES')            ? RESOURCES            : 'Resources';
 $tzTxtPerHour    = defined('HERO_HEADER_PER_HOUR') ? HERO_HEADER_PER_HOUR : 'per hour';
@@ -424,7 +424,7 @@ $tzTxtLevel      = defined('LEVEL')                ? LEVEL                : 'Lev
 $tzTxtHealth     = defined('TZ_HEALTH')            ? TZ_HEALTH            : 'Health';
 $tzTxtExperience = defined('EXPERIENCE')           ? EXPERIENCE           : 'Experience';
 $tzTxtSilver     = defined('HERO_SILVER')          ? HERO_SILVER          : 'Silver';
-$tzTxtAdventures = defined('HERO_T4_TAB_ADVENTURES') ? HERO_T4_TAB_ADVENTURES : 'Adventures';
+$tzTxtAdventures = defined('HERO_T4_TAB_ADVENTURES') ? HERO_T4_TAB_ADVENTURES : 'Quests';
 
 /**
  * Numele afisate vin din baza de date, deci trec obligatoriu prin escape.

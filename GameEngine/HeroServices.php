@@ -116,7 +116,7 @@ class HeroServices
             $db->addVillageGold($village->wid, $price, VillageGold::capOf($village));
             return false;
         }
-        self::log($db, $village, $uid, 'New hero adventures', $price);
+        self::log($db, $village, $uid, 'New hero quests', $price);
         return true;
     }
 

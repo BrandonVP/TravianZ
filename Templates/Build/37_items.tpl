@@ -33,7 +33,7 @@ if ($t4AwayReason === 'nohero') {
         : 'You have no hero yet. Train one in the Hero\'s Mansion before equipping items.';
 } elseif ($t4AwayReason === 'adventure') {
     $t4AwayText = defined('HERO_LOCKED_ADVENTURE') ? HERO_LOCKED_ADVENTURE
-        : 'Your hero is on an adventure. Equipment can only be changed while the hero is in a village.';
+        : 'Your hero is on a quest. Equipment can only be changed while the hero is in a village.';
 } elseif ($t4AwayReason === 'attack') {
     $t4AwayText = defined('HERO_LOCKED_ATTACK') ? HERO_LOCKED_ATTACK
         : 'Your hero is on the move with the army. Equipment can only be changed while the hero is in a village.';

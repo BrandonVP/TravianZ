@@ -67,6 +67,7 @@ if(isset($_GET['newdid'])) {
  | <a href="berichte.php?t=1" <?php if (isset($_GET['t']) && $_GET['t'] == 1) { echo "class=\"selected \""; } ?>><?php echo REINFORCEMENT; ?></a>
  | <a href="berichte.php?t=3" <?php if (isset($_GET['t']) && $_GET['t'] == 3) { echo "class=\"selected \""; } ?>><?php echo TZ_ATTACKS; ?></a>
  | <a href="berichte.php?t=4" <?php if (isset($_GET['t']) && $_GET['t'] == 4) { echo "class=\"selected \""; } ?>><?php echo TZ_MISCELLANEOUS; ?></a>
+ | <a href="berichte.php?t=6" <?php if (isset($_GET['t']) && $_GET['t'] == 6) { echo "class=\"selected \""; } ?>><?php echo defined('TZ_REPORTS_QUESTS') ? TZ_REPORTS_QUESTS : 'Quests'; ?></a>
  <?php if($session->plus) {
  echo "| <a href=\"berichte.php?t=5\"";
  if (isset($_GET['t']) && $_GET['t'] == 5) { echo "class=\"selected \""; }

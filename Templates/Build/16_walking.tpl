@@ -32,8 +32,8 @@ if (defined('NEW_FUNCTIONS_HERO_T4') && NEW_FUNCTIONS_HERO_T4) {
 <?php foreach ($advWalking as $m):
     $session->timer++;
     $action = $m['t4adv'] === 'out'
-        ? (defined('HERO_ADV_MOV_OUT') ? HERO_ADV_MOV_OUT : 'Hero on an adventure')
-        : (defined('HERO_ADV_MOV_BACK') ? HERO_ADV_MOV_BACK : 'Hero returning from an adventure');
+        ? (defined('HERO_ADV_MOV_OUT') ? HERO_ADV_MOV_OUT : 'Hero on a quest')
+        : (defined('HERO_ADV_MOV_BACK') ? HERO_ADV_MOV_BACK : 'Hero returning from a quest');
     $dt = $generator->procMtime($m['endtime']);
 ?>
 <table class="troop_details" cellpadding="1" cellspacing="1">

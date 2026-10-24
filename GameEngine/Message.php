@@ -137,6 +137,9 @@ class Message
                 case 4:
                     $type = [0, 18, 19, 20, 21, 24, 25];
                     break;
+                case 6: // local redesign: hero quests
+                    $type = [26];
+                    break;
                 case 5:
                     if (!$session->plus) {
                         header("Location: berichte.php");

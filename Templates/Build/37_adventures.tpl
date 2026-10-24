@@ -100,7 +100,7 @@ $tzAdvDetails = function ($offer, $prof) use ($tzAdvXpBonus, $tzAdvHealth, $tzAd
         foreach ($nonzero as $k => $r) $parts[] = '<b>' . ucfirst($names[$k]) . '</b> ' . number_format($r[0]) . '&ndash;' . number_format($r[1]);
     }
     if ($tzAdvFirst) {
-        $parts[] = '<b>First adventure:</b> ' . (function_exists('heroItemName') ? heroItemName(HeroAdventure::FIRST_ADVENTURE_ITEM) : 'a special item');
+        $parts[] = '<b>First quest:</b> ' . (function_exists('heroItemName') ? heroItemName(HeroAdventure::FIRST_ADVENTURE_ITEM) : 'a special item');
     } else {
         $parts[] = '<b>Item</b> ' . $gear . '% gear, ' . $cons . '% consumable';
     }
@@ -112,9 +112,9 @@ if ($tzAdvHeroRow) {
     $tzS = $t4Adventures->strength($session->uid, $tzAdvHeroRow);
     $tzF = $tzS['ref'] / max(1, $tzS['power']);
     if ($tzF > 1.05) {
-        $tzAdvStrengthNote = 'Your hero is weaker than usual for level ' . (int) $tzAdvHeroRow['level'] . ' (fighting strength ' . number_format($tzS['power']) . ' vs ' . number_format($tzS['ref']) . '), so adventures hurt more. Points in attack or defence, or fighting gear, make them safer.';
+        $tzAdvStrengthNote = 'Your hero is weaker than usual for level ' . (int) $tzAdvHeroRow['level'] . ' (fighting strength ' . number_format($tzS['power']) . ' vs ' . number_format($tzS['ref']) . '), so quests hurt more. Points in attack or defence, or fighting gear, make them safer.';
     } elseif ($tzF < 0.95) {
-        $tzAdvStrengthNote = 'Your hero is strong for level ' . (int) $tzAdvHeroRow['level'] . ' (fighting strength ' . number_format($tzS['power']) . ' vs ' . number_format($tzS['ref']) . '), so adventures hurt less.';
+        $tzAdvStrengthNote = 'Your hero is strong for level ' . (int) $tzAdvHeroRow['level'] . ' (fighting strength ' . number_format($tzS['power']) . ' vs ' . number_format($tzS['ref']) . '), so quests hurt less.';
     }
     if ($tzS['reduce'] > 0) {
         $tzAdvStrengthNote .= ($tzAdvStrengthNote ? ' ' : '') . 'Armour takes ' . (int) $tzS['reduce'] . ' off every health loss.';
@@ -355,6 +355,52 @@ table.t4adv .tz-adv-good { color: #3f7a2a; }
 <?php if ($tzHeroMsg !== '') echo '<p class="tz-hero-msg">' . htmlspecialchars($tzHeroMsg) . '</p>'; ?>
 <?php if (VillageGold::pays($village)) {
     echo '<div class="tz-hero-reroll">'
-       . HeroServices::button('reroll', 'Find new adventures', HeroServices::rerollPrice(), 'Replace the available adventures with new ones for ' . HeroServices::rerollPrice() . ' gold?')
-       . '<span class="tz-hero-hint">Replaces the adventures on offer (not one already under way).</span></div>';
+       . HeroServices::button('reroll', 'Find new quests', HeroServices::rerollPrice(), 'Replace the available quests with new ones for ' . HeroServices::rerollPrice() . ' gold?')
+       . '<span class="tz-hero-hint">Replaces the quests on offer (not one already under way).</span></div>';
 } ?>
+
+<?php
+// local redesign: quest log - the last finished quests, kept in hero_adventure
+// (outlives the reports, which are deleted or cleaned up after 14 days)
+$tzQLog = $t4Adventures->getLog($session->uid, 10);
+if ($tzQLog) { ?>
+<style>
+.tz-qlog { width: 100%; margin-top: 14px; border-collapse: collapse; font-size: 12px; }
+.tz-qlog caption { text-align: left; font-weight: 700; padding: 0 0 6px; color: #5a4128; }
+.tz-qlog td { padding: 6px 5px; border-top: 1px solid var(--tz-line, #e3d3b0); vertical-align: top; }
+.tz-qlog .q-when { color: #8a7a62; white-space: nowrap; width: 1%; }
+.tz-qlog .q-place b { display: block; }
+.tz-qlog .q-hard { color: #a0402a; font-size: 11px; font-weight: 700; }
+.tz-qlog .q-ok { color: #3f7a2a; font-weight: 700; }
+.tz-qlog .q-dead { color: #a0402a; font-weight: 700; }
+.tz-qlog .q-sub { color: #7a6650; }
+.tz-qlog .q-link { text-align: right; white-space: nowrap; width: 1%; }
+</style>
+<table class="tz-qlog">
+    <caption>Recent quests</caption>
+    <?php foreach ($tzQLog as $tzQ) {
+        $d = $tzQ['data'];
+        $tzQDef = $heroAdventureConfig['types'][(int) $tzQ['type']] ?? null;
+        $tzQWhen = $generator->procMtime((int) $tzQ['finished']);
+        $tzQDead = !empty($d['died']);
+        $tzQRes = (int) ($d['wood'] ?? 0) + (int) ($d['clay'] ?? 0) + (int) ($d['iron'] ?? 0) + (int) ($d['crop'] ?? 0);
+        $tzQBits = array();
+        if (!$tzQDead) {
+            $tzQBits[] = '+' . number_format((int) ($d['exp'] ?? 0)) . ' XP';
+            if ($tzQRes > 0) $tzQBits[] = number_format($tzQRes) . ' resources';
+            if (!empty($d['itemid'])) $tzQBits[] = heroItemName((int) $d['itemid']);
+        }
+        $tzQHp = !empty($d['heal']) ? '+' . (int) $d['heal'] . '% health' : (!empty($d['hp']) ? '&minus;' . (int) $d['hp'] . '% health' : '');
+    ?>
+    <tr>
+        <td class="q-when"><?php echo $tzQWhen[0] . '<br>' . substr($tzQWhen[1], 0, 5); ?></td>
+        <td class="q-place"><b><?php echo $tzQDef ? htmlspecialchars($tzQDef['name']) : 'Quest'; ?><?php if ((int) $tzQ['difficulty'] === 1) { ?> <span class="q-hard">Hard</span><?php } ?></b>
+            <span class="q-sub"><?php echo !empty($d['foe']) && $tzQDef && !empty($tzQDef['foe']) ? 'vs ' . htmlspecialchars($tzQDef['foe'][(int) $tzQ['difficulty']] ?? $tzQDef['foe'][0]) : ''; ?></span></td>
+        <td><?php echo $tzQDead ? '<span class="q-dead">Hero fell</span>' : '<span class="q-ok">Completed</span>'; ?>
+            <span class="q-sub"><?php echo $tzQHp; ?></span><br>
+            <span class="q-sub"><?php echo implode(' &middot; ', $tzQBits); ?></span></td>
+        <td class="q-link"><?php if ((int) $tzQ['has_report'] > 0) { ?><a href="berichte.php?id=<?php echo (int) $tzQ['report']; ?>">Report</a><?php } ?></td>
+    </tr>
+    <?php } ?>
+</table>
+<?php } ?>

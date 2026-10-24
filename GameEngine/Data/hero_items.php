@@ -378,15 +378,18 @@ $heroAdventureConfig = array(
      * 'weight' = how often it is offered (terrain adjusts it, see
      * HeroAdventure::pickType); 'single_res' = all resources as one kind;
      * 'heal' = health restored instead of lost (per difficulty);
-     * 'pool' = consumables found there; 'tiers' = gear tier weights. */
+     * 'pool' = consumables found there; 'tiers' = gear tier weights;
+     * 'foe' = who the hero faces (normal, hard), shown in the quest report. */
     'types' => array(
         0 => array( // offers made before site types existed
             'name' => 'Abandoned valley', 'hint' => 'A bit of everything',
+            'foe'  => array('wild animals', 'a pack of wild animals'),
             'weight' => 0, 'xp' => 1, 'res' => 1, 'hp' => 1, 'gear' => 1, 'cons' => 1,
             'story' => array('Your hero searched the valley and came back with what could be found.'),
         ),
         1 => array(
             'name' => 'Bandit camp', 'hint' => 'Mostly resources',
+            'foe'  => array('a band of bandits', 'a fortified bandit camp'),
             'weight' => 25, 'xp' => 0.8, 'res' => 1.8, 'hp' => 1.1, 'gear' => 0.6, 'cons' => 0.8,
             'pool' => array(206, 207, 203, 200),
             'story' => array(
@@ -397,6 +400,7 @@ $heroAdventureConfig = array(
         ),
         2 => array(
             'name' => 'Ancient ruins', 'hint' => 'Best chance of gear',
+            'foe'  => array('old traps', 'traps and the ruin guardians'),
             'weight' => 20, 'xp' => 0.8, 'res' => 0.3, 'hp' => 0.7, 'gear' => 2.0, 'cons' => 0.7,
             'pool' => array(201, 201, 201, 201, 203, 203, 203, 204, 205),
             'tiers' => array(1 => 45, 2 => 40, 3 => 15),
@@ -408,6 +412,7 @@ $heroAdventureConfig = array(
         ),
         3 => array(
             'name' => 'Beast lair', 'hint' => 'Lots of XP, dangerous',
+            'foe'  => array('a wolf pack', 'a cave bear'),
             'weight' => 20, 'xp' => 2.0, 'res' => 0.4, 'hp' => 1.5, 'gear' => 0.7, 'cons' => 1.3,
             'pool' => array(208, 208, 208, 200, 206),
             'story' => array(
@@ -418,6 +423,7 @@ $heroAdventureConfig = array(
         ),
         4 => array(
             'name' => 'Lost caravan', 'hint' => 'Safe, one kind of resource',
+            'foe'  => array('a few scavengers', 'raiders picking over the wreck'),
             'weight' => 20, 'xp' => 0.5, 'res' => 3.0, 'hp' => 0.3, 'gear' => 0.3, 'cons' => 0.7,
             'single_res' => true,
             'pool' => array(200, 201, 206),

@@ -399,6 +399,20 @@ class HeroAdventure
             $health    = (float) $hero['health'];
             $newHealth = min(100, $health - $hpLoss + $heal);
 
+            // local redesign: context for the quest report and the quest log -
+            // the real numbers the roll used (site, trip, hero strength vs the
+            // strength expected at its level, armour), not a simulated battle
+            $tzS    = $this->strength($uid, $hero);
+            $tzDef  = $heroAdventureConfig['types'][(int) $data['type']] ?? $heroAdventureConfig['types'][0];
+            $tzName = ($tzDef['name'] ?? 'Quest') . ((int) $data['difficulty'] === 1 ? ' (hard)' : '');
+            $tzCtx  = '&site=' . (int) $data['to'] . '&x=' . (int) $o['x'] . '&y=' . (int) $o['y'] . '&dist=' . round((float) $o['dist'], 1)
+                    . '&leg=' . (int) $this->travelLegDuration($data)
+                    . '&lvl=' . (int) $hero['level'] . '&xp0=' . (int) $hero['experience']
+                    . '&hpb=' . round($health, 1) . '&pow=' . (int) round($tzS['power'])
+                    . '&ref=' . (int) round($tzS['ref']) . '&red=' . (int) $tzS['reduce']
+                    . '&fac=' . round((float) $o['factor'], 2) . '&foe=' . (empty($tzDef['heal']) ? 1 : 0)
+                    . '&hero=' . rawurlencode((string) ($hero['name'] ?? ''));
+
             if ($newHealth <= 0) {
                 /* ---- Hero dies at the site: loot forfeited, no return trip. ---- */
                 $stmt = $this->db->prepare(
@@ -433,9 +447,11 @@ class HeroAdventure
                           WHERE v.owner = " . $heroOwner . " AND e.hero > 0");
                 }
 
-                $payload = 'difficulty=' . (int) $data['difficulty'] . '&type=' . (int) $data['type'] . '&died=1&hp=' . $hpLoss;
+                $payload = 'difficulty=' . (int) $data['difficulty'] . '&type=' . (int) $data['type'] . '&died=1&hp=' . $hpLoss
+                         . '&hpa=0' . $tzCtx;
                 $database->addNotice($uid, (int) $data['from'], 0, NTYPE_ADVENTURE_REPORT,
-                    'Hero fell on an adventure', $payload, $now);
+                    'Quest failed: ' . $tzName . ' · hero fell', $payload, $now);
+                $this->saveResult($data['advid'], $payload, (int) mysqli_insert_id($this->db), $now);
 
                 $this->finishAdventure($data['advid']);
                 $processed++;
@@ -505,12 +521,19 @@ class HeroAdventure
             $payload = 'difficulty=' . (int) $data['difficulty']
                      . '&type=' . (int) $data['type'] . '&story=' . $story . '&heal=' . $heal
                      . '&exp=' . $xpGain . '&silver=' . $silver . '&hp=' . $hpLoss
-                     . '&wood=' . $wood . '&clay=' . $clay . '&iron=' . $iron . '&crop=' . $crop;
+                     . '&wood=' . $wood . '&clay=' . $clay . '&iron=' . $iron . '&crop=' . $crop
+                     . '&xpb=' . (int) $exp . '&hpa=' . round($newHealth, 1) . $tzCtx;
             if ($itemId > 0) {
                 $payload .= '&itemid=' . $itemId . '&itemqty=' . $itemQty . '&itemq=' . (int) $quality;
             }
+            // the subject sums the result up, so the report list reads at a glance
+            $tzSum = array('+' . $xpGain . ' XP');
+            if ($heal > 0)   $tzSum[] = '+' . $heal . '% health';
+            if ($hpLoss > 0) $tzSum[] = '-' . $hpLoss . '% health';
+            if ($itemId > 0 && function_exists('heroItemName')) $tzSum[] = strip_tags(heroItemName($itemId));
             $database->addNotice($uid, $toHome, 0, NTYPE_ADVENTURE_REPORT,
-                'Hero returned from an adventure', $payload, $now);
+                'Quest complete: ' . $tzName . ' · ' . implode(', ', $tzSum), $payload, $now);
+            $this->saveResult($data['advid'], $payload, (int) mysqli_insert_id($this->db), $now);
 
             $this->finishAdventure($data['advid']);
             $processed++;
@@ -799,7 +822,10 @@ class HeroAdventure
 
         return array('exp' => $exp, 'silver' => $silver, 'hp' => $hpLoss, 'heal' => $heal,
                      'wood' => $wood, 'clay' => $clay, 'iron' => $iron, 'crop' => $crop,
-                     'itemId' => $itemId, 'itemQty' => $itemQty, 'story' => $story, 'quality' => $quality);
+                     'itemId' => $itemId, 'itemQty' => $itemQty, 'story' => $story, 'quality' => $quality,
+                     // local redesign: what the quest report shows about the trip and the fight
+                     'dist' => $dist, 'x' => (int) ($cSite['x'] ?? 0), 'y' => (int) ($cSite['y'] ?? 0),
+                     'factor' => $prof['factor']);
     }
 
     /** Hero row for the offer list (same columns the arrival roll uses). */
@@ -865,6 +891,40 @@ class HeroAdventure
         return $ok;
     }
 
+    /** Local redesign: keeps the quest's outcome (report payload) for the quest log. */
+    private function saveResult($advid, $payload, $reportId, $time)
+    {
+        $stmt = $this->db->prepare(
+            "UPDATE " . TB_PREFIX . "hero_adventure SET result = ?, report = ?, finished = ? WHERE id = ? LIMIT 1"
+        );
+        $advid = (int) $advid; $reportId = (int) $reportId; $time = (int) $time;
+        $stmt->bind_param('siii', $payload, $reportId, $time, $advid);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    /**
+     * Local redesign: the player's finished quests, newest first, with the
+     * stored outcome parsed into 'data' and whether the report still exists.
+     */
+    public function getLog($uid, $limit = 10)
+    {
+        $uid   = (int) $uid;
+        $limit = max(1, min(50, (int) $limit));
+        $rows  = array();
+        $r = mysqli_query($this->db,
+            "SELECT a.id, a.type, a.difficulty, a.result, a.report, a.finished,
+                    (SELECT COUNT(*) FROM " . TB_PREFIX . "ndata n WHERE n.id = a.report AND n.uid = $uid AND n.del = 0) AS has_report
+               FROM " . TB_PREFIX . "hero_adventure a
+              WHERE a.uid = $uid AND a.status = 2 AND a.result IS NOT NULL
+              ORDER BY a.finished DESC, a.id DESC LIMIT $limit");
+        while ($r && ($row = mysqli_fetch_assoc($r))) {
+            parse_str((string) $row['result'], $row['data']);
+            $rows[] = $row;
+        }
+        return $rows;
+    }
+
     private function finishAdventure($advid)
     {
         $advid = (int) $advid;
@@ -880,7 +940,7 @@ class HeroAdventure
     {
         $uid  = (int) $uid;
         $stmt = $this->db->prepare(
-            "SELECT heroid, uid, unit, wref, level, experience, health, dead, attack, defence
+            "SELECT heroid, uid, unit, name, wref, level, experience, health, dead, attack, defence
                FROM " . TB_PREFIX . "hero WHERE uid = ? AND dead = 0 LIMIT 1"
         );
         $stmt->bind_param('i', $uid);
