@@ -516,6 +516,7 @@ echo $form->getError('agree');
 <p class="og-error"><?php echo REGISTER_CLOSED; ?></p>
 <?php } ?>
 <p class="og-muted">Already have an account? <a href="login.php"><?php echo LOGIN; ?></a></p>
+<p class="og-muted">By registering you agree to our <a href="terms.php">Terms</a> and <a href="privacy.php">Privacy Policy</a>.</p>
 </section>
 <aside class="og-stack">
 	<section class="og-card og-serverinfo">

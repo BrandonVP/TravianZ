@@ -42,7 +42,7 @@ class Mailer
 			"Click the following link in order to activate your account:\n" .
 			SERVER . "activate.php?code=" . $act . "\n\n" .
 			"Greetings,\n" .
-			"Travian administration";
+			SERVER_NAME . " team";
 
 		$headers = "From: " . ADMIN_EMAIL . "\r\n";
 
@@ -84,7 +84,7 @@ class Mailer
 		"Link: " . SERVER . "anmelden.php?id=ref" . $uid . "\n\n" .
 		$text . "\n\n\n" .
 		"Greetings,\n" .
-		"Travian";
+		SERVER_NAME . " team";
 
 	$headers = "From: " . ADMIN_EMAIL . "\r\n";
 
@@ -104,7 +104,7 @@ class Mailer
 
 		$message =
 			"Hello " . $username . "\n\n" .
-			"You have requested a new password for Travian.\n\n" .
+			"You have requested a new password for " . SERVER_NAME . ".\n\n" .
 			"----------------------------\n" .
 			"Name: " . $username . "\n" .
 			"Password: " . $npw . "\n" .
@@ -114,7 +114,7 @@ class Mailer
 			"If you want to change your new password, you can enter a new one in your profile\n" .
 			"on tab \"account\".\n\n" .
 			"In case you did not request a new password you may ignore this email.\n\n" .
-			"Travian";
+			SERVER_NAME . " team";
 
 		$headers = "From: " . ADMIN_EMAIL . "\r\n";
 

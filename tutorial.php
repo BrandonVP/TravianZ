@@ -23,6 +23,17 @@
 use App\Utils\AccessLogger;
 
 include_once("GameEngine/config.php");
+// local (landing cleanup): logged-out visitors go to the landing page; same check as Session::checkLogin()
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    if (PHP_VERSION_ID >= 70300) {
+        session_set_cookie_params(array('lifetime' => 0, 'path' => '/', 'secure' => !empty($_SERVER['HTTPS']), 'httponly' => true, 'samesite' => 'Lax'));
+    }
+    session_start();
+}
+if (empty($_SESSION['username']) || empty($_SESSION['sessid'])) {
+    header('Location: index.php');
+    exit;
+}
 include_once("GameEngine/Database.php");
 require_once __DIR__ . "/GameEngine/Lang/loader.php";
 tz_load_language(LANG);

@@ -20,41 +20,32 @@ AccessLogger::logRequest();
 ?>
 <?php
 // local redesign: logged-out frame (Templates/layout/outgame_*.tpl, css/outgame.css)
-$ogTitle  = 'Impressum';
+$ogTitle  = 'Contact';
 $ogActive = '';
 include("Templates/layout/outgame_top.tpl");
 ?>
 <section class="og-card og-doc">
-            <h1>Impressum</h1>
+            <h1>Contact</h1>
 
             <p class="submenu">
 
-                <b>Project:</b><br/>
-                TravianZ by Shadow<br/><br/>
+                <b>Who runs this game:</b><br/>
+                Empires of Rome is a free, non-commercial browser strategy game run by the Empires of Rome team.<br/><br/>
 
-                <b>Initiator & Lead Developer:</b><br/>
-                Shadow (Catalin Novgorodschi)<br/><br/>
-
-                <b><?php echo PUBLIC_ABOUT_PROJECT; ?></b><br/>
-                Open-source Travian 3.6 engine modernization project focused on performance,
-                stability and gameplay preservation.<br/><br/>
-
-                <b><?php echo PUBLIC_MAIN_GOALS; ?></b><br/>
-                - Preserve classic Travian gameplay<br/>
-                - Refactor legacy codebase<br/>
-                - Improve performance and stability<br/>
-                <?php echo PUBLIC_ADD_TRIBES; ?><br/>
-                - Maintain community-driven development<br/><br/>
+                <b>Contact:</b><br/>
+                <a href="mailto:contact@empiresofrome.com">contact@empiresofrome.com</a><br/>
+                For account questions, data or deletion requests (see our <a href="privacy.php">Privacy Policy</a>) and anything else.<br/><br/>
 
                 <b>Source Code:</b><br/>
-                <a href="https://github.com/Shadowss/TravianZ" target="_blank">
-                    https://github.com/Shadowss/TravianZ
+                Built on the open-source TravianZ engine, licensed under the GNU GPLv3.<br/>
+                <a href="https://github.com/BrandonVP/TravianZ" target="_blank" rel="noopener">
+                    https://github.com/BrandonVP/TravianZ
                 </a><br/><br/>
 
                 <b>Disclaimer:</b><br/>
                 <?php echo PUBLIC_UNOFFICIAL_PROJECT; ?><br/><br/>
 
-                © 2010-<?php echo date('Y'); ?> TravianZ Project
+                &copy; <?php echo date('Y'); ?> Empires of Rome
 
             </p>
 

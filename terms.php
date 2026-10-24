@@ -75,9 +75,9 @@ include("Templates/layout/outgame_top.tpl");
 
                 <h3 class="pop popgreen bold">5. Intellectual Property</h3>
                 <p>
-                    Travian® is a registered trademark of Travian Games GmbH.
+                    All trademarks mentioned belong to their respective owners.
                     <?php echo PUBLIC_TERMS_NO_AFFILIATION; ?>
-                    All custom code and modifications belong to TravianZ by Shadow.
+                    The game engine is open-source software licensed under the GNU GPLv3; original artwork and content of Empires of Rome belong to the operators of Empires of Rome.
                 </p>
 
                 <br/>

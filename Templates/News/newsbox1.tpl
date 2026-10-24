@@ -1,4 +1,4 @@
-<h5><img src="img/en/t2/newsbox1.gif" alt="<?php echo EDIT_NEWSBOX1; ?>"></h5>
+<h5>Server info</h5>
 
 <?php
 /**

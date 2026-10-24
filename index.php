@@ -66,10 +66,10 @@ $online = $ogCount(" AND timestamp > " . (time() - 60 * 10));
 
 // ---- screenshots: thumbnail, full picture, title + text ----
 $ogShots = [];
-foreach ([[1, 1], [2, 2], [4, 3], [3, 4], [5, 5], [7, 6], [8, 7]] as $s) {
+foreach ([[1, 1], [2, 2], [3, 1], [4, 4]] as $s) {
 	$ogShots[] = [
-		'thumb' => 'img/un/s/s' . $s[0] . 's.jpg',
-		'img'   => 'img/en/s/s' . $s[0] . '.png',
+		'thumb' => 'img/eor/s' . $s[0] . 's.jpg',
+		'img'   => 'img/eor/s' . $s[0] . '.jpg',
 		'hl'    => $lang['screenshots']['title' . $s[1]] ?? '',
 		'desc'  => $lang['screenshots']['desc' . $s[1]] ?? '',
 	];
@@ -79,15 +79,15 @@ foreach ([[1, 1], [2, 2], [4, 3], [3, 4], [5, 5], [7, 6], [8, 7]] as $s) {
 $ogTitle  = '';
 $ogActive = 'home';
 include("Templates/layout/outgame_top.tpl");
-$ogReg = $lang['register'] ?? 'Register';
+$ogReg = REG_OPEN ? ($lang['register'] ?? 'Register') : 'Coming soon';
 ?>
 <div class="og-hero">
-	<img class="og-hero-art" src="img/tz/landing.jpg" alt="" />
+	<img class="og-hero-art" src="img/eor/landing.jpg" alt="" />
 	<div class="og-hero-title">
 		<h1><?php echo defined('TZ_TRAVIANZ') ? TZ_TRAVIANZ : 'TravianZ'; ?></h1>
 		<p>Free browser strategy game - build, trade and conquer</p>
 	</div>
-	<a class="og-hero-sign" href="anmelden.php"><?php echo $ogReg; ?><small>Free to play</small></a>
+	<a class="og-hero-sign" href="anmelden.php"><?php echo $ogReg; ?><small><?php echo REG_OPEN ? 'Free to play' : 'Registration closed'; ?></small></a>
 </div>
 
 <div class="og-grid">
@@ -104,7 +104,6 @@ $ogReg = $lang['register'] ?? 'Register';
 			<div class="og-btn-row">
 				<a class="og-btn og-btn-gold" href="anmelden.php"><?php echo $ogReg; ?></a>
 				<a class="og-btn" href="login.php"><?php echo LOGIN; ?></a>
-				<a class="og-btn" href="anleitung.php"><?php echo $lang['index'][0][2]; ?></a>
 			</div>
 		</section>
 
