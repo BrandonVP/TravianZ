@@ -1,10 +1,15 @@
 ## Local (Empires of Rome): behind Cloudflare, Apache only sees plain http.
-## Mark requests the visitor made over https as HTTPS so PHP sets the Secure
-## flag on session cookies (Session.php checks $_SERVER['HTTPS']). Direct LAN
-## access over http has no such header and keeps working.
-<IfModule mod_setenvif.c>
-	SetEnvIf X-Forwarded-Proto "^https$" HTTPS=on
-</IfModule>
+## A request that a trusted proxy (same list as IP_TRUSTED_PROXIES in
+## config.php: the Docker network the tunnel comes from, and the NAS) marks
+## as https is treated as HTTPS, so PHP sets the Secure flag on session
+## cookies (Session.php and Admin/admin.php check $_SERVER['HTTPS']). The
+## header is ignored from anyone else; direct LAN access over http still works.
+<If "%{HTTP:X-Forwarded-Proto} == 'https' && (-R '172.16.0.0/12' || -R '192.168.68.205')">
+	SetEnv HTTPS on
+	<IfModule mod_php.c>
+		php_flag session.cookie_secure on
+	</IfModule>
+</If>
 
 ## Session cookie defaults for every page. Many pages call session_start()
 ## themselves, so the flags set in Session.php did not always apply and the
@@ -13,9 +18,6 @@
 	php_flag session.cookie_httponly on
 	php_value session.cookie_samesite Lax
 	php_flag session.use_strict_mode on
-	<If "%{HTTP:X-Forwarded-Proto} == 'https'">
-		php_flag session.cookie_secure on
-	</If>
 </IfModule>
 
 <Files "*.tpl">
